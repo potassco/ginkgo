@@ -4,7 +4,7 @@
 
 `ginkgo` proceeds in a four-step approach:
 
-1. Conflict constraints are extracted while solving a logic program with xclasp, a variant of clasp extended with facilities for logging learned constraints.
+1. Conflict constraints are extracted while solving a logic program with [`xclasp`](https://github.com/potassco/xclasp), a variant of [`clasp`](https://github.com/potassco/clasp) extended with facilities for logging learned constraints.
 1. The learned constraints are generalized by abstraction over the time domain, which results in candidate properties.
 1. The candidate properties are validated, using an induction-based proof method or a simpler, state-wise method.
 1. Valid generalized constraints can finally be reused via generalized constraint feedback, that is, by enriching logic programs with the newly generalized constraints.
@@ -12,7 +12,7 @@
 ## Installation
 
 `ginkgo` is built with `cmake` and requires a compiler capable of C++14 as well as `boost` and `jsoncpp`.
-`ginkgo` requires `clasp`, `xclasp`, and `gringo` binaries at runtime.
+`ginkgo` requires [`clasp`](https://github.com/potassco/clasp), [`xclasp`](https://github.com/potassco/xclasp), and [`gringo`](https://github.com/potassco/clingo) binaries at runtime.
 The optional graphical output requires `GTKmm`.
 
 ## Usage
