@@ -1,4 +1,4 @@
-# Ginkgo—Tools for Generalizing Learned Constraints
+# ginkgo—Tools for Generalizing Learned Constraints
 
 `ginkgo` uses ASP techniques to automatically generalize learned conflict constraints to make them applicable to other PDDL problem instances.
 
