@@ -7,7 +7,7 @@
 1. Conflict constraints are extracted while solving a logic program with [`xclasp`](https://github.com/potassco/xclasp), a variant of [`clasp`](https://github.com/potassco/clasp) extended with facilities for logging learned constraints.
 1. The learned constraints are generalized by abstraction over the time domain, which results in candidate properties.
 1. The candidate properties are validated, using an induction-based proof method or a simpler, state-wise method.
-1. Valid generalized constraints can finally be reused via generalized constraint feedback, that is, by enriching logic programs with the newly generalized constraints.
+1. Valid generalized constraints can finally be reused via *generalized constraint feedback*, that is, by enriching logic programs with the newly generalized constraints.
 
 ## Literature
 
