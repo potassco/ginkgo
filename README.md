@@ -9,6 +9,10 @@
 1. The candidate properties are validated, using an induction-based proof method or a simpler, state-wise method.
 1. Valid generalized constraints can finally be reused via generalized constraint feedback, that is, by enriching logic programs with the newly generalized constraints.
 
+## Literature
+
+* Patrick Lühne, 2015. [Generalizing Learned Knowledge in Answer Set Solving](https://www.luehne.de/theses/generalizing-learned-knowledge-in-answer-set-solving.pdf). M.Sc. thesis, Hasso Plattner Institute, Potsdam
+
 ## Installation
 
 `ginkgo` is built with `cmake` and requires a compiler capable of C++14 as well as `boost` and `jsoncpp`.
