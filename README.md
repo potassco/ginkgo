@@ -19,7 +19,7 @@ The optional graphical output requires `GTKmm`.
 
 `ginkgo` consists of the following tools:
 
-* `ginkgo-produce` accepts a PDDL instance and domain as input (as ASP facts, such as obtained with [plasp](http://potassco.sourceforge.net/labs.html#plasp)) and generalizes a specified number of learned constraints.
+* `ginkgo-produce` accepts a PDDL instance and domain as input (as ASP facts, such as obtained with [`plasp`](http://potassco.sourceforge.net/labs.html#plasp)) and generalizes a specified number of learned constraints.
 * `ginkgo-consume` performs *generalized constraint feedback*. That is, a given is solved again but enriched with a specific number of constraints previously generalized with `ginkgo-produce`. `ginkgo-consume` was primarily implemented for benchmarking and demonstration purposes.
 * `ginkgo-analyze` uses the statistical output of the above two tools and aggregates the results for easier evaluation.
 * `ginkgo-evaluate` displays a graphical evaluation of the statistical analyses.
