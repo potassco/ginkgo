@@ -13,7 +13,7 @@
 
 * Patrick Lühne, 2015. [*Generalizing Learned Knowledge in Answer Set Solving*](https://www.luehne.de/theses/generalizing-learned-knowledge-in-answer-set-solving.pdf). M.Sc. Thesis, Hasso Plattner Institute, Potsdam
 
-## Installation
+## Building and Installation
 
 `ginkgo` is built with `cmake` and requires a compiler capable of C++14 as well as `boost` and `jsoncpp`.
 `ginkgo` requires [`clasp`](https://github.com/potassco/clasp), [`xclasp`](https://github.com/potassco/xclasp), and [`gringo`](https://github.com/potassco/clingo) binaries at runtime.
