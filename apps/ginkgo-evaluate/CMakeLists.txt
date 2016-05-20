@@ -3,7 +3,7 @@ set(target ginkgo-evaluate)
 file(GLOB core_sources "*.cpp")
 file(GLOB core_headers "*.h")
 
-INCLUDE_DIRECTORIES(
+include_directories(
 	${Boost_INCLUDE_DIRS}
 	${GTKmm_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIR}
