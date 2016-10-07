@@ -28,7 +28,7 @@ script:
   - echo "CC = 'gcc-5'" >> build/debug.py
   - echo "CXXFLAGS = ['-std=c++11', '-O2', '-W', '-Wall']" >> build/debug.py
   - echo "LINKFLAGS = ['-std=c++11']" >> build/debug.py
-  - scons -j3
+  - scons -j3 libclingo
   - cd ../..
   - git submodule init
   - git submodule update
