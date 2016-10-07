@@ -15,11 +15,23 @@ matrix:
             - libboost-iostreams1.55-dev
             - libboost-system1.55-dev
             - libboost-filesystem1.55-dev
+            - libjsoncpp-dev
       env: COMPILER=g++-5
 script:
+  - mkdir dependencies
+  - cd dependencies
+  - git clone git@github.com:potassco/clingo.git
+  - cd clingo
+  - mkdir build
+  - echo "CXX = 'g++-5'" > build/debug.py
+  - echo "CC = 'gcc-5'" >> build/debug.py
+  - echo "CXXFLAGS = ['-std=c++11', '-O2', '-W', '-Wall']" >> build/debug.py
+  - echo "LINKFLAGS = ['-std=c++11']" >> build/debug.py
+  - scons -j3
+  - cd ..
   - git submodule init
   - git submodule update
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$COMPILER
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$COMPILER -DClingo_LIBRARY=dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=dependencies/clingo/libgringo
   - make -j3 && make -j3 run-tests
