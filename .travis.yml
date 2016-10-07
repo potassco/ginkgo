@@ -20,7 +20,7 @@ matrix:
 script:
   - mkdir dependencies
   - cd dependencies
-  - git clone git@github.com:potassco/clingo.git
+  - git clone https://github.com/potassco/clingo.git
   - cd clingo
   - mkdir build
   - echo "CXX = 'g++-5'" > build/debug.py
