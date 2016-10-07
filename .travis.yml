@@ -34,5 +34,5 @@ script:
   - git submodule update
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$COMPILER -DClingo_LIBRARY=dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=dependencies/clingo/libgringo
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$COMPILER -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo
   - make -j3 && make -j3 run-tests
