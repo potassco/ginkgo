@@ -6,6 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 find_package(Boost 1.55.0 COMPONENTS program_options iostreams system filesystem REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(JsonCpp REQUIRED)
+find_package(Clingo REQUIRED)
 
 if(BUILD_GTK3_GUI_TOOLS)
 	pkg_check_modules(GTKmm REQUIRED gtkmm-3.0>=3.12.0)

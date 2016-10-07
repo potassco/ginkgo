@@ -5,6 +5,7 @@ file(GLOB core_headers "*.h")
 
 include_directories(
 	${Boost_INCLUDE_DIRS}
+	${Clingo_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIR}
 	${PROJECT_SOURCE_DIR}/include
 )
@@ -16,6 +17,7 @@ set(sources
 
 set(libraries
 	${Boost_LIBRARIES}
+	${Clingo_LIBRARIES}
 	${JSONCPP_LIBRARY}
 	ginkgo
 )

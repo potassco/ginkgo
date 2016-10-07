@@ -29,6 +29,7 @@ file(GLOB utils_headers "../include/ginkgo/utils/*.h")
 
 include_directories(
 	${Boost_INCLUDE_DIRS}
+	${Clingo_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIR}
 )
 
@@ -88,6 +89,7 @@ endif(BUILD_GTK3_GUI_TOOLS)
 
 set(libraries
 	${Boost_LIBRARIES}
+	${Clingo_LIBRARIES}
 	${JSONCPP_LIBRARY}
 	pthread
 )
