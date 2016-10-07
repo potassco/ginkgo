@@ -3,7 +3,7 @@ project(ginkgo CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
-option(BUILD_GTK3_GUI_TOOLS "Build GTK3-based GUI tools to render benchmark results" ON)
+option(BUILD_GTK3_GUI_TOOLS "Build GTK3-based GUI tools to render benchmark results" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 
 find_package(Boost 1.55.0 COMPONENTS program_options iostreams system filesystem REQUIRED)
