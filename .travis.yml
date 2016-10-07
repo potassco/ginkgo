@@ -16,6 +16,7 @@ matrix:
             - libboost-system1.55-dev
             - libboost-filesystem1.55-dev
             - libjsoncpp-dev
+            - re2c
       env: COMPILER=g++-5
 script:
   - mkdir dependencies
