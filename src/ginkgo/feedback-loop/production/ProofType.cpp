@@ -19,9 +19,9 @@ namespace production
 
 using ProofTypeNames = boost::bimap<ProofType, std::string>;
 static ProofTypeNames proofTypeNames = boost::assign::list_of<ProofTypeNames::relation>
-	(ProofType::StateWiseProof, "StateWiseProof")
-	(ProofType::InductionBaseProof, "InductionBaseProof")
-	(ProofType::InductionStepProof, "InductionStepProof");
+	(ProofType::StateWise, "StateWise")
+	(ProofType::InductiveBase, "InductiveBase")
+	(ProofType::InductiveStep, "InductiveStep");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

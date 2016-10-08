@@ -19,9 +19,9 @@ namespace production
 enum class ProofType
 {
 	Unknown,
-	StateWiseProof,
-	InductionBaseProof,
-	InductionStepProof
+	StateWise,
+	InductiveBase,
+	InductiveStep
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

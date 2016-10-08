@@ -84,7 +84,7 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 		{
 			const auto &event = std::get<1>(timedEvent);
 
-			if (event.proofType == production::ProofType::StateWiseProof || event.proofType == production::ProofType::InductionBaseProof)
+			if (event.proofType == production::ProofType::StateWise || event.proofType == production::ProofType::InductiveBase)
 			{
 				if (event.purpose == purposeProve)
 				{
@@ -104,7 +104,7 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 					productionAnalysis.minimizationProofs++;
 			}
 
-			if ((event.proofType == production::ProofType::StateWiseProof || event.proofType == production::ProofType::InductionStepProof)
+			if ((event.proofType == production::ProofType::StateWise || event.proofType == production::ProofType::InductiveStep)
 				&& event.proofResult == production::ProofResult::Proven)
 			{
 				if (event.purpose == purposeProve)

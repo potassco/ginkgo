@@ -819,7 +819,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 		{
 			EventHypothesisTested event =
 			{
-				ProofType::InductionBaseProof,
+				ProofType::InductiveBase,
 				purpose,
 				generalizedHypothesis.degree(),
 				generalizedHypothesis.numberOfLiterals(),
@@ -911,7 +911,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 		{
 			EventHypothesisTested event =
 			{
-				ProofType::InductionStepProof,
+				ProofType::InductiveStep,
 				purpose,
 				generalizedHypothesis.degree(),
 				generalizedHypothesis.numberOfLiterals(),
