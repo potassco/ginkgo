@@ -54,7 +54,6 @@ class FeedbackLoop
 		std::unique_ptr<Configuration<Plain>> m_configuration;
 
 		AsyncProcess m_gringo;
-		AsyncProcess m_clasp;
 		AsyncProcess m_xclasp;
 
 		std::condition_variable m_pauseCondition;

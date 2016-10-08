@@ -117,7 +117,6 @@ FeedbackLoop::FeedbackLoop(std::unique_ptr<Environment> environment, std::unique
 :	m_environment(std::move(environment)),
 	m_configuration(std::move(configuration)),
 	m_gringo(m_environment->gringoConfiguration()),
-	m_clasp(m_environment->claspConfiguration()),
 	m_xclasp(m_environment->xclaspConfiguration()),
 	m_feedback(m_environment->symbolTable()),
 	m_learnedConstraints(m_environment->symbolTable())

@@ -22,7 +22,6 @@ int main(int argc, char **argv)
 		("help,h", "display this help message")
 		("input,i", po::value<std::vector<std::string>>(), "Instance and domain files (both required)")
 		("output,o", po::value<std::string>(), "Output prefix of the result files")
-		("clasp,c", po::value<std::string>(), "clasp binary (unmodified)")
 		("xclasp,x", po::value<std::string>(), "xclasp binary (clasp with extensions for knowledge extraction)")
 		("gringo,g", po::value<std::string>(), "gringo binary")
 		("horizon", po::value<size_t>(), "Horizon (maximum time steps)")
@@ -77,7 +76,6 @@ int main(int argc, char **argv)
 
 	checkVariable("input", "No instance encoding specified");
 	checkVariable("output", "No output prefix specified");
-	checkVariable("clasp", "clasp binary unspecified");
 	checkVariable("xclasp", "xclasp binary unspecified");
 	checkVariable("gringo", "gringo binary unspecified");
 	checkVariable("horizon", "Horizon (maximum time steps) unspecified");
@@ -102,12 +100,6 @@ int main(int argc, char **argv)
 	}
 
 	// Feedback loop environment
-	ginkgo::AsyncProcess::Configuration claspConfiguration =
-	{
-		variablesMap["clasp"].as<std::string>(),
-		{"--quiet=2", "--time-limit=600", "--stats=2", "--outf=2"}
-	};
-
 	ginkgo::AsyncProcess::Configuration xclaspConfiguration =
 	{
 		variablesMap["xclasp"].as<std::string>(),
@@ -123,7 +115,6 @@ int main(int argc, char **argv)
 	};
 
 	auto environment = std::make_unique<ginkgo::feedbackLoop::production::Environment>(variablesMap["output"].as<std::string>());
-	environment->setClaspConfiguration(claspConfiguration);
 	environment->setXclaspConfiguration(xclaspConfiguration);
 	environment->setGringoConfiguration(gringoConfiguration);
 	environment->setLogLevel(variablesMap["log-level"].as<ginkgo::feedbackLoop::production::LogLevel>());

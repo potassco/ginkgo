@@ -45,20 +45,6 @@ std::ofstream &Environment::statisticsStream()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Environment::setClaspConfiguration(AsyncProcess::Configuration claspConfiguration)
-{
-	m_claspConfiguration = claspConfiguration;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const AsyncProcess::Configuration &Environment::claspConfiguration() const
-{
-	return m_claspConfiguration;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void Environment::setXclaspConfiguration(AsyncProcess::Configuration xclaspConfiguration)
 {
 	m_xclaspConfiguration = xclaspConfiguration;

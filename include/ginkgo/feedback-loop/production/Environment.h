@@ -38,9 +38,6 @@ class Environment
 		std::ofstream &generalizedConstraintsStream();
 		std::ofstream &statisticsStream();
 
-		void setClaspConfiguration(AsyncProcess::Configuration claspConfiguration);
-		const AsyncProcess::Configuration &claspConfiguration() const;
-
 		void setXclaspConfiguration(AsyncProcess::Configuration XclaspConfiguration);
 		const AsyncProcess::Configuration &xclaspConfiguration() const;
 
