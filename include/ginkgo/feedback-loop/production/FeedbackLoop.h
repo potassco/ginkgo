@@ -34,8 +34,8 @@ class FeedbackLoop
 		static const std::string FluentClosureEncoding;
 		// Check whether the hypothesis holds
 		static const std::string StateWiseProofEncoding;
-		static const std::string InductionProofBaseEncoding;
-		static const std::string InductionProofStepEncoding;
+		static const std::string InductiveProofBaseEncoding;
+		static const std::string InductiveProofStepEncoding;
 
 	public:
 		FeedbackLoop(std::unique_ptr<Environment> environment, std::unique_ptr<Configuration<Plain>> configuration);

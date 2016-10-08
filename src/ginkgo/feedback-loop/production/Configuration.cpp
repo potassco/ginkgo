@@ -21,7 +21,7 @@ namespace production
 Configuration<Plain>::Configuration()
 {
 	horizon = 0;
-	proofMethod = ProofMethod::StateWiseProof;
+	proofMethod = ProofMethod::StateWise;
 	testingPolicy = TestingPolicy::FindFirst;
 	minimizationStrategy = MinimizationStrategy::NoMinimization;
 	fluentClosureUsage = FluentClosureUsage::NoFluentClosure;

@@ -73,7 +73,7 @@ const std::string FeedbackLoop::StateWiseProofEncoding =
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::string FeedbackLoop::InductionProofBaseEncoding =
+const std::string FeedbackLoop::InductiveProofBaseEncoding =
 	// Degree of the hypothesis
 	"time(0..degree).\n"
 	// Establish the initial state
@@ -92,7 +92,7 @@ const std::string FeedbackLoop::InductionProofBaseEncoding =
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::string FeedbackLoop::InductionProofStepEncoding =
+const std::string FeedbackLoop::InductiveProofStepEncoding =
 	// Degree of the hypothesis (+ 1)
 	"time(0..degree).\n"
 	// Perform actions
@@ -261,10 +261,10 @@ void FeedbackLoop::run()
 
 			switch (m_configuration->proofMethod)
 			{
-				case ProofMethod::StateWiseProof:
+				case ProofMethod::StateWise:
 					proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Prove);
 					break;
-				case ProofMethod::InductionProof:
+				case ProofMethod::Inductive:
 					proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Prove);
 					break;
 				default:
@@ -593,10 +593,10 @@ GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstrai
 
 		switch (m_configuration->proofMethod)
 		{
-			case ProofMethod::StateWiseProof:
+			case ProofMethod::StateWise:
 				proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Minimize);
 				break;
-			case ProofMethod::InductionProof:
+			case ProofMethod::Inductive:
 				proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Minimize);
 				break;
 			default:
@@ -733,7 +733,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GeneralizedConstraint &g
 	{
 		EventHypothesisTested event =
 		{
-			ProofType::StateWiseProof,
+			ProofType::StateWise,
 			purpose,
 			generalizedHypothesis.degree(),
 			generalizedHypothesis.numberOfLiterals(),
@@ -769,7 +769,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 
 		inductionBaseEncoding
 			<< std::endl
-			<< InductionProofBaseEncoding << std::endl;
+			<< InductiveProofBaseEncoding << std::endl;
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
@@ -861,7 +861,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 
 		inductionStepEncoding
 			<< std::endl
-			<< InductionProofStepEncoding << std::endl;
+			<< InductiveProofStepEncoding << std::endl;
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{

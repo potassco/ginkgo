@@ -19,8 +19,8 @@ namespace production
 
 using ProofMethodNames = boost::bimap<ProofMethod, std::string>;
 static ProofMethodNames proofMethodNames = boost::assign::list_of<ProofMethodNames::relation>
-	(ProofMethod::StateWiseProof, "StateWiseProof")
-	(ProofMethod::InductionProof, "InductionProof");
+	(ProofMethod::StateWise, "StateWise")
+	(ProofMethod::Inductive, "Inductive");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
