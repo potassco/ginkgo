@@ -1,8 +1,8 @@
 #ifndef __FEEDBACK_LOOP__PRODUCTION__FEEDBACK_LOOP_H
 #define __FEEDBACK_LOOP__PRODUCTION__FEEDBACK_LOOP_H
 
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
 
 #include <ginkgo/feedback-loop/production/Environment.h>
 #include <ginkgo/feedback-loop/production/ProofResult.h>

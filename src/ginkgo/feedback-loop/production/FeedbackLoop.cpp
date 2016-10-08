@@ -4,6 +4,8 @@
 #include <limits>
 #include <thread>
 
+#include <clingo.hh>
+
 #include <json/json.h>
 
 #include <ginkgo/utils/TextFile.h>
@@ -692,60 +694,23 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GeneralizedConstraint &g
 	proofEncoding.clear();
 	proofEncoding.seekg(0, std::ios::beg);
 
-	bool groundingTimeout = false;
-	bool solvingTimeout = false;
+	// TODO: add warning/error message handler
+	// TODO: handle grounding/solving timeouts
+	// TODO: make timeout configurable
+	// TODO: record statistics, including grounding time
+	Clingo::Control clingoControl{{"--stats=2"}};
+	clingoControl.add("base", {}, proofEncoding.str().c_str());
+	clingoControl.ground({{"base", {}}});
 
-	const auto groundingStartTime = std::chrono::high_resolution_clock::now();
-	m_gringo.run(proofEncoding, m_configuration->hypothesisTestingTimeout, groundingTimeout);
-	m_gringo.join();
-	const auto groundingFinishedTime = std::chrono::high_resolution_clock::now();
+	auto satisfiable = Satisfiability::Unsatisfiable;
 
-	auto satisfiable = Satisfiability::Unknown;
+	for (auto model : clingoControl.solve_iteratively())
+		satisfiable = Satisfiability::Satisfiable;
 
-	if (!groundingTimeout)
-	{
-		BOOST_ASSERT(m_gringo.stdout());
-
-		if (m_gringo.stderr() && parseForWarnings(*m_gringo.stderr()))
-			std::cout << "[Warn ] Warning while grounding: " << m_gringo.stderr()->rdbuf() << std::endl;
-
-		m_clasp.run(*m_gringo.stdout(), m_configuration->hypothesisTestingTimeout, solvingTimeout);
-		m_clasp.join();
-
-		BOOST_ASSERT(m_clasp.stdout());
-		satisfiable = parseForSatisfiability(*m_clasp.stdout());
-	}
-
-	auto proofResult = ProofResult::Unknown;
-
-	if (groundingTimeout)
-		proofResult = ProofResult::GroundingTimeout;
-	else if (solvingTimeout)
-		proofResult = ProofResult::SolvingTimeout;
-	else if (satisfiable == Satisfiability::Unsatisfiable)
-		proofResult = ProofResult::Proven;
-	else if (satisfiable == Satisfiability::Satisfiable)
-		proofResult = ProofResult::Unproven;
+	if (satisfiable == Satisfiability::Unsatisfiable)
+		return ProofResult::Proven;
 	else
-		std::cout << "[Warn ] Proof result is unknown" << std::endl;
-
-	// Statistics
-	{
-		EventHypothesisTested event =
-		{
-			ProofType::StateWise,
-			purpose,
-			generalizedHypothesis.degree(),
-			generalizedHypothesis.numberOfLiterals(),
-			proofResult,
-			std::chrono::duration<double>(groundingFinishedTime - groundingStartTime).count()
-		};
-		*m_clasp.stdout() >> event.claspJSONOutput;
-
-		m_events.notifyHypothesisTested(event);
-	}
-
-	return proofResult;
+		return ProofResult::Unproven;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -759,77 +724,46 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 	// Induction Base
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	{
-		std::stringstream inductionBaseEncoding;
-		inductionBaseEncoding
+		std::stringstream proofEncoding;
+		proofEncoding
 			<< m_program.rdbuf()
 			<< "#const degree=" << generalizedHypothesis.degree() << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		generalizedHypothesis.print(inductionBaseEncoding);
+		generalizedHypothesis.print(proofEncoding);
 
-		inductionBaseEncoding
+		proofEncoding
 			<< std::endl
 			<< InductiveProofBaseEncoding << std::endl;
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			GeneralizedConstraint(constraint).print(inductionBaseEncoding);
-			inductionBaseEncoding << std::endl;
+			GeneralizedConstraint(constraint).print(proofEncoding);
+			proofEncoding << std::endl;
 		});
 
-		inductionBaseEncoding.clear();
-		inductionBaseEncoding.seekg(0, std::ios::beg);
+		proofEncoding.clear();
+		proofEncoding.seekg(0, std::ios::beg);
 
-		bool groundingTimeout = false;
-		bool solvingTimeout = false;
+		// TODO: add warning/error message handler
+		// TODO: handle grounding/solving timeouts
+		// TODO: make timeout configurable
+		// TODO: record statistics, including grounding time
+		Clingo::Control clingoControl{{"--stats=2"}};
+		clingoControl.add("base", {}, proofEncoding.str().c_str());
+		clingoControl.ground({{"base", {}}});
 
-		const auto groundingStartTime = std::chrono::high_resolution_clock::now();
-		m_gringo.run(inductionBaseEncoding, m_configuration->hypothesisTestingTimeout, groundingTimeout);
-		m_gringo.join();
-		const auto groundingFinishedTime = std::chrono::high_resolution_clock::now();
+		auto satisfiable = Satisfiability::Unsatisfiable;
 
-		auto satisfiable = Satisfiability::Unknown;
+		for (auto model : clingoControl.solve_iteratively())
+			satisfiable = Satisfiability::Satisfiable;
 
-		if (!groundingTimeout)
-		{
-			BOOST_ASSERT(m_gringo.stdout());
+		ProofResult proofResult = ProofResult::Unknown;
 
-			if (m_gringo.stderr() && parseForWarnings(*m_gringo.stderr()))
-				std::cout << "[Warn ] Warning while grounding: " << m_gringo.stderr()->rdbuf() << std::endl;
-
-			m_clasp.run(*m_gringo.stdout(), m_configuration->hypothesisTestingTimeout, solvingTimeout);
-			m_clasp.join();
-
-			BOOST_ASSERT(m_clasp.stdout());
-			satisfiable = parseForSatisfiability(*m_clasp.stdout());
-		}
-
-		auto proofResult = ProofResult::Unknown;
-
-		if (groundingTimeout)
-			proofResult = ProofResult::GroundingTimeout;
-		else if (solvingTimeout)
-			proofResult = ProofResult::SolvingTimeout;
-		else if (satisfiable == Satisfiability::Unsatisfiable)
+		if (satisfiable == Satisfiability::Unsatisfiable)
 			proofResult = ProofResult::Proven;
 		else
 			proofResult = ProofResult::Unproven;
-
-		// Statistics
-		{
-			EventHypothesisTested event =
-			{
-				ProofType::InductiveBase,
-				purpose,
-				generalizedHypothesis.degree(),
-				generalizedHypothesis.numberOfLiterals(),
-				proofResult,
-				std::chrono::duration<double>(groundingFinishedTime - groundingStartTime).count()
-			};
-			*m_clasp.stdout() >> event.claspJSONOutput;
-
-			m_events.notifyHypothesisTested(event);
-		}
 
 		if (proofResult == ProofResult::Unproven
 			|| proofResult == ProofResult::GroundingTimeout
@@ -844,84 +778,53 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 	// Induction Step
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	{
-		std::stringstream inductionStepEncoding;
-		inductionStepEncoding
+		std::stringstream proofEncoding;
+		proofEncoding
 			<< m_program.rdbuf();
 
 		if (m_configuration->fluentClosureUsage == FluentClosureUsage::UseFluentClosure)
-			inductionStepEncoding << FluentClosureEncoding;
+			proofEncoding << FluentClosureEncoding;
 		else
-			inductionStepEncoding << StateGeneratorEncoding;
+			proofEncoding << StateGeneratorEncoding;
 
-		inductionStepEncoding
+		proofEncoding
 			<< "#const degree=" << (generalizedHypothesis.degree() + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		generalizedHypothesis.print(inductionStepEncoding);
+		generalizedHypothesis.print(proofEncoding);
 
-		inductionStepEncoding
+		proofEncoding
 			<< std::endl
 			<< InductiveProofStepEncoding << std::endl;
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			GeneralizedConstraint(constraint).print(inductionStepEncoding);
-			inductionStepEncoding << std::endl;
+			GeneralizedConstraint(constraint).print(proofEncoding);
+			proofEncoding << std::endl;
 		});
 
-		inductionStepEncoding.clear();
-		inductionStepEncoding.seekg(0, std::ios::beg);
+		proofEncoding.clear();
+		proofEncoding.seekg(0, std::ios::beg);
 
-		bool groundingTimeout = false;
-		bool solvingTimeout = false;
+		// TODO: add warning/error message handler
+		// TODO: handle grounding/solving timeouts
+		// TODO: make timeout configurable
+		// TODO: record statistics, including grounding time
+		Clingo::Control clingoControl{{"--stats=2"}};
+		clingoControl.add("base", {}, proofEncoding.str().c_str());
+		clingoControl.ground({{"base", {}}});
 
-		const auto groundingStartTime = std::chrono::high_resolution_clock::now();
-		m_gringo.run(inductionStepEncoding, m_configuration->hypothesisTestingTimeout, groundingTimeout);
-		m_gringo.join();
-		const auto groundingFinishedTime = std::chrono::high_resolution_clock::now();
+		auto satisfiable = Satisfiability::Unsatisfiable;
 
-		auto satisfiable = Satisfiability::Unknown;
+		for (auto model : clingoControl.solve_iteratively())
+			satisfiable = Satisfiability::Satisfiable;
 
-		if (!groundingTimeout)
-		{
-			BOOST_ASSERT(m_gringo.stdout());
+		ProofResult proofResult = ProofResult::Unknown;
 
-			if (m_gringo.stderr() && parseForWarnings(*m_gringo.stderr()))
-				std::cout << "[Warn ] Warning while grounding: " << m_gringo.stderr()->rdbuf() << std::endl;
-
-			m_clasp.run(*m_gringo.stdout(), m_configuration->hypothesisTestingTimeout, solvingTimeout);
-			m_clasp.join();
-
-			BOOST_ASSERT(m_clasp.stdout());
-			satisfiable = parseForSatisfiability(*m_clasp.stdout());
-		}
-
-		auto proofResult = ProofResult::Unknown;
-
-		if (groundingTimeout)
-			proofResult = ProofResult::GroundingTimeout;
-		else if (solvingTimeout)
-			proofResult = ProofResult::SolvingTimeout;
-		else if (satisfiable == Satisfiability::Unsatisfiable)
+		if (satisfiable == Satisfiability::Unsatisfiable)
 			proofResult = ProofResult::Proven;
 		else
 			proofResult = ProofResult::Unproven;
-
-		// Statistics
-		{
-			EventHypothesisTested event =
-			{
-				ProofType::InductiveStep,
-				purpose,
-				generalizedHypothesis.degree(),
-				generalizedHypothesis.numberOfLiterals(),
-				proofResult,
-				std::chrono::duration<double>(groundingFinishedTime - groundingStartTime).count()
-			};
-			*m_clasp.stdout() >> event.claspJSONOutput;
-
-			m_events.notifyHypothesisTested(event);
-		}
 
 		return proofResult;
 	}
