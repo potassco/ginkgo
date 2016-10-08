@@ -5,7 +5,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Duplicate literals in constraints are eliminated", "[constraints]")
+TEST_CASE("[constraints] Duplicate literals in constraints are eliminated", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- a, b, b, a, b, a(b(c(d(e)))), a(b(c(d(e)))), a(b(c(d(e)))).", symbolTable);
@@ -17,7 +17,7 @@ TEST_CASE("Duplicate literals in constraints are eliminated", "[constraints]")
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("The time arguments of temporal literals are parsed correctly", "[constraints]")
+TEST_CASE("[constraints] The time arguments of temporal literals are parsed correctly", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- holds(a, 0), holds(b, 0), holds(c, 0).", symbolTable);
@@ -33,7 +33,7 @@ TEST_CASE("The time arguments of temporal literals are parsed correctly", "[cons
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Literal identifiers are collected correctly", "[constraints]")
+TEST_CASE("[constraints] Literal identifiers are collected correctly", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- a, b, c, terminal, holds(f, 7), not apply(t, 1).", symbolTable);
@@ -49,7 +49,7 @@ TEST_CASE("Literal identifiers are collected correctly", "[constraints]")
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Constraints are correctly generalized and subsumed", "[constraints]")
+TEST_CASE("[constraints] Constraints are correctly generalized and subsumed", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	auto a = std::make_shared<ginkgo::Constraint>(0, ":- holds(a, 0), holds(b, 0), holds(c, 0).", symbolTable);
@@ -77,7 +77,7 @@ TEST_CASE("Constraints are correctly generalized and subsumed", "[constraints]")
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Literals are eliminated as specified", "[constraints]")
+TEST_CASE("[constraints] Literals are eliminated as specified", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- a, b, c, d, e.", symbolTable);
@@ -93,7 +93,7 @@ TEST_CASE("Literals are eliminated as specified", "[constraints]")
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Constraits subsume themselves", "[constraints]")
+TEST_CASE("[constraints] Constraits subsume themselves", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- a, b, c, d, e.", symbolTable);
@@ -105,7 +105,7 @@ TEST_CASE("Constraits subsume themselves", "[constraints]")
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Constraints are correctly subsumed by other constraints", "[constraints]")
+TEST_CASE("[constraints] Constraints are correctly subsumed by other constraints", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- a, b, c, d, e.", symbolTable);
@@ -147,7 +147,7 @@ TEST_CASE("Constraints are correctly subsumed by other constraints", "[constrain
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Constraint subsumption is negation-sensitive", "[constraints]")
+TEST_CASE("[constraints] Constraint subsumption is negation-sensitive", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 	ginkgo::Constraint a(0, ":- a, not b, c, d, e.", symbolTable);
@@ -166,7 +166,7 @@ TEST_CASE("Constraint subsumption is negation-sensitive", "[constraints]")
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Generalized constraints are correctly subsumed by other generalized constraints", "[constraints]")
+TEST_CASE("[constraints] Generalized constraints are correctly subsumed by other generalized constraints", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 
@@ -215,7 +215,7 @@ TEST_CASE("Generalized constraints are correctly subsumed by other generalized c
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Generalized constraint subsumption works with actions", "[constraints]")
+TEST_CASE("[constraints] Generalized constraint subsumption works with actions", "[constraints]")
 {
 	ginkgo::SymbolTable symbolTable;
 
