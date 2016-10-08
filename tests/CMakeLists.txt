@@ -2,7 +2,7 @@ set(target tests)
 
 file(GLOB core_sources "*.cpp")
 
-INCLUDE_DIRECTORIES(
+include_directories(
 	${Boost_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIR}
 	${PROJECT_SOURCE_DIR}/include
