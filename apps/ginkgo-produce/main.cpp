@@ -26,21 +26,38 @@ int main(int argc, char **argv)
 		("xclasp,x", po::value<std::string>(), "xclasp binary (clasp with extensions for knowledge extraction)")
 		("gringo,g", po::value<std::string>(), "gringo binary")
 		("horizon", po::value<size_t>(), "Horizon (maximum time steps)")
-		("proof-method", po::value<ginkgo::feedbackLoop::production::ProofMethod>(), "Proof method to use (StateWise, Induction)")
-		("testing-policy", po::value<ginkgo::feedbackLoop::production::TestingPolicy>(), "Feedback constraint Testing policy (FindFirst, TestAll)")
-		("minimization-strategy", po::value<ginkgo::feedbackLoop::production::MinimizationStrategy>(), "Clause minimization strategy (NoMinimization, SimpleMinimization, LinearMinimization)")
-		("fluent-closure-usage", po::value<ginkgo::feedbackLoop::production::FluentClosureUsage>(), "Usage of fluent closure (NoFluentClosure, UseFluentClosure)")
+		("proof-method", po::value<ginkgo::feedbackLoop::production::ProofMethod>()->default_value(ginkgo::feedbackLoop::production::ProofMethod::StateWise), "Proof method to use (StateWise, Induction)")
+		("testing-policy", po::value<ginkgo::feedbackLoop::production::TestingPolicy>()->default_value(ginkgo::feedbackLoop::production::TestingPolicy::TestAll), "Feedback constraint Testing policy (FindFirst, TestAll)")
+		("minimization-strategy", po::value<ginkgo::feedbackLoop::production::MinimizationStrategy>()->default_value(ginkgo::feedbackLoop::production::MinimizationStrategy::NoMinimization), "Clause minimization strategy (NoMinimization, SimpleMinimization, LinearMinimization)")
+		("fluent-closure-usage", po::value<ginkgo::feedbackLoop::production::FluentClosureUsage>()->default_value(ginkgo::feedbackLoop::production::FluentClosureUsage::NoFluentClosure), "Usage of fluent closure (NoFluentClosure, UseFluentClosure)")
 		("constraints-to-extract", po::value<size_t>(), "Extract <n> constraints")
 		("constraints-to-prove", po::value<size_t>(), "Finish after <n> proven constraints")
-		("max-degree", po::value<size_t>(), "Maximum degree of hypotheses to test")
-		("max-number-of-literals", po::value<size_t>(), "Maximum number of literals of hypotheses to test")
-		("extraction-timeout", po::value<size_t>(), "Knowledge extraction timeout (seconds)")
-		("hypothesis-testing-timeout", po::value<size_t>(), "Hypothesis testing timeout (seconds)")
+		("max-degree", po::value<size_t>()->default_value(10), "Maximum degree of hypotheses to test")
+		("max-number-of-literals", po::value<size_t>()->default_value(50), "Maximum number of literals of hypotheses to test")
+		("extraction-timeout", po::value<size_t>()->default_value(600), "Knowledge extraction timeout (seconds)")
+		("hypothesis-testing-timeout", po::value<size_t>()->default_value(10), "Hypothesis testing timeout (seconds)")
 		("log-level", po::value<ginkgo::feedbackLoop::production::LogLevel>()->default_value(ginkgo::feedbackLoop::production::LogLevel::Normal), "Output (Debug = detailed output)");
 
+	po::positional_options_description positionalOptionsDescription;
+	positionalOptionsDescription.add("input", -1);
+
 	po::variables_map variablesMap;
-	po::store(po::parse_command_line(argc, argv, description), variablesMap);
-	po::notify(variablesMap);
+
+	try
+	{
+		po::store(po::command_line_parser(argc, argv)
+			.options(description)
+			.positional(positionalOptionsDescription)
+			.run(),
+			variablesMap);
+		po::notify(variablesMap);
+	}
+	catch (const po::error &e)
+	{
+		std::cerr << e.what() << std::endl;
+		std::cout << std::endl << description;
+		return EXIT_FAILURE;
+	}
 
 	if (variablesMap.count("help"))
 	{
