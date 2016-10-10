@@ -1,31 +1,48 @@
 # Use container-based distribution
 sudo: false
 language: c++
+addons:
+  apt:
+    sources: &default_sources
+      - ubuntu-toolchain-r-test
+      - boost-latest
+    packages: &default_packages
+      - libboost-program-options1.55-dev
+      - libboost-iostreams1.55-dev
+      - libboost-system1.55-dev
+      - libboost-filesystem1.55-dev
+      - libjsoncpp-dev
+      - re2c
 matrix:
   include:
-    - compiler: gcc
+    - env: COMPILER_NAME=g++ _CXX=g++-5 _CC=gcc-5
+      os: linux
+      language: cpp
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - boost-latest
+            - *default_sources
           packages:
+            - *default_packages
             - g++-5
-            - libboost-program-options1.55-dev
-            - libboost-iostreams1.55-dev
-            - libboost-system1.55-dev
-            - libboost-filesystem1.55-dev
-            - libjsoncpp-dev
-            - re2c
-      env: COMPILER=g++-5
+    - env: COMPILER_NAME=g++ _CXX=g++-6 _CC=gcc-6
+      os: linux
+      language: cpp
+      addons:
+        apt:
+          sources:
+            - *default_sources
+          packages:
+            - *default_packages
+            - g++-6
 script:
   - mkdir dependencies
   - cd dependencies
   - git clone https://github.com/potassco/clingo.git
   - cd clingo
   - mkdir build
-  - echo "CXX = 'g++-5'" > build/debug.py
-  - echo "CC = 'gcc-5'" >> build/debug.py
+  - echo "CXX = '"$_CXX"'" > build/debug.py
+  - echo "CC = '"$_CC"'" >> build/debug.py
   - echo "CXXFLAGS = ['-std=c++11', '-O2', '-W', '-Wall']" >> build/debug.py
   - echo "LINKFLAGS = ['-std=c++11']" >> build/debug.py
   - scons -j3 libclingo
@@ -34,5 +51,5 @@ script:
   - git submodule update
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$COMPILER -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$_CXX -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo
   - make -j3 && make -j3 run-tests
