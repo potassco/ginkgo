@@ -79,8 +79,7 @@ script:
   - git clone https://github.com/potassco/clingo.git
   - cd clingo
   - mkdir build
-  - echo "CXX = '"$_CXX"'" > build/debug.py
-  - echo "CC = '"$_CC"'" >> build/debug.py
+  - echo "CXX = '"$COMPILER"'" > build/debug.py
   - echo "CXXFLAGS = ['-std=c++11', '-O2', '-W', '-Wall']" >> build/debug.py
   - echo "LINKFLAGS = ['-std=c++11']" >> build/debug.py
   - scons -j3 libclingo
@@ -89,5 +88,5 @@ script:
   - git submodule update
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$_CXX -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$COMPILER -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo
   - make -j3 && make -j3 run-tests
