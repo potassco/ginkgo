@@ -76,7 +76,7 @@ matrix:
 script:
   - mkdir dependencies
   - cd dependencies
-  - git clone https://github.com/potassco/clingo.git
+  - git clone --single-branch v5.1.0 https://github.com/potassco/clingo.git
   - cd clingo
   - mkdir build
   - echo "CXX = '"$COMPILER"'" > build/debug.py
