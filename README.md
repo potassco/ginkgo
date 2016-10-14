@@ -19,9 +19,24 @@
 
 ## Building and Installation
 
-`ginkgo` is built with `cmake` and requires a compiler capable of C++14 as well as `boost` and `jsoncpp`.
-`ginkgo` requires [`clasp`](https://github.com/potassco/clasp), [`xclasp`](https://github.com/potassco/xclasp), and [`gringo`](https://github.com/potassco/clingo) binaries at runtime.
-The optional graphical output requires `GTKmm`.
+`ginkgo` is built with `cmake` and has the following dependencies:
+
+* C++14 compiler
+* [`libclingo`](https://github.com/potassco/clingo) ≥ 5.1
+* `boost`
+* `jsoncpp`
+* `GTKmm` (optional, for graphical evaluation tool)
+
+After installing the dependencies, build `ginkgo` like this:
+
+```bash
+$ git clone https://github.com/potassco/ginkgo.git
+$ cd ginkgo
+$ mkdir -p build/release
+$ cd build/release
+$ cmake ../.. -DCMAKE_BUILD_TYPE=Release
+$ make
+```
 
 ## Usage
 
