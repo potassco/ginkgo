@@ -15,8 +15,9 @@ addons:
       - re2c
 matrix:
   include:
-    - env: COMPILER_NAME=g++ _CXX=g++-5 _CC=gcc-5
+    - env: _CXX=g++-5 _CC=gcc-5
       os: linux
+      compiler: gcc
       language: cpp
       addons:
         apt:
@@ -25,8 +26,9 @@ matrix:
           packages:
             - *default_packages
             - g++-5
-    - env: COMPILER_NAME=g++ _CXX=g++-6 _CC=gcc-6
+    - env: _CXX=g++-6 _CC=gcc-6
       os: linux
+      compiler: gcc
       language: cpp
       addons:
         apt:
