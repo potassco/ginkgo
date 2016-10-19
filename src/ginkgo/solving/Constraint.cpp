@@ -233,8 +233,8 @@ void Constraint::print(std::ostream &ostream, Literal::OutputFormat outputFormat
 	if (outputFormat == Literal::OutputFormat::Generalized)
 	{
 		const auto timeRange = this->timeRange();
-		const auto &timeMin = std::get<0>(timeRange) + offset;
-		const auto &timeMax = std::get<1>(timeRange) + offset;
+		const auto &timeMin = static_cast<int>(std::get<0>(timeRange)) + offset;
+		const auto &timeMax = static_cast<int>(std::get<1>(timeRange)) + offset;
 
 		for (auto time = timeMin; time <= timeMax; time++)
 		{

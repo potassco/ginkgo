@@ -280,7 +280,7 @@ void Literal::print(std::ostream &ostream, OutputFormat outputFormat, int offset
 		if (m_arguments.size() > 1)
 			ostream << ", ";
 
-		const auto time = timeArgument() + offset;
+		const auto time = static_cast<int>(timeArgument()) + offset;
 
 		// Normalize time argument
 		switch (outputFormat)
