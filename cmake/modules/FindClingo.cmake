@@ -16,6 +16,16 @@ find_path(Clingo_libgringo_INCLUDE_DIR
   HINTS ${Clingo_PKGCONF_INCLUDE_DIRS}
 )
 
+find_path(Clingo_libclasp_INCLUDE_DIR
+  NAMES clasp/solver.h
+  HINTS ${Clingo_PKGCONF_INCLUDE_DIRS}
+)
+
+find_path(Clingo_libpotassco_INCLUDE_DIR
+  NAMES potassco/aspif.h
+  HINTS ${Clingo_PKGCONF_INCLUDE_DIRS}
+)
+
 # Finally the library itself
 find_library(Clingo_LIBRARY
   NAMES clingo
@@ -24,6 +34,6 @@ find_library(Clingo_LIBRARY
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(Clingo_PROCESS_INCLUDES Clingo_libgringo_INCLUDE_DIR)
+set(Clingo_PROCESS_INCLUDES Clingo_libgringo_INCLUDE_DIR Clingo_libclasp_INCLUDE_DIR Clingo_libpotassco_INCLUDE_DIR)
 set(Clingo_PROCESS_LIBS Clingo_LIBRARY)
 libfind_process(Clingo)

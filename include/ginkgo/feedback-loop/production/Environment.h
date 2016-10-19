@@ -38,14 +38,8 @@ class Environment
 		std::ofstream &generalizedConstraintsStream();
 		std::ofstream &statisticsStream();
 
-		void setXclaspConfiguration(AsyncProcess::Configuration XclaspConfiguration);
-		const AsyncProcess::Configuration &xclaspConfiguration() const;
-
-		void setGringoConfiguration(AsyncProcess::Configuration gringoConfiguration);
-		const AsyncProcess::Configuration &gringoConfiguration() const;
-
-		SymbolTable &symbolTable();
-		const SymbolTable &symbolTable() const;
+		deprecated::SymbolTable &symbolTable();
+		const deprecated::SymbolTable &symbolTable() const;
 
 		void setLogLevel(LogLevel logLevel);
 		LogLevel logLevel() const;
@@ -57,11 +51,7 @@ class Environment
 		std::ofstream m_generalizedConstraintsStream;
 		std::ofstream m_statisticsStream;
 
-		AsyncProcess::Configuration m_claspConfiguration;
-		AsyncProcess::Configuration m_xclaspConfiguration;
-		AsyncProcess::Configuration m_gringoConfiguration;
-
-		SymbolTable m_symbolTable;
+		deprecated::SymbolTable m_symbolTable;
 
 		LogLevel m_logLevel;
 };

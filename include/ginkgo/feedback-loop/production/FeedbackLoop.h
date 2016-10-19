@@ -39,32 +39,28 @@ class FeedbackLoop
 
 	public:
 		FeedbackLoop(std::unique_ptr<Environment> environment, std::unique_ptr<Configuration<Plain>> configuration);
-		~FeedbackLoop();
 
 		void run();
 
 	private:
 		void mergeEncodings();
 		void generateFeedback(size_t constraintsToExtract, bool startOver = true);
-		GeneralizedConstraint minimizeConstraint(const GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement);
-		ProofResult testHypothesisStateWise(const GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
-		ProofResult testHypothesisInduction(const GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
+		deprecated::GeneralizedConstraint minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement);
+		ProofResult testHypothesisStateWise(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
+		ProofResult testHypothesisInduction(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
 
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;
 
-		AsyncProcess m_gringo;
-		AsyncProcess m_xclasp;
-
 		std::condition_variable m_pauseCondition;
 		std::mutex m_pauseConditionMutex;
 
-		Constraints m_feedback;
+		deprecated::Constraints m_feedback;
 
 		Events m_events;
 
 		std::stringstream m_program;
-		Constraints m_learnedConstraints;
+		deprecated::Constraints m_learnedConstraints;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

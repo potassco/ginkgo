@@ -8,6 +8,8 @@
 
 namespace ginkgo
 {
+namespace deprecated
+{
 
 // Forward declarations
 class Literal;
@@ -29,6 +31,7 @@ class SymbolTable
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+}
 }
 
 #endif

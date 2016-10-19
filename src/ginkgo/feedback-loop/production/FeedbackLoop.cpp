@@ -5,9 +5,11 @@
 #include <thread>
 
 #include <clingo.hh>
+#include <clasp/clasp_facade.h>
 
 #include <json/json.h>
 
+#include <ginkgo/feedback-loop/production/ClaspConstraintLogger.h>
 #include <ginkgo/utils/TextFile.h>
 #include <ginkgo/solving/ClaspOutputParsing.h>
 
@@ -116,23 +118,9 @@ const std::string FeedbackLoop::InductiveProofStepEncoding =
 FeedbackLoop::FeedbackLoop(std::unique_ptr<Environment> environment, std::unique_ptr<Configuration<Plain> > configuration)
 :	m_environment(std::move(environment)),
 	m_configuration(std::move(configuration)),
-	m_gringo(m_environment->gringoConfiguration()),
-	m_xclasp(m_environment->xclaspConfiguration()),
 	m_feedback(m_environment->symbolTable()),
 	m_learnedConstraints(m_environment->symbolTable())
 {
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-FeedbackLoop::~FeedbackLoop()
-{
-	if (m_xclasp.isRunning())
-	{
-		m_xclasp.resume();
-		m_xclasp.terminate();
-		m_xclasp.join();
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +206,7 @@ void FeedbackLoop::run()
 		// Remove all constraints subsumed by previously proven constraints
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](auto constraint)
 		{
-			m_feedback.removeConstraintsSubsumedBy(GeneralizedConstraint(constraint));
+			m_feedback.removeConstraintsSubsumedBy(deprecated::GeneralizedConstraint(constraint));
 		});
 
 		// Statistics
@@ -235,7 +223,7 @@ void FeedbackLoop::run()
 		}
 
 		// Sort in descending order so that we can efficiently pop elements from the back
-		m_feedback.sortBy(Constraints::SortKey::TimeDegree, Constraints::SortDirection::Descending, true);
+		m_feedback.sortBy(deprecated::Constraints::SortKey::TimeDegree, deprecated::Constraints::SortDirection::Descending, true);
 
 		std::for_each(m_feedback.cbegin(), m_feedback.cend(), [](const auto &constraint)
 		{
@@ -250,7 +238,7 @@ void FeedbackLoop::run()
 
 			BOOST_ASSERT(!constraint->containsIdentifier("terminal"));
 
-			auto hypothesis = GeneralizedConstraint(constraint);
+			auto hypothesis = deprecated::GeneralizedConstraint(constraint);
 
 			if (m_environment->logLevel() == LogLevel::Debug)
 			{
@@ -373,13 +361,6 @@ void FeedbackLoop::run()
 			break;
 	}
 
-	if (m_xclasp.isRunning())
-	{
-		m_xclasp.resume();
-		m_xclasp.terminate();
-		m_xclasp.join();
-	}
-
 	// Statistics
 	if (m_learnedConstraints.size() == m_configuration->constraintsToProve)
 	{
@@ -430,142 +411,51 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			GeneralizedConstraint(constraint).print(metaEncoding);
+			deprecated::GeneralizedConstraint(constraint).print(metaEncoding);
 			metaEncoding << std::endl;
 		});
 
 		metaEncoding.clear();
 		metaEncoding.seekg(0, std::ios::beg);
 
-		bool extractionTimeout = false;
+		// TODO: add back extraction timeout
+		Clingo::Control clingoControl;
+		clingoControl.add("base", {}, metaEncoding.str().c_str());
+		clingoControl.ground({{"base", {}}});
 
-		m_gringo.run(metaEncoding, m_configuration->extractionTimeout, extractionTimeout);
-		m_gringo.join();
+		auto &claspFacade = *static_cast<Clasp::ClaspFacade *>(clingoControl.claspFacade());
 
-		if (m_xclasp.isRunning())
+		Clasp::SharedContext::LogPtr previousEventHandler = claspFacade.ctx.eventHandler();
+		Clasp::SharedContext::ReportMode mode = claspFacade.ctx.reportMode();
+
+		if (previousEventHandler)
+			std::cout << "warning: ignoring clasp’s previously set event handler" << std::endl;
+
+		ClaspConstraintLogger claspConstraintLogger;
+
+		claspFacade.ctx.setEventHandler(&claspConstraintLogger, Clasp::SharedContext::report_conflict);
+
+		for (auto model : clingoControl.solve_iteratively())
 		{
-			m_xclasp.resume();
-			m_xclasp.terminate();
-			m_xclasp.join();
-
-			if (m_environment->logLevel() == LogLevel::Debug)
-				std::cout << "[Info ] Terminated feedback extraction" << std::endl;
+			//claspFacade->
+			std::cout << "model" << std::endl;
 		}
 
+		// TODO: handle already running feedback extraction
 		m_feedback.clear();
-
-		if (extractionTimeout)
-		{
-			// Statistics
-			const EventFinished event = {EventFinished::Reason::ExtractionTimeout};
-			m_events.notifyFinished(event);
-			std::cerr << "[Info ] Knowledge extraction timeout, exiting" << std::endl;
-			return;
-		}
-	}
-
-	// TODO: Clean up symbol table at some point
-	if (startOver)
-	{
-		BOOST_ASSERT(m_gringo.stdout());
-		m_xclasp.run(*m_gringo.stdout(), false, true);
-
-		if (m_environment->logLevel() == LogLevel::Debug)
-			std::cout << "[Info ] Starting feedback extraction" << std::endl;
-	}
-	else
-	{
-		if (!m_xclasp.isRunning())
-		{
-			// Statistics
-			const EventFinished event = {EventFinished::Reason::FeedbackEmpty};
-			m_events.notifyFinished(event);
-			std::cerr << "[Info ] No more constraints available (solver terminated) ..." << std::endl;
-			return;
-		}
-
-		m_xclasp.resume();
-
-		if (m_environment->logLevel() == LogLevel::Debug)
-			std::cout << "[Info ] Resuming feedback extraction" << std::endl;
-	}
-
-	const auto startTime = std::chrono::high_resolution_clock::now();
-
-	// Extract requested number of constraints
-	while (true)
-	{
-		if (!m_xclasp.waitForEvent())
-		{
-			// Clasp terminated; join thread
-			m_xclasp.join();
-			break;
-		}
-
-		std::lock_guard<std::mutex> lock(m_xclasp.stderrAccessMutex());
-
-		auto *stderr = m_xclasp.stderr();
-		if (!stderr)
-			continue;
-
-		const auto constraintString = stderr->str();
-		m_xclasp.clearStderr();
-
-		if (constraintString.size() < 2)
-			continue;
-
-		// TODO: Don't copy stderr
-		auto constraint = std::make_shared<Constraint>(m_feedback.size(), constraintString, m_environment->symbolTable());
-		m_feedback.push_back(std::move(constraint));
-
-		if (m_environment->logLevel() == LogLevel::Debug)
-		{
-			if (m_feedback.size() % 256 == 0)
-				std::cout << "[Debug] " << m_feedback.size() << " constraints" << std::endl;
-		}
-
-		if (m_feedback.size() >= constraintsToExtract)
-			break;
-	}
-
-	if (m_xclasp.exists())
-		m_xclasp.pause();
-
-	if (m_environment->logLevel() == LogLevel::Debug)
-		std::cout << "[Info ] Extracted " << m_feedback.size() << " constraints" << std::endl;
-
-	const auto now = std::chrono::high_resolution_clock::now();
-
-	EventFeedbackExtracted event =
-	{
-		startOver ? EventFeedbackExtracted::Mode::StartOver : EventFeedbackExtracted::Mode::Resume,
-		std::chrono::duration<double>(now - startTime).count(),
-		constraintsToExtract,
-		m_feedback.size()
-	};
-
-	m_events.notifyFeedbackExtracted(event);
-
-	if (m_feedback.empty())
-	{
-		// Statistics
-		const EventFinished event = {EventFinished::Reason::FeedbackEmpty};
-		m_events.notifyFinished(event);
-		std::cerr << "[Info ] No more constraints available (solver didn't find anything) ..." << std::endl;
-		return;
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement)
+deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement)
 {
 	const auto literalsBefore = provenGeneralizedConstraint.numberOfLiterals();
 	const auto degreeBefore = provenGeneralizedConstraint.degree();
 	size_t requiredTests = 0;
 
 	// If nothing works, keep the original constraint
-	GeneralizedConstraint result = provenGeneralizedConstraint;
+	auto result = provenGeneralizedConstraint;
 
 	if (m_environment->logLevel() == LogLevel::Debug)
 		std::cout << "[Info ] Trying to minimize " << provenGeneralizedConstraint << std::endl;
@@ -578,7 +468,7 @@ GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstrai
 		if (m_environment->logLevel() == LogLevel::Debug)
 			std::cout << "[Info ] Trying to eliminate " << windowSize << " literals starting at " << i << std::endl;
 
-		GeneralizedConstraint hypothesis(result.originalConstraint()->withoutLiterals(i, windowSize));
+		deprecated::GeneralizedConstraint hypothesis(result.originalConstraint()->withoutLiterals(i, windowSize));
 
 		// Skip candidates that have become empty due to removing literals
 		if (hypothesis.numberOfLiterals() == 0)
@@ -665,7 +555,7 @@ GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstrai
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisStateWise(const GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testHypothesisStateWise(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -686,7 +576,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GeneralizedConstraint &g
 
 	std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 	{
-		GeneralizedConstraint(constraint).print(proofEncoding);
+		deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 		proofEncoding << std::endl;
 	});
 
@@ -714,7 +604,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GeneralizedConstraint &g
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -737,7 +627,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			GeneralizedConstraint(constraint).print(proofEncoding);
+			deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 			proofEncoding << std::endl;
 		});
 
@@ -798,7 +688,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const GeneralizedConstraint &g
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			GeneralizedConstraint(constraint).print(proofEncoding);
+			deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 			proofEncoding << std::endl;
 		});
 
