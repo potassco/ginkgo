@@ -1,4 +1,4 @@
-#include <ginkgo/solving/SymbolTable.h>
+#include <ginkgo/solving/__deprecated__SymbolTable.h>
 
 #include <algorithm>
 #include <iostream>

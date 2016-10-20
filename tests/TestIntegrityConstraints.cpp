@@ -1,7 +1,7 @@
 #include <catch.hpp>
 
-#include <ginkgo/solving/Constraint.h>
-#include <ginkgo/solving/GeneralizedConstraint.h>
+#include <ginkgo/solving/__deprecated__Constraint.h>
+#include <ginkgo/solving/__deprecated__GeneralizedConstraint.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -1,4 +1,4 @@
-#include <ginkgo/solving/Literal.h>
+#include <ginkgo/solving/__deprecated__Literal.h>
 
 #include <iostream>
 #include <sstream>

@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 
-#include <ginkgo/solving/Constraint.h>
+#include <ginkgo/solving/__deprecated__Constraint.h>
 
 namespace ginkgo
 {

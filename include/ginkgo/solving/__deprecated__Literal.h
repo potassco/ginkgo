@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 
-#include <ginkgo/solving/SymbolTable.h>
+#include <ginkgo/solving/__deprecated__SymbolTable.h>
 
 namespace ginkgo
 {

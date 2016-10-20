@@ -6,7 +6,7 @@
 #include <vector>
 #include <tuple>
 
-#include <ginkgo/solving/Literal.h>
+#include <ginkgo/solving/__deprecated__Literal.h>
 
 namespace ginkgo
 {

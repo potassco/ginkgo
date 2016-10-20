@@ -13,7 +13,7 @@
 #include <ginkgo/feedback-loop/production/ProofMethod.h>
 #include <ginkgo/feedback-loop/production/TestingPolicy.h>
 
-#include <ginkgo/solving/Constraints.h>
+#include <ginkgo/solving/__deprecated__Constraints.h>
 #include <ginkgo/solving/AsyncProcess.h>
 
 namespace ginkgo

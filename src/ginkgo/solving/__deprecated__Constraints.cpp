@@ -1,4 +1,4 @@
-#include <ginkgo/solving/Constraints.h>
+#include <ginkgo/solving/__deprecated__Constraints.h>
 
 #include <sstream>
 #include <algorithm>

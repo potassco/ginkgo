@@ -8,7 +8,7 @@
 #include <ginkgo/feedback-loop/production/ProofResult.h>
 #include <ginkgo/feedback-loop/production/Events.h>
 
-#include <ginkgo/solving/GeneralizedConstraint.h>
+#include <ginkgo/solving/__deprecated__GeneralizedConstraint.h>
 
 namespace ginkgo
 {

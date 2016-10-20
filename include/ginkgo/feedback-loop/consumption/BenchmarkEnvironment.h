@@ -5,7 +5,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 
-#include <ginkgo/solving/Constraints.h>
+#include <ginkgo/solving/__deprecated__Constraints.h>
 #include <ginkgo/solving/AsyncProcess.h>
 
 #include <ginkgo/feedback-loop/consumption/FeedbackType.h>
