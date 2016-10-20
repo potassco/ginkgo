@@ -38,7 +38,7 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 		LiteralName literalName(Clasp::Literal literal) const;
 
 		SymbolTable m_symbolTable;
-		size_t m_numberOfSymbols;
+		size_t m_seenSymbols;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

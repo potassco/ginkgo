@@ -16,7 +16,7 @@ namespace production
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ClaspConstraintLogger::ClaspConstraintLogger()
-:	m_numberOfSymbols{0}
+:	m_seenSymbols{0}
 {
 }
 
@@ -72,7 +72,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 void ClaspConstraintLogger::readSymbolTable(const Clasp::OutputTable &outputTable)
 {
-	if (m_numberOfSymbols == outputTable.size())
+	if (m_seenSymbols == outputTable.size())
 		return;
 
 	std::for_each(outputTable.pred_begin(), outputTable.pred_end(),
@@ -87,7 +87,7 @@ void ClaspConstraintLogger::readSymbolTable(const Clasp::OutputTable &outputTabl
 				m_symbolTable[variable] = Symbol(predicate.name.c_str(), predicate.cond);
 		});
 
-	m_numberOfSymbols = outputTable.size();
+	m_seenSymbols = outputTable.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
