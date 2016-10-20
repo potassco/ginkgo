@@ -1,5 +1,5 @@
-#ifndef __SOLVING__LITERAL_H
-#define __SOLVING__LITERAL_H
+#ifndef __SOLVING____DEPRECATED__LITERAL_H
+#define __SOLVING____DEPRECATED__LITERAL_H
 
 #include <iosfwd>
 #include <string>

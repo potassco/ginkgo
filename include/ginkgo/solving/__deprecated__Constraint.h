@@ -1,5 +1,5 @@
-#ifndef __SOLVING__CONSTRAINT_H
-#define __SOLVING__CONSTRAINT_H
+#ifndef __SOLVING____DEPRECATED__CONSTRAINT_H
+#define __SOLVING____DEPRECATED__CONSTRAINT_H
 
 #include <iosfwd>
 #include <memory>

@@ -1,5 +1,5 @@
-#ifndef __SOLVING__SYMBOL_TABLE_H
-#define __SOLVING__SYMBOL_TABLE_H
+#ifndef __SOLVING____DEPRECATED__SYMBOL_TABLE_H
+#define __SOLVING____DEPRECATED__SYMBOL_TABLE_H
 
 #include <string>
 #include <unordered_map>

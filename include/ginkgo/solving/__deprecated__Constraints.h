@@ -1,5 +1,5 @@
-#ifndef __SOLVING__CONSTRAINTS_H
-#define __SOLVING__CONSTRAINTS_H
+#ifndef __SOLVING____DEPRECATED__CONSTRAINTS_H
+#define __SOLVING____DEPRECATED__CONSTRAINTS_H
 
 #include <set>
 
