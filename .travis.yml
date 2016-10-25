@@ -51,5 +51,5 @@ script:
   - git submodule update
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$_CXX -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$_CXX -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo -DClingo_libclasp_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libclasp -DClingo_libpotassco_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/liblp
   - make -j3 && make -j3 run-tests
