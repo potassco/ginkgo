@@ -87,15 +87,17 @@ void ClaspConstraintLogger::readSymbolTable(const Clasp::OutputTable &outputTabl
 	if (m_seenSymbols == outputTable.size())
 		return;
 
+	const char *noName = "<?>";
+
 	std::for_each(outputTable.pred_begin(), outputTable.pred_end(),
 		[&](const auto &predicate)
 		{
 			const auto variable = predicate.cond.var();
 
 			if (m_symbolTable.size() <= variable)
-				m_symbolTable.resize(variable + 1, Symbol("<?>", Clasp::lit_false()));
+				m_symbolTable.resize(variable + 1, Symbol(noName, Clasp::lit_false()));
 
-			if (m_symbolTable[variable].first == 0 || (!predicate.cond.sign() && m_symbolTable[variable].second.sign()))
+			if (m_symbolTable[variable].first == noName || (!predicate.cond.sign() && m_symbolTable[variable].second.sign()))
 				m_symbolTable[variable] = Symbol(predicate.name.c_str(), predicate.cond);
 		});
 
