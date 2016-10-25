@@ -419,27 +419,20 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 		metaEncoding.seekg(0, std::ios::beg);
 
 		// TODO: add back extraction timeout
-		Clingo::Control clingoControl;
+		Clingo::Control clingoControl({"--heuristic=Domain", "--dom-mod=1,16", "--loops=no", "--reverse-arcs=0", "--otfs=0", "--stats"});
 		clingoControl.add("base", {}, metaEncoding.str().c_str());
 		clingoControl.ground({{"base", {}}});
 
 		auto &claspFacade = *static_cast<Clasp::ClaspFacade *>(clingoControl.claspFacade());
 
 		Clasp::SharedContext::LogPtr previousEventHandler = claspFacade.ctx.eventHandler();
-		Clasp::SharedContext::ReportMode mode = claspFacade.ctx.reportMode();
 
-		if (previousEventHandler)
-			std::cout << "warning: ignoring clasp’s previously set event handler" << std::endl;
-
-		ClaspConstraintLogger claspConstraintLogger;
+		ClaspConstraintLogger claspConstraintLogger(previousEventHandler);
 
 		claspFacade.ctx.setEventHandler(&claspConstraintLogger, Clasp::SharedContext::report_conflict);
 
 		for (auto model : clingoControl.solve_iteratively())
-		{
-			//claspFacade->
-			std::cout << "model" << std::endl;
-		}
+			std::cout << "model found" << std::endl;
 
 		// TODO: handle already running feedback extraction
 		m_feedback.clear();

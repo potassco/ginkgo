@@ -4,6 +4,8 @@
 #include <clasp/clasp_facade.h>
 #include <clasp/solver.h>
 
+#include <ginkgo/solving/SymbolTable.h>
+
 namespace ginkgo
 {
 namespace feedbackLoop
@@ -20,12 +22,16 @@ namespace production
 class ClaspConstraintLogger: public Clasp::EventHandler
 {
 	public:
+		enum class Sign
+		{
+			Negative = 0,
+			Positive = 1
+		};
+
 		using LiteralName = std::pair<const char *, const char *>;
-		using Symbol = std::pair<const char*, Clasp::Literal>;
-		using SymbolTable = std::vector<Symbol>;
 
 	public:
-		ClaspConstraintLogger();
+		explicit ClaspConstraintLogger(Clasp::EventHandler *childEventHandler);
 
 		void onEvent(const Clasp::Event &event) override;
 
@@ -36,6 +42,8 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 		void readSymbolTable(const Clasp::OutputTable &outputTable);
 
 		LiteralName literalName(Clasp::Literal literal) const;
+
+		Clasp::EventHandler *m_childEventHandler;
 
 		SymbolTable m_symbolTable;
 		size_t m_seenSymbols;

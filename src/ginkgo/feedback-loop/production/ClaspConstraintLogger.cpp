@@ -15,8 +15,9 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ClaspConstraintLogger::ClaspConstraintLogger()
-:	m_seenSymbols{0}
+ClaspConstraintLogger::ClaspConstraintLogger(Clasp::EventHandler *childEventHandler)
+:	m_childEventHandler{childEventHandler},
+	m_seenSymbols{0}
 {
 }
 
@@ -24,6 +25,8 @@ ClaspConstraintLogger::ClaspConstraintLogger()
 
 void ClaspConstraintLogger::onEvent(const Clasp::Event &event)
 {
+	m_childEventHandler->onEvent(event);
+
 	const auto conflictEvent = Clasp::event_cast<Clasp::NewConflictEvent>(event);
 
 	if (conflictEvent)
@@ -42,30 +45,39 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	readSymbolTable(outputTable);
 
-	const uint32_t MAX_LBD = 127;
+	const uint32_t maxLBD = 127;
 	uint32_t lbd = constraintInfo.lbd();
 
 	const auto allowedVariables = Clasp::VarInfo::Input | Clasp::VarInfo::Output;
 
 	Clasp::LitVec output;
 
-	if (lbd > MAX_LBD || !solver.resolveToFlagged(literals, allowedVariables, output, lbd) || lbd > MAX_LBD)
+	if (lbd > maxLBD)
 	{
-		std::cout << "warning: skipped conflict" << std::endl;
+		std::cout << "\033[1;31mwarning: skipped conflict (LBD too high: " << lbd << ", maximum allowed: " << maxLBD << ")\033[0m" << std::endl;
 		return;
 	}
 
-	std::cout << "[constraint] :- ";
+	if (!solver.resolveToFlagged(literals, allowedVariables, output, lbd))
+	{
+		std::cout << "\033[1;33mwarning: skipped conflict (cannot be resolved to selected variables)\033[0m" << std::endl;
+		return;
+	}
 
-	std::for_each(output.begin(), output.end(),
-		[&](const auto &literal)
-		{
-			const auto outputLiteral = ~literal;
-			const auto name = this->literalName(outputLiteral);
-			std::cout << name.first << name.second << ", ";
-		});
+	std::cout << ":- ";
 
-	std::cout << std::endl;
+	for (auto i = output.begin(); i != output.end(); i++)
+	{
+		if (i != output.begin())
+			std::cout << ", ";
+
+		const auto outputLiteral = ~*i;
+		const auto name = literalName(outputLiteral);
+
+		std::cout << name.first << name.second;
+	}
+
+	std::cout << ".  %lbd = " << lbd << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
