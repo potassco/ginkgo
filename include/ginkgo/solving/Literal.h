@@ -26,7 +26,7 @@ class Literal
 		};
 
 	public:
-		static Literal parse(const char *text, const SymbolTable &symbolTable);
+		Literal(Clasp::Literal literal, const SymbolTable &symbolTable);
 
 	public:
 		Sign sign;

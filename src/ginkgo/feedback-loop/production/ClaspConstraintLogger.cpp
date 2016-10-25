@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <ginkgo/solving/Literal.h>
+
 namespace ginkgo
 {
 namespace feedbackLoop
@@ -35,7 +37,7 @@ void ClaspConstraintLogger::onEvent(const Clasp::Event &event)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec &literals,
+void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec &claspLiterals,
 	const Clasp::ConstraintInfo &constraintInfo)
 {
 	if (solver.id() != 0)
@@ -58,7 +60,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		return;
 	}
 
-	if (!solver.resolveToFlagged(literals, allowedVariables, output, lbd))
+	if (!solver.resolveToFlagged(claspLiterals, allowedVariables, output, lbd))
 	{
 		std::cout << "\033[1;33mwarning: skipped conflict (cannot be resolved to selected variables)\033[0m" << std::endl;
 		return;
@@ -66,12 +68,18 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	std::cout << ":- ";
 
+	std::vector<Literal> literals;
+	literals.reserve(output.size());
+
 	for (auto i = output.begin(); i != output.end(); i++)
 	{
 		if (i != output.begin())
 			std::cout << ", ";
 
 		const auto outputLiteral = ~*i;
+
+		literals.emplace_back(Literal(outputLiteral, m_symbolTable));
+
 		const auto name = literalName(outputLiteral);
 
 		std::cout << name.first << name.second;
