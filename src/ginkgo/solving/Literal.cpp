@@ -10,6 +10,7 @@ namespace ginkgo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Literal::Literal(Clasp::Literal literal, const SymbolTable &symbolTable)
+:	claspLiteral{literal}
 {
 	const auto &claspSymbol = symbolTable.at(literal.var());
 

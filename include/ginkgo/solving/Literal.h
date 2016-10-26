@@ -30,7 +30,7 @@ class Literal
 
 	public:
 		Sign sign;
-		Clasp::Literal literal;
+		Clasp::Literal claspLiteral;
 		Clingo::Symbol symbol;
 };
 
