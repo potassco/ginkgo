@@ -444,7 +444,7 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 
 		auto solveAsync = clingoControl.solve_async(handleModel, handleFinished);
 
-		solveAsync.wait(600);
+		solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
 
 		// TODO: handle already running feedback extraction
 		m_feedback.clear();

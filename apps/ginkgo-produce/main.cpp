@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 		("constraints-to-prove", po::value<size_t>(), "Finish after <n> proven constraints")
 		("max-degree", po::value<size_t>()->default_value(10), "Maximum degree of hypotheses to test")
 		("max-number-of-literals", po::value<size_t>()->default_value(50), "Maximum number of literals of hypotheses to test")
-		("extraction-timeout", po::value<size_t>()->default_value(600), "Knowledge extraction timeout (seconds)")
+		("extraction-timeout", po::value<double>()->default_value(600.0), "Knowledge extraction timeout (seconds)")
 		("hypothesis-testing-timeout", po::value<size_t>()->default_value(10), "Hypothesis testing timeout (seconds)")
 		("log-level", po::value<ginkgo::feedbackLoop::production::LogLevel>()->default_value(ginkgo::feedbackLoop::production::LogLevel::Normal), "Output (Debug = detailed output)");
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 	configuration->constraintsToProve = variablesMap["constraints-to-prove"].as<size_t>();
 	configuration->maxDegree = variablesMap["max-degree"].as<size_t>();
 	configuration->maxNumberOfLiterals = variablesMap["max-number-of-literals"].as<size_t>();
-	configuration->extractionTimeout = std::chrono::seconds(variablesMap["extraction-timeout"].as<size_t>());
+	configuration->extractionTimeout = std::chrono::milliseconds(static_cast<std::chrono::milliseconds::rep>(variablesMap["extraction-timeout"].as<double>() * 1000));
 	configuration->hypothesisTestingTimeout = std::chrono::seconds(variablesMap["hypothesis-testing-timeout"].as<size_t>());
 
 	configuration->instance = inputFileNames[0];
