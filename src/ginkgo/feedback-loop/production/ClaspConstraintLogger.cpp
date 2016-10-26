@@ -17,8 +17,9 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ClaspConstraintLogger::ClaspConstraintLogger(Clasp::EventHandler *childEventHandler)
+ClaspConstraintLogger::ClaspConstraintLogger(Clasp::EventHandler *childEventHandler, Constraints &constraints)
 :	m_childEventHandler{childEventHandler},
+	m_constraints(constraints),
 	m_seenSymbols{0}
 {
 }
@@ -68,8 +69,8 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	std::cout << ":- ";
 
-	std::vector<Literal> literals;
-	literals.reserve(output.size());
+	Constraint constraint;
+	constraint.reserve(output.size());
 
 	for (auto i = output.begin(); i != output.end(); i++)
 	{
@@ -78,12 +79,14 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 		const auto outputLiteral = ~*i;
 
-		literals.emplace_back(Literal(outputLiteral, m_symbolTable));
+		constraint.emplace_back(Literal(outputLiteral, m_symbolTable));
 
 		const auto name = literalName(outputLiteral);
 
 		std::cout << name.first << name.second;
 	}
+
+	m_constraints.emplace_back(constraint);
 
 	std::cout << ".  %lbd = " << lbd << std::endl;
 }

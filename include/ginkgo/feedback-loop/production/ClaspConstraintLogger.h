@@ -4,6 +4,7 @@
 #include <clasp/clasp_facade.h>
 #include <clasp/solver.h>
 
+#include <ginkgo/solving/Literal.h>
 #include <ginkgo/solving/SymbolTable.h>
 
 namespace ginkgo
@@ -31,7 +32,7 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 		using LiteralName = std::pair<const char *, const char *>;
 
 	public:
-		explicit ClaspConstraintLogger(Clasp::EventHandler *childEventHandler);
+		ClaspConstraintLogger(Clasp::EventHandler *childEventHandler, Constraints &constraints);
 
 		void onEvent(const Clasp::Event &event) override;
 
@@ -44,6 +45,8 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 		LiteralName literalName(Clasp::Literal literal) const;
 
 		Clasp::EventHandler *m_childEventHandler;
+
+		Constraints &m_constraints;
 
 		SymbolTable m_symbolTable;
 		size_t m_seenSymbols;

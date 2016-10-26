@@ -427,7 +427,7 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 
 		Clasp::SharedContext::LogPtr previousEventHandler = claspFacade.ctx.eventHandler();
 
-		ClaspConstraintLogger claspConstraintLogger(previousEventHandler);
+		ClaspConstraintLogger claspConstraintLogger(previousEventHandler, m_extractedConstraints);
 
 		claspFacade.ctx.setEventHandler(&claspConstraintLogger, Clasp::SharedContext::report_conflict);
 

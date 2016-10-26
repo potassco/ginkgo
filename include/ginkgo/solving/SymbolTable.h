@@ -18,7 +18,7 @@ namespace ginkgo
 // Entry == variable name
 //using SymbolTable = std::vector<const char *>;
 
-using Symbol = std::pair<const char*, Clasp::Literal>;
+using Symbol = std::pair<const char*, ::Clasp::Literal>;
 using SymbolTable = std::vector<Symbol>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

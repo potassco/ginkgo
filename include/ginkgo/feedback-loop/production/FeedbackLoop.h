@@ -8,6 +8,7 @@
 #include <ginkgo/feedback-loop/production/ProofResult.h>
 #include <ginkgo/feedback-loop/production/Events.h>
 
+#include <ginkgo/solving/Literal.h>
 #include <ginkgo/solving/__deprecated__GeneralizedConstraint.h>
 
 namespace ginkgo
@@ -55,6 +56,7 @@ class FeedbackLoop
 		std::condition_variable m_pauseCondition;
 		std::mutex m_pauseConditionMutex;
 
+		Constraints m_extractedConstraints;
 		deprecated::Constraints m_feedback;
 
 		Events m_events;
