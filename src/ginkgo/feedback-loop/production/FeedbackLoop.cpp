@@ -444,7 +444,12 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 
 		auto solveAsync = clingoControl.solve_async(handleModel, handleFinished);
 
-		solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
+		const auto stillRunning = solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
+
+		if (stillRunning)
+			std::cout << "still searching" << std::endl;
+		else
+			std::cout << "search finished" << std::endl;
 
 		// TODO: handle already running feedback extraction
 		m_feedback.clear();

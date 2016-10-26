@@ -67,28 +67,29 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		return;
 	}
 
-	std::cout << ":- ";
+	//std::cout << ":- ";
 
 	Constraint constraint;
 	constraint.reserve(output.size());
 
 	for (auto i = output.begin(); i != output.end(); i++)
 	{
-		if (i != output.begin())
-			std::cout << ", ";
+		//if (i != output.begin())
+		//	std::cout << ", ";
 
-		const auto outputLiteral = ~*i;
+		const auto literal = ~*i;
 
-		constraint.emplace_back(Literal(outputLiteral, m_symbolTable));
+		const auto &symbol = m_symbolTable.at(literal.var());
+		const auto sign = (symbol.claspLiteral == literal ? Literal::Sign::Positive : Literal::Sign::Negative);
 
-		const auto name = literalName(outputLiteral);
+		constraint.emplace_back(Literal(sign, symbol));
 
-		std::cout << name.first << name.second;
+		//std::cout << (sign == Literal::Sign::Negative ? "not " : "") << symbol.name;
 	}
 
 	m_constraints.emplace_back(constraint);
 
-	std::cout << ".  %lbd = " << lbd << std::endl;
+	//std::cout << ".  %lbd = " << lbd << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,22 +107,13 @@ void ClaspConstraintLogger::readSymbolTable(const Clasp::OutputTable &outputTabl
 			const auto variable = predicate.cond.var();
 
 			if (m_symbolTable.size() <= variable)
-				m_symbolTable.resize(variable + 1, Symbol(noName, Clasp::lit_false()));
+				m_symbolTable.resize(variable + 1, {noName, Clingo::Symbol(), Clasp::lit_false()});
 
-			if (m_symbolTable[variable].first == noName || (!predicate.cond.sign() && m_symbolTable[variable].second.sign()))
-				m_symbolTable[variable] = Symbol(predicate.name.c_str(), predicate.cond);
+			if (m_symbolTable[variable].name == noName || (!predicate.cond.sign() && m_symbolTable[variable].claspLiteral.sign()))
+				m_symbolTable[variable] = {predicate.name.c_str(), Clingo::parse_term(predicate.name.c_str()), predicate.cond};
 		});
 
 	m_seenSymbols = outputTable.size();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-ClaspConstraintLogger::LiteralName ClaspConstraintLogger::literalName(Clasp::Literal literal) const
-{
-	const auto &symbol = m_symbolTable.at(literal.var());
-
-	return {symbol.second == literal ? "" : "not ", symbol.first};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

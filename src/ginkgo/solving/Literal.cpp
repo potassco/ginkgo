@@ -9,13 +9,10 @@ namespace ginkgo
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Literal::Literal(Clasp::Literal literal, const SymbolTable &symbolTable)
-:	claspLiteral{literal}
+Literal::Literal(Literal::Sign sign, const Symbol &symbol)
+:	sign{sign},
+	symbol(symbol)
 {
-	const auto &claspSymbol = symbolTable.at(literal.var());
-
-	symbol = Clingo::parse_term(claspSymbol.first);
-	sign = (claspSymbol.second == literal ? Sign::Positive : Sign::Negative);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

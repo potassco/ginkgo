@@ -26,12 +26,10 @@ class Literal
 		};
 
 	public:
-		Literal(Clasp::Literal literal, const SymbolTable &symbolTable);
+		Literal(Sign sign, const Symbol &symbol);
 
-	public:
 		Sign sign;
-		Clasp::Literal claspLiteral;
-		Clingo::Symbol symbol;
+		const Symbol &symbol;
 };
 
 using Constraint = std::vector<Literal>;

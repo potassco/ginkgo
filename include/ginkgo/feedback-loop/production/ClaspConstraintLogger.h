@@ -23,15 +23,6 @@ namespace production
 class ClaspConstraintLogger: public Clasp::EventHandler
 {
 	public:
-		enum class Sign
-		{
-			Negative = 0,
-			Positive = 1
-		};
-
-		using LiteralName = std::pair<const char *, const char *>;
-
-	public:
 		ClaspConstraintLogger(Clasp::EventHandler *childEventHandler, Constraints &constraints);
 
 		void onEvent(const Clasp::Event &event) override;
@@ -41,8 +32,6 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 
 	private:
 		void readSymbolTable(const Clasp::OutputTable &outputTable);
-
-		LiteralName literalName(Clasp::Literal literal) const;
 
 		Clasp::EventHandler *m_childEventHandler;
 
