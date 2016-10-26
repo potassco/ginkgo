@@ -27,34 +27,6 @@ BenchmarkEnvironment::BenchmarkEnvironment(boost::filesystem::path filePrefix)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BenchmarkEnvironment::setClaspConfiguration(AsyncProcess::Configuration claspConfiguration)
-{
-	m_claspConfiguration = claspConfiguration;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const AsyncProcess::Configuration &BenchmarkEnvironment::claspConfiguration() const
-{
-	return m_claspConfiguration;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void BenchmarkEnvironment::setGringoConfiguration(AsyncProcess::Configuration gringoConfiguration)
-{
-	m_gringoConfiguration = gringoConfiguration;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const AsyncProcess::Configuration &BenchmarkEnvironment::gringoConfiguration() const
-{
-	return m_gringoConfiguration;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void BenchmarkEnvironment::setFeedbackType(FeedbackType feedbackType)
 {
 	m_feedbackType = feedbackType;

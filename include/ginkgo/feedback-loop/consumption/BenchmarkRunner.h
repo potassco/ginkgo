@@ -2,6 +2,7 @@
 #define __FEEDBACK_LOOP__CONSUMPTION__BENCHMARK_RUNNER_H
 
 #include <memory>
+#include <sstream>
 
 #include <ginkgo/feedback-loop/production/Events.h>
 #include <ginkgo/feedback-loop/consumption/BenchmarkEnvironment.h>

@@ -6,7 +6,6 @@
 #include <boost/filesystem.hpp>
 
 #include <ginkgo/solving/__deprecated__Constraints.h>
-#include <ginkgo/solving/AsyncProcess.h>
 
 #include <ginkgo/feedback-loop/consumption/FeedbackType.h>
 
@@ -28,12 +27,6 @@ class BenchmarkEnvironment
 	public:
 		BenchmarkEnvironment(boost::filesystem::path filePrefix);
 
-		void setClaspConfiguration(AsyncProcess::Configuration claspConfiguration);
-		const AsyncProcess::Configuration &claspConfiguration() const;
-
-		void setGringoConfiguration(AsyncProcess::Configuration gringoConfiguration);
-		const AsyncProcess::Configuration &gringoConfiguration() const;
-
 		void setFeedbackType(FeedbackType feedbackType);
 		FeedbackType feedbackType() const;
 
@@ -49,9 +42,6 @@ class BenchmarkEnvironment
 
 	private:
 		boost::filesystem::path m_filePrefix;
-
-		AsyncProcess::Configuration m_claspConfiguration;
-		AsyncProcess::Configuration m_gringoConfiguration;
 
 		FeedbackType m_feedbackType;
 		size_t m_horizon;

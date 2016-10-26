@@ -88,40 +88,7 @@ void BenchmarkRunner::run()
 
 			const auto groundingStartTime = std::chrono::high_resolution_clock::now();
 
-			AsyncProcess gringo(m_environment->gringoConfiguration());
-
-			if (!groundingTimeout)
-			{
-				gringo.run(metaEncoding, std::chrono::minutes(10), groundingTimeout);
-				gringo.join();
-			}
-
-			const auto groundingFinishedTime = std::chrono::high_resolution_clock::now();
-
-			Json::Value output;
-
-			if (groundingTimeout)
-			{
-				output["Ginkgo"]["GroundingTimeout"] = true;
-
-				std::cout << "[Info ] Timeout at " << numberOfConstraints << "/" << m_constraints.size() << std::endl;
-			}
-			else
-			{
-				AsyncProcess clasp(m_environment->claspConfiguration());
-				BOOST_ASSERT(gringo.stdout());
-				clasp.run(*gringo.stdout());
-				clasp.join();
-
-				*clasp.stdout() >> output;
-				output["Ginkgo"]["GroundingTimeout"] = false;
-
-				std::cout << "[Info ] Measured " << numberOfConstraints << "/" << m_constraints.size() << std::endl;
-			}
-
-			output["Ginkgo"]["SelectedConstraints"] = static_cast<Json::UInt64>(numberOfConstraints);
-			output["Ginkgo"]["GroundingTime"] = std::chrono::duration<double>(groundingFinishedTime - groundingStartTime).count();
-			m_environment->consumptionStatisticsStream() << Json::FastWriter().write(output) << std::flush;
+			// TODO: reimplement
 		};
 
 	// Measure solving time without feedback

@@ -9,8 +9,6 @@
 
 #include <ginkgo/FeedbackLoopProduction.h>
 
-#include <ginkgo/solving/AsyncProcess.h>
-
 int main(int argc, char **argv)
 {
 	namespace po = boost::program_options;

@@ -3,6 +3,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <sstream>
 
 #include <ginkgo/feedback-loop/production/Environment.h>
 #include <ginkgo/feedback-loop/production/ProofResult.h>
@@ -52,9 +53,6 @@ class FeedbackLoop
 
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;
-
-		std::condition_variable m_pauseCondition;
-		std::mutex m_pauseConditionMutex;
 
 		Constraints m_extractedConstraints;
 		deprecated::Constraints m_feedback;

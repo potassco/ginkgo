@@ -11,7 +11,7 @@
 
 #include <ginkgo/feedback-loop/production/ClaspConstraintLogger.h>
 #include <ginkgo/utils/TextFile.h>
-#include <ginkgo/solving/ClaspOutputParsing.h>
+#include <ginkgo/solving/Satisfiability.h>
 
 namespace ginkgo
 {
