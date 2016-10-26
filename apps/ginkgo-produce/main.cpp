@@ -4,8 +4,6 @@
 
 #include <ginkgo/solving/__deprecated__Literal.h>
 #include <ginkgo/solving/__deprecated__Constraints.h>
-#include <ginkgo/solving/Clasp.h>
-#include <ginkgo/solving/Gringo.h>
 #include <ginkgo/utils/TextFile.h>
 #include <ginkgo/utils/Utils.h>
 
