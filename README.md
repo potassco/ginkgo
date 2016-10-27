@@ -13,10 +13,6 @@
 1. The candidate properties are validated, using an induction-based proof method or a simpler, state-wise method.
 1. Valid generalized constraints can finally be reused via *generalized constraint feedback*, that is, by enriching logic programs with the newly generalized constraints.
 
-## Literature
-
-* [Patrick Lühne](https://www.luehne.de), 2015. [*Generalizing Learned Knowledge in Answer Set Solving*](https://www.luehne.de/theses/generalizing-learned-knowledge-in-answer-set-solving.pdf). M.Sc. Thesis, Hasso Plattner Institute, Potsdam
-
 ## Building and Installation
 
 `ginkgo` is built with `cmake` and requires a compiler capable of C++14 as well as `boost` and `jsoncpp`.
@@ -33,6 +29,12 @@ The optional graphical output requires `GTKmm`.
 * `ginkgo-evaluate` displays a graphical evaluation of the statistical analyses.
 
 Use the option ```--help``` for a full list of options of each of the respective tools.
+
+## Literature
+
+* Martin Gebser, Roland Kaminski, Benjamin Kaufmann, [Patrick Lühne](https://www.luehne.de), Javier Romero, and Torsten Schaub: [*Answer Set Solving With Generalized Learned Constraints*](http://software.imdea.org/Conferences/ICLP2016/Proceedings/ICLP-TCs/p09-gebser.pdf). In: Technical Communications of the [32nd International Conference on Logic Programming](http://software.imdea.org/Conferences/ICLP2016/), 2016, pp. 9:1–9:14
+
+* [Patrick Lühne](https://www.luehne.de): [*Generalizing Learned Knowledge in Answer Set Solving*](https://www.luehne.de/theses/generalizing-learned-knowledge-in-answer-set-solving.pdf). M.Sc. Thesis, 2015, Hasso Plattner Institute, Potsdam
 
 ## Contributors
 
