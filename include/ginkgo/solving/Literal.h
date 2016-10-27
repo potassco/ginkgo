@@ -5,7 +5,7 @@
 
 #include <clasp/solver.h>
 
-#include <ginkgo/solving/SymbolTable.h>
+#include <ginkgo/solving/Symbol.h>
 
 namespace ginkgo
 {
@@ -28,12 +28,17 @@ class Literal
 	public:
 		Literal(Sign sign, const Symbol &symbol);
 
-		Sign sign;
-		const Symbol &symbol;
+		Sign sign() const;
+		const Symbol &symbol() const;
+
+	private:
+		Sign m_sign;
+		const Symbol &m_symbol;
 };
 
-using Constraint = std::vector<Literal>;
-using Constraints = std::vector<Constraint>;
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+using Literals = std::vector<Literal>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

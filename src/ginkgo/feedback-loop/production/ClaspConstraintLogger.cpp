@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <ginkgo/solving/Literal.h>
+#include <ginkgo/solving/Constraint.h>
 
 namespace ginkgo
 {
@@ -48,20 +48,21 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	readSymbolTable(outputTable);
 
-	const uint32_t maxLBD = 127;
-	uint32_t lbd = constraintInfo.lbd();
+	const uint32_t lbdMax = 127;
+	const auto lbdOriginal = constraintInfo.lbd();
+	uint32_t lbdAfterResolution = constraintInfo.lbd();
 
 	const auto allowedVariables = Clasp::VarInfo::Input | Clasp::VarInfo::Output;
 
 	Clasp::LitVec output;
 
-	if (lbd > maxLBD)
+	if (lbdOriginal > lbdMax)
 	{
-		std::cout << "\033[1;31mwarning: skipped conflict (LBD too high: " << lbd << ", maximum allowed: " << maxLBD << ")\033[0m" << std::endl;
+		std::cout << "\033[1;31mwarning: skipped conflict (LBD too high: " << lbdOriginal << ", maximum allowed: " << lbdMax << ")\033[0m" << std::endl;
 		return;
 	}
 
-	if (!solver.resolveToFlagged(claspLiterals, allowedVariables, output, lbd))
+	if (!solver.resolveToFlagged(claspLiterals, allowedVariables, output, lbdAfterResolution))
 	{
 		std::cout << "\033[1;33mwarning: skipped conflict (cannot be resolved to selected variables)\033[0m" << std::endl;
 		return;
@@ -69,8 +70,8 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	//std::cout << ":- ";
 
-	Constraint constraint;
-	constraint.reserve(output.size());
+	Literals literals;
+	literals.reserve(output.size());
 
 	for (auto i = output.begin(); i != output.end(); i++)
 	{
@@ -79,17 +80,21 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 		const auto literal = ~*i;
 
-		const auto &symbol = m_symbolTable.at(literal.var());
+		const auto &symbol = m_symbols.at(literal.var());
 		const auto sign = (symbol.claspLiteral == literal ? Literal::Sign::Positive : Literal::Sign::Negative);
 
-		constraint.emplace_back(Literal(sign, symbol));
+		literals.emplace_back(Literal(sign, symbol));
 
 		//std::cout << (sign == Literal::Sign::Negative ? "not " : "") << symbol.name;
 	}
 
+	Constraint constraint(std::move(literals));
+	constraint.setLBDOriginal(lbdOriginal);
+	constraint.setLBDAfterResolution(lbdAfterResolution);
+
 	m_constraints.emplace_back(constraint);
 
-	//std::cout << ".  %lbd = " << lbd << std::endl;
+	//std::cout << ".  %lbd = " << lbdAfterResolution << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,11 +111,11 @@ void ClaspConstraintLogger::readSymbolTable(const Clasp::OutputTable &outputTabl
 		{
 			const auto variable = predicate.cond.var();
 
-			if (m_symbolTable.size() <= variable)
-				m_symbolTable.resize(variable + 1, {noName, Clingo::Symbol(), Clasp::lit_false()});
+			if (m_symbols.size() <= variable)
+				m_symbols.resize(variable + 1, {noName, Clingo::Symbol(), Clasp::lit_false()});
 
-			if (m_symbolTable[variable].name == noName || (!predicate.cond.sign() && m_symbolTable[variable].claspLiteral.sign()))
-				m_symbolTable[variable] = {predicate.name.c_str(), Clingo::parse_term(predicate.name.c_str()), predicate.cond};
+			if (m_symbols[variable].name == noName || (!predicate.cond.sign() && m_symbols[variable].claspLiteral.sign()))
+				m_symbols[variable] = {predicate.name.c_str(), Clingo::parse_term(predicate.name.c_str()), predicate.cond};
 		});
 
 	m_seenSymbols = outputTable.size();

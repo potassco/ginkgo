@@ -1,11 +1,7 @@
-#ifndef __SOLVING__LITERAL_H
-#define __SOLVING__LITERAL_H
+#ifndef __SOLVING__CONSTRAINT_H
+#define __SOLVING__CONSTRAINT_H
 
-#include <clingo.hh>
-
-#include <clasp/solver.h>
-
-#include <ginkgo/solving/SymbolTable.h>
+#include <ginkgo/solving/Literal.h>
 
 namespace ginkgo
 {
@@ -15,6 +11,31 @@ namespace ginkgo
 // Constraint
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Constraint
+{
+	public:
+		Constraint(Literals &&literals);
+
+		Literals &literals();
+		const Literals &literals() const;
+
+		void setLBDOriginal(size_t lbdOriginal);
+		size_t lbdOriginal() const;
+
+		void setLBDAfterResolution(size_t lbdAfterResolution);
+		size_t lbdAfterResolution() const;
+
+	private:
+		Literals m_literals;
+
+		size_t m_lbdOriginal;
+		size_t m_lbdAfterResolution;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+using Constraints = std::vector<Constraint>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

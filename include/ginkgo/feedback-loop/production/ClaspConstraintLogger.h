@@ -5,7 +5,7 @@
 #include <clasp/solver.h>
 
 #include <ginkgo/solving/Literal.h>
-#include <ginkgo/solving/SymbolTable.h>
+#include <ginkgo/solving/Constraint.h>
 
 namespace ginkgo
 {
@@ -37,7 +37,7 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 
 		Constraints &m_constraints;
 
-		SymbolTable m_symbolTable;
+		Symbols m_symbols;
 		size_t m_seenSymbols;
 };
 
