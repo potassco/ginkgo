@@ -32,7 +32,7 @@ Use the option ```--help``` for a full list of options of each of the respective
 
 ## Literature
 
-* Martin Gebser, Roland Kaminski, Benjamin Kaufmann, [Patrick Lühne](https://www.luehne.de), Javier Romero, and Torsten Schaub: [*Answer Set Solving With Generalized Learned Constraints*](http://software.imdea.org/Conferences/ICLP2016/Proceedings/ICLP-TCs/p09-gebser.pdf). In: Technical Communications of the [32nd International Conference on Logic Programming](http://software.imdea.org/Conferences/ICLP2016/), 2016, pp. 9:1–9:14
+* Martin Gebser, Roland Kaminski, Benjamin Kaufmann, [Patrick Lühne](https://www.luehne.de), Javier Romero, and Torsten Schaub: [*Answer Set Solving with Generalized Learned Constraints*](http://software.imdea.org/Conferences/ICLP2016/Proceedings/ICLP-TCs/p09-gebser.pdf). In: Technical Communications of the [32nd International Conference on Logic Programming](http://software.imdea.org/Conferences/ICLP2016/), 2016, pp. 9:1–9:14
 
 * [Patrick Lühne](https://www.luehne.de): [*Generalizing Learned Knowledge in Answer Set Solving*](https://www.luehne.de/theses/generalizing-learned-knowledge-in-answer-set-solving.pdf). M.Sc. Thesis, 2015, Hasso Plattner Institute, Potsdam
 
