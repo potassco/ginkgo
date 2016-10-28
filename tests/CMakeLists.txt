@@ -20,4 +20,5 @@ target_link_libraries(${target} ${libraries})
 add_custom_target(run-tests
 	COMMAND ${CMAKE_BINARY_DIR}/bin/tests
 	DEPENDS ${target}
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)

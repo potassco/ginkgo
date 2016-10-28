@@ -37,7 +37,7 @@ if(BUILD_GTK3_GUI_TOOLS)
 	include_directories(
 		${GTKmm_INCLUDE_DIRS}
 	)
-endif(BUILD_GTK3_GUI_TOOLS)
+endif()
 
 include_directories(
 	${PROJECT_SOURCE_DIR}/include
@@ -85,7 +85,7 @@ if(BUILD_GTK3_GUI_TOOLS)
 		${feedback-loop-evaluation_sources}
 		${feedback-loop-evaluation_headers}
 	)
-endif(BUILD_GTK3_GUI_TOOLS)
+endif()
 
 set(libraries
 	${Boost_LIBRARIES}
@@ -100,7 +100,7 @@ if(BUILD_GTK3_GUI_TOOLS)
 
 		${GTKmm_LIBRARIES}
 	)
-endif(BUILD_GTK3_GUI_TOOLS)
+endif()
 
 add_library(${target} ${sources})
 target_link_libraries(${target} ${libraries})

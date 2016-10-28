@@ -13,7 +13,7 @@ find_package(Clingo REQUIRED)
 
 if(BUILD_GTK3_GUI_TOOLS)
 	pkg_check_modules(GTKmm REQUIRED gtkmm-3.0>=3.12.0)
-endif(BUILD_GTK3_GUI_TOOLS)
+endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -25,6 +25,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src)
 add_subdirectory(apps)
+
 if(BUILD_TESTS)
 	add_subdirectory(tests)
-endif(BUILD_TESTS)
+endif()
