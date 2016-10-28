@@ -1,6 +1,8 @@
 #ifndef __SOLVING__CONSTRAINT_H
 #define __SOLVING__CONSTRAINT_H
 
+#include <set>
+
 #include <ginkgo/solving/Literal.h>
 
 namespace ginkgo
@@ -15,7 +17,9 @@ namespace ginkgo
 class Constraint
 {
 	public:
-		Constraint(Literals &&literals);
+		Constraint(size_t id, Literals &&literals);
+
+		size_t id() const;
 
 		Literals &literals();
 		const Literals &literals() const;
@@ -27,6 +31,8 @@ class Constraint
 		size_t lbdAfterResolution() const;
 
 	private:
+		size_t m_id;
+
 		Literals m_literals;
 
 		size_t m_lbdOriginal;
@@ -35,7 +41,20 @@ class Constraint
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using Constraints = std::vector<Constraint>;
+struct sortConstraints
+{
+	bool operator()(const Constraint &c1, const Constraint &c2)
+	{
+		if (c1.literals().size() == c2.literals().size())
+			return c1.id() < c2.id();
+
+		return c1.literals().size() < c2.literals().size();
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+using Constraints = std::set<Constraint, sortConstraints>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -418,38 +418,18 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 		metaEncoding.clear();
 		metaEncoding.seekg(0, std::ios::beg);
 
-		Clingo::Control clingoControl({"--heuristic=Domain", "--dom-mod=1,16", "--loops=no", "--reverse-arcs=0", "--otfs=0", "--stats"});
-		clingoControl.add("base", {}, metaEncoding.str().c_str());
-		clingoControl.ground({{"base", {}}});
+		ClaspConstraintLogger claspConstraintLogger(metaEncoding, m_extractedConstraints);
 
-		auto &claspFacade = *static_cast<Clasp::ClaspFacade *>(clingoControl.claspFacade());
+		claspConstraintLogger.fill(16384);
 
-		auto previousEventHandler = claspFacade.ctx.eventHandler();
-
-		ClaspConstraintLogger claspConstraintLogger(previousEventHandler, m_extractedConstraints);
-
-		claspFacade.ctx.setEventHandler(&claspConstraintLogger, Clasp::SharedContext::report_conflict);
-
-		const auto handleModel = [](auto model)
-			{
-				std::cout << "model found" << std::endl;
-
-				return true;
-			};
-
-		const auto handleFinished = [](auto result)
-			{
-				std::cout << "search finished" << std::endl;
-			};
-
-		auto solveAsync = clingoControl.solve_async(handleModel, handleFinished);
-
-		const auto stillRunning = solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
+		/*const auto stillRunning = solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
 
 		if (stillRunning)
 			std::cout << "still searching" << std::endl;
 		else
-			std::cout << "search finished" << std::endl;
+			std::cout << "search finished" << std::endl;*/
+
+
 
 		// TODO: handle already running feedback extraction
 		m_feedback.clear();

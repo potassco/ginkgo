@@ -17,11 +17,55 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ClaspConstraintLogger::ClaspConstraintLogger(Clasp::EventHandler *childEventHandler, Constraints &constraints)
-:	m_childEventHandler{childEventHandler},
+ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, Constraints &constraints)
+:	m_state{State::Full},
+	m_clingoControl{{"--heuristic=Domain", "--dom-mod=1,16", "--loops=no", "--reverse-arcs=0", "--otfs=0", "--stats"}},
 	m_constraints(constraints),
+	m_currentConstraintID{0},
 	m_seenSymbols{0}
 {
+	m_clingoControl.add("base", {}, program.str().c_str());
+	m_clingoControl.ground({{"base", {}}});
+
+	auto &claspFacade = *static_cast<Clasp::ClaspFacade *>(m_clingoControl.claspFacade());
+
+	m_childEventHandler = claspFacade.ctx.eventHandler();
+
+	claspFacade.ctx.setEventHandler(this, Clasp::SharedContext::report_conflict);
+
+	const auto handleModel = [](auto model)
+		{
+			std::cout << "model found" << std::endl;
+
+			return true;
+		};
+
+	const auto handleFinished = [](auto result)
+		{
+			std::cout << "search finished" << std::endl;
+		};
+
+	m_clingoSolveAsync = std::make_unique<Clingo::SolveAsync>(m_clingoControl.solve_async(handleModel, handleFinished));
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ClaspConstraintLogger::fill(size_t constraintBufferSize)
+{
+	{
+		std::lock_guard<std::mutex> lock(m_constraintBufferMutex);
+		m_constraintBufferSize = constraintBufferSize;
+
+		if (m_constraints.size() >= constraintBufferSize)
+			return;
+
+		m_state = State::Filling;
+	}
+
+	m_constraintBufferCondition.notify_one();
+
+	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
+	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Full;});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,11 +132,26 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		//std::cout << (sign == Literal::Sign::Negative ? "not " : "") << symbol.name;
 	}
 
-	Constraint constraint(std::move(literals));
+	std::cout << "constraint " << (m_currentConstraintID + 1) << std::endl;
+
+	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
+	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Filling;});
+
+	Constraint constraint(m_currentConstraintID, std::move(literals));
 	constraint.setLBDOriginal(lbdOriginal);
 	constraint.setLBDAfterResolution(lbdAfterResolution);
 
-	m_constraints.emplace_back(constraint);
+	m_constraints.insert(constraint);
+
+	m_currentConstraintID++;
+
+	if (m_constraints.size() >= m_constraintBufferSize)
+	{
+		m_state = State::Full;
+
+		lock.unlock();
+		m_constraintBufferCondition.notify_one();
+	}
 
 	//std::cout << ".  %lbd = " << lbdAfterResolution << std::endl;
 }
