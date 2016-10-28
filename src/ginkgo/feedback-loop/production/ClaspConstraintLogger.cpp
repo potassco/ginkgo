@@ -132,8 +132,6 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		//std::cout << (sign == Literal::Sign::Negative ? "not " : "") << symbol.name;
 	}
 
-	std::cout << "constraint " << (m_currentConstraintID + 1) << std::endl;
-
 	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
 	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Filling;});
 

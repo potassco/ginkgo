@@ -68,4 +68,28 @@ size_t Constraint::lbdAfterResolution() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+std::ostream &operator<<(std::ostream &stream, const Constraint &constraint)
+{
+	stream << ":- ";
+
+	for (auto i = constraint.literals().cbegin(); i != constraint.literals().cend(); i++)
+	{
+		const auto &literal = *i;
+
+		if (i != constraint.literals().cbegin())
+			stream << ", ";
+
+		if (literal.sign() == Literal::Sign::Negative)
+			stream << "not ";
+
+		stream << literal.symbol().clingoSymbol;
+	}
+
+	stream << ".  %lbd = " << constraint.lbdAfterResolution();
+
+	return stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
