@@ -1,5 +1,7 @@
 #include <ginkgo/solving/Constraint.h>
 
+#include <boost/assert.hpp>
+
 namespace ginkgo
 {
 
@@ -68,24 +70,131 @@ size_t Constraint::lbdAfterResolution() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::ostream &operator<<(std::ostream &stream, const Constraint &constraint)
+std::tuple<size_t, size_t> Constraint::timeRange() const
+{
+	// Currently, normalization only works for plasp-formatted encodings
+	/*std::for_each(m_literals.cbegin(), m_literals.cend(), [](const auto &literal)
+	{
+		BOOST_ASSERT_MSG(Literal::SupportedTimeIdentifiers.find(*literal.name()) != Literal::SupportedTimeIdentifiers.end(),
+			"Identifier unsupported");
+	});*/
+
+	size_t timeMin = std::numeric_limits<size_t>::max();
+	size_t timeMax = std::numeric_limits<size_t>::min();
+
+	for (const auto &literal : m_literals)
+	{
+		BOOST_ASSERT(!literal.symbol().clingoSymbol.arguments().empty());
+
+		const auto &timeArgument = literal.symbol().clingoSymbol.arguments().back();
+		const size_t time = timeArgument.number();
+
+		// Actions require at least one preceding time step in order to check preconditions
+		if (std::strcmp(literal.symbol().clingoSymbol.name(), "apply") == 0 || std::strcmp(literal.symbol().clingoSymbol.name(), "del") == 0)
+			timeMin = std::min(timeMin, time - 1);
+		else
+			timeMin = std::min(timeMin, time);
+
+		timeMax = std::max(timeMax, time);
+	}
+
+	return std::make_tuple(timeMin, timeMax);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Constraint::print(std::ostream &stream) const
+{
+	print(stream, OutputFormat::Normal);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Constraint::printNormalized(std::ostream &stream, int offset) const
+{
+	print(stream, OutputFormat::Normalized, offset);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Constraint::printGeneralized(std::ostream &stream, int offset) const
+{
+	print(stream, OutputFormat::Generalized, offset);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputFormat, int offset) const
 {
 	stream << ":- ";
 
-	for (auto i = constraint.literals().cbegin(); i != constraint.literals().cend(); i++)
+	const auto printNormalizedLiteral =
+		[&](const auto &literal)
+		{
+			const auto &clingoSymbol = literal.symbol().clingoSymbol;
+
+			stream << clingoSymbol.name();
+
+			if (clingoSymbol.arguments().empty())
+				return;
+
+			stream << "(";
+
+			for (auto i = clingoSymbol.arguments().begin(); i != clingoSymbol.arguments().end() - 1; i++)
+			{
+				const auto &argument = *i;
+
+				if (i != clingoSymbol.arguments().begin())
+					stream << ",";
+
+				stream << argument;
+			}
+
+			if (clingoSymbol.arguments().size() > 1)
+				stream << ",";
+
+			const auto &timeArgument = clingoSymbol.arguments().back();
+			const int time = timeArgument.number() + offset;
+
+			if (outputFormat == OutputFormat::Normalized)
+				stream << time;
+			else if (outputFormat == OutputFormat::Generalized)
+			{
+				stream << "T";
+
+				if (time > 0)
+					stream << "+" << time;
+				else if (time < 0)
+					stream << "-" << -time;
+			}
+
+			stream << ")";
+		};
+
+	for (auto i = m_literals.cbegin(); i != m_literals.cend(); i++)
 	{
 		const auto &literal = *i;
 
-		if (i != constraint.literals().cbegin())
+		if (i != m_literals.cbegin())
 			stream << ", ";
 
 		if (literal.sign() == Literal::Sign::Negative)
 			stream << "not ";
 
-		stream << literal.symbol().clingoSymbol;
+		if (outputFormat == OutputFormat::Normal)
+			stream << literal.symbol().clingoSymbol;
+		else
+			printNormalizedLiteral(literal);
 	}
 
-	stream << ".  %lbd = " << constraint.lbdAfterResolution();
+	stream << ".  %lbd = " << m_lbdAfterResolution;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::ostream &operator<<(std::ostream &stream, const Constraint &constraint)
+{
+	constraint.print(stream);
 
 	return stream;
 }

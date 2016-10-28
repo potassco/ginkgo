@@ -421,13 +421,25 @@ void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
 		ClaspConstraintLogger claspConstraintLogger(metaEncoding, m_extractedConstraints);
 
 		claspConstraintLogger.fill(1000);
-		std::cout << m_extractedConstraints.size() << std::endl;
 
 		std::for_each(m_extractedConstraints.cbegin(), m_extractedConstraints.cend(),
 			[&](const auto &constraint)
 			{
 				std::cout << constraint << std::endl;
 			});
+
+		std::cout << std::endl << std::endl;
+
+		std::for_each(m_extractedConstraints.cbegin(), m_extractedConstraints.cend(),
+			[&](const auto &constraint)
+			{
+				const auto timeMin = std::get<0>(constraint.timeRange());
+
+				constraint.printGeneralized(std::cout, -timeMin);
+				std::cout << std::endl;
+			});
+
+		exit(0);
 
 		/*const auto stillRunning = solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
 

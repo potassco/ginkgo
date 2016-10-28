@@ -30,7 +30,23 @@ class Constraint
 		void setLBDAfterResolution(size_t lbdAfterResolution);
 		size_t lbdAfterResolution() const;
 
+		std::tuple<size_t, size_t> timeRange() const;
+
+		void print(std::ostream &stream) const;
+		void printNormalized(std::ostream &stream, int offset) const;
+		void printGeneralized(std::ostream &stream, int offset) const;
+
 	private:
+		enum class OutputFormat
+		{
+			Normal,
+			Normalized,
+			Generalized
+		};
+
+	private:
+		void print(std::ostream &stream, OutputFormat outputFormat, int offset = 0) const;
+
 		size_t m_id;
 
 		Literals m_literals;

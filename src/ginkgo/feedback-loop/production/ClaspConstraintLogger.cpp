@@ -112,24 +112,17 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		return;
 	}
 
-	//std::cout << ":- ";
-
 	Literals literals;
 	literals.reserve(output.size());
 
 	for (auto i = output.begin(); i != output.end(); i++)
 	{
-		//if (i != output.begin())
-		//	std::cout << ", ";
-
 		const auto literal = ~*i;
 
 		const auto &symbol = m_symbols.at(literal.var());
 		const auto sign = (symbol.claspLiteral == literal ? Literal::Sign::Positive : Literal::Sign::Negative);
 
 		literals.emplace_back(Literal(sign, symbol));
-
-		//std::cout << (sign == Literal::Sign::Negative ? "not " : "") << symbol.name;
 	}
 
 	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
@@ -150,8 +143,6 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		lock.unlock();
 		m_constraintBufferCondition.notify_one();
 	}
-
-	//std::cout << ".  %lbd = " << lbdAfterResolution << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
