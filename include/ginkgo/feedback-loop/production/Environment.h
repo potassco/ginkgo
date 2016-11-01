@@ -13,8 +13,6 @@
 #include <ginkgo/feedback-loop/production/ProofMethod.h>
 #include <ginkgo/feedback-loop/production/TestingPolicy.h>
 
-#include <ginkgo/solving/__deprecated__Constraints.h>
-
 namespace ginkgo
 {
 namespace feedbackLoop
@@ -37,9 +35,6 @@ class Environment
 		std::ofstream &generalizedConstraintsStream();
 		std::ofstream &statisticsStream();
 
-		deprecated::SymbolTable &symbolTable();
-		const deprecated::SymbolTable &symbolTable() const;
-
 		void setLogLevel(LogLevel logLevel);
 		LogLevel logLevel() const;
 
@@ -49,8 +44,6 @@ class Environment
 		std::ofstream m_directConstraintsStream;
 		std::ofstream m_generalizedConstraintsStream;
 		std::ofstream m_statisticsStream;
-
-		deprecated::SymbolTable m_symbolTable;
 
 		LogLevel m_logLevel;
 };

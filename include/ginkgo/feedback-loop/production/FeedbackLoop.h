@@ -5,10 +5,10 @@
 #include <mutex>
 #include <sstream>
 
+#include <ginkgo/feedback-loop/production/ClaspConstraintLogger.h>
 #include <ginkgo/feedback-loop/production/Environment.h>
-#include <ginkgo/feedback-loop/production/ProofResult.h>
 #include <ginkgo/feedback-loop/production/Events.h>
-
+#include <ginkgo/feedback-loop/production/ProofResult.h>
 #include <ginkgo/solving/Constraint.h>
 #include <ginkgo/solving/__deprecated__GeneralizedConstraint.h>
 
@@ -46,7 +46,7 @@ class FeedbackLoop
 
 	private:
 		void mergeEncodings();
-		void generateFeedback(size_t constraintsToExtract, bool startOver = true);
+		void prepareExtraction();
 		deprecated::GeneralizedConstraint minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement);
 		ProofResult testHypothesisStateWise(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
 		ProofResult testHypothesisInduction(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
@@ -54,13 +54,14 @@ class FeedbackLoop
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;
 
+		std::unique_ptr<ClaspConstraintLogger> m_claspConstraintLogger;
+
 		Constraints m_extractedConstraints;
-		deprecated::Constraints m_feedback;
+		Constraints m_learnedConstraints;
 
 		Events m_events;
 
 		std::stringstream m_program;
-		deprecated::Constraints m_learnedConstraints;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

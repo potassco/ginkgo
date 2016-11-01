@@ -9,7 +9,6 @@
 
 #include <json/json.h>
 
-#include <ginkgo/feedback-loop/production/ClaspConstraintLogger.h>
 #include <ginkgo/utils/TextFile.h>
 #include <ginkgo/solving/Satisfiability.h>
 
@@ -115,11 +114,9 @@ const std::string FeedbackLoop::InductiveProofStepEncoding =
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-FeedbackLoop::FeedbackLoop(std::unique_ptr<Environment> environment, std::unique_ptr<Configuration<Plain> > configuration)
+FeedbackLoop::FeedbackLoop(std::unique_ptr<Environment> environment, std::unique_ptr<Configuration<Plain>> configuration)
 :	m_environment(std::move(environment)),
-	m_configuration(std::move(configuration)),
-	m_feedback(m_environment->symbolTable()),
-	m_learnedConstraints(m_environment->symbolTable())
+	m_configuration(std::move(configuration))
 {
 }
 
@@ -129,252 +126,56 @@ void FeedbackLoop::run()
 {
 	setlocale(LC_NUMERIC, "C");
 
-	m_feedback.clear();
-
 	mergeEncodings();
 
 	m_events.startTimer();
 
-	bool startOver = true;
-
 	while (true)
 	{
-		generateFeedback(m_configuration->constraintsToExtract, startOver);
+		prepareExtraction();
 
-		if (m_feedback.empty())
+		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
+
+		if (m_extractedConstraints.empty())
 			// No more constraints, exiting
 			break;
 
-		// If we couldn't prove anything, we'll extract more constraints next time
-		startOver = false;
-
-		auto extractedConstraints = m_feedback.size();
+		// TODO: reimplement statistics
 
 		// Remove constraints with a too high degree
-		m_feedback.removeConstraintsWithTooHighDegree(m_configuration->maxDegree);
+		// TODO: reimplement
 
-		if (m_environment->logLevel() == LogLevel::Debug)
-		{
-			std::cout << "[Info ] \033[1;33mRemoved " << (extractedConstraints - m_feedback.size())
-				<< " constraints with a degree higher than " << m_configuration->maxDegree
-				<< "\033[0m" << std::endl;
-		}
-
-		// Statistics
-		{
-			EventConstraintsRemoved event =
-			{
-				EventConstraintsRemoved::Source::Feedback,
-				EventConstraintsRemoved::Reason::DegreeTooHigh,
-				extractedConstraints - m_feedback.size(),
-				m_feedback.size()
-			};
-
-			m_events.notifyConstraintsRemoved(event);
-		}
-
-		extractedConstraints = m_feedback.size();
-
-		// Remove constraints with too many literals
-		m_feedback.removeConstraintsContainingTooManyLiterals(m_configuration->maxNumberOfLiterals);
-
-		if (m_environment->logLevel() == LogLevel::Debug)
-		{
-			std::cout << "[Info ] \033[1;33mRemoved " << (extractedConstraints - m_feedback.size())
-				<< " constraints containing more than " << m_configuration->maxNumberOfLiterals
-				<< " literals\033[0m" << std::endl;
-		}
-
-		// Statistics
-		{
-			EventConstraintsRemoved event =
-			{
-				EventConstraintsRemoved::Source::Feedback,
-				EventConstraintsRemoved::Reason::ContainsTooManyLiterals,
-				extractedConstraints - m_feedback.size(),
-				m_feedback.size()
-			};
-
-			m_events.notifyConstraintsRemoved(event);
-		}
-
-		extractedConstraints = m_feedback.size();
-
-		// Remove all 'terminal' literal
-		m_feedback.removeLiterals("terminal");
+		// Remove all “terminal” literal
+		// TODO: reimplement
 
 		// Remove all constraints subsumed by previously proven constraints
-		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](auto constraint)
-		{
-			m_feedback.removeConstraintsSubsumedBy(deprecated::GeneralizedConstraint(constraint));
-		});
-
-		// Statistics
-		{
-			EventConstraintsRemoved event =
-			{
-				EventConstraintsRemoved::Source::Feedback,
-				EventConstraintsRemoved::Reason::Subsumed,
-				extractedConstraints - m_feedback.size(),
-				m_feedback.size()
-			};
-
-			m_events.notifyConstraintsRemoved(event);
-		}
+		// TODO: reimplement
 
 		// Sort in descending order so that we can efficiently pop elements from the back
-		m_feedback.sortBy(deprecated::Constraints::SortKey::TimeDegree, deprecated::Constraints::SortDirection::Descending, true);
+		// TODO: reimplement
 
-		std::for_each(m_feedback.cbegin(), m_feedback.cend(), [](const auto &constraint)
+		while (!m_extractedConstraints.empty())
 		{
-			BOOST_ASSERT(constraint);
-		});
+			const auto constraint = *m_extractedConstraints.begin();
+			m_extractedConstraints.erase(m_extractedConstraints.begin());
 
-		while (!m_feedback.empty())
-		{
-			const auto constraint = m_feedback.back();
-			// Pop the constraint to test
-			m_feedback.pop_back();
+			m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
 
-			BOOST_ASSERT(!constraint->containsIdentifier("terminal"));
+			std::cout << "\033[1;30mTesting constraint:\033[0m ";
 
-			auto hypothesis = deprecated::GeneralizedConstraint(constraint);
+			const auto timeMin = std::get<0>(constraint.timeRange());
 
-			if (m_environment->logLevel() == LogLevel::Debug)
-			{
-				std::cout << "[Info ] Testing hypothesis (degree: " << hypothesis.degree()
-					<< ", #literals: " << hypothesis.numberOfLiterals() << ")" << std::endl;
-			}
+			constraint.printGeneralized(std::cout, -timeMin);
 
-			auto proofResult = ProofResult::Unknown;
+			std::cout << std::endl;
 
-			switch (m_configuration->proofMethod)
-			{
-				case ProofMethod::StateWise:
-					proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Prove);
-					break;
-				case ProofMethod::Inductive:
-					proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Prove);
-					break;
-				default:
-					std::cerr << "[Error] Unknown proof method" << std::endl;
-					break;
-			}
-
-			if (proofResult == ProofResult::Unknown)
-			{
-				std::cerr << "[Error] Invalid proof result" << std::endl;
-				continue;
-			}
-
-			if (proofResult == ProofResult::Unproven)
-			{
-				if (m_environment->logLevel() == LogLevel::Debug)
-					std::cout << "[Info ] \033[1;31mHypothesis unproven\033[0m" << std::endl;
-
-				continue;
-			}
-
-			if (proofResult == ProofResult::GroundingTimeout || proofResult == ProofResult::SolvingTimeout)
-			{
-				if (m_environment->logLevel() == LogLevel::Debug)
-					std::cout << "[Info ] \033[1;33mTimeout proving hypothesis\033[0m" << std::endl;
-
-				continue;
-			}
-
-			// TODO: Handle sigterm etc. and gracefully terminate all child processes
-
-			// Constraint is proven, now try to minimize it (if enabled)
-			if (m_configuration->minimizationStrategy == MinimizationStrategy::SimpleMinimization)
-				hypothesis = minimizeConstraint(hypothesis, 0);
-			else if (m_configuration->minimizationStrategy == MinimizationStrategy::LinearMinimization)
-				hypothesis = minimizeConstraint(hypothesis, 1);
-
-			// If proven, remove all subsumed constraints (they are weaker and also satisfied)
-			const auto feedbackSizeBefore = m_feedback.size();
-			m_feedback.removeConstraintsSubsumedBy(hypothesis);
-
-			if (m_environment->logLevel() == LogLevel::Debug)
-				std::cout << "[Info ] New constraint subsumed " << (feedbackSizeBefore - m_feedback.size()) << " constraints from feedback" << std::endl;
-
-			// Statistics
-			{
-				EventConstraintsRemoved event =
-				{
-					EventConstraintsRemoved::Source::Feedback,
-					EventConstraintsRemoved::Reason::Subsumed,
-					(feedbackSizeBefore - m_feedback.size()),
-					m_feedback.size()
-				};
-
-				m_events.notifyConstraintsRemoved(event);
-			}
-
-			std::for_each(m_feedback.cbegin(), m_feedback.cend(), [](auto constraint)
-			{
-				BOOST_ASSERT(constraint);
-			});
-
-			// Add new generalized constraint
-			m_learnedConstraints.push_back(hypothesis.originalConstraint());
-
-			auto &directConstraintsStream = m_environment->directConstraintsStream();
-			auto &generalizedConstraintsStream = m_environment->generalizedConstraintsStream();
-
-			constraint->print(directConstraintsStream);
-			directConstraintsStream << std::endl;
-
-			hypothesis.print(generalizedConstraintsStream);
-			generalizedConstraintsStream << std::endl;
-
-			// Statistics
-			{
-				EventConstraintLearned event =
-				{
-					hypothesis.degree(),
-					hypothesis.numberOfLiterals(),
-					m_learnedConstraints.size()
-				};
-
-				m_events.notifyConstraintLearned(event);
-			}
-
-			std::cout << "[Info ] \033[1;32mHypothesis proven\033[0m" << " ("
-				<< m_learnedConstraints.size() << "/"
-				<< m_configuration->constraintsToProve << ")" << std::endl;
-
-			// We have learned a constraint, so we can extract new feedback next time
-			startOver = true;
-
-			// Generate new feedback when using the find-first policy (else, continue testing with test-all)
-			if (m_configuration->testingPolicy == TestingPolicy::FindFirst)
-				break;
-
-			// Stop if we have proven enough constraints
-			if (m_learnedConstraints.size() >= m_configuration->constraintsToProve)
-				break;
+			// TODO: reimplement
 		}
 
 		// Stop if we have proven enough constraints
 		if (m_learnedConstraints.size() >= m_configuration->constraintsToProve)
 			break;
 	}
-
-	// Statistics
-	if (m_learnedConstraints.size() == m_configuration->constraintsToProve)
-	{
-		EventFinished event = {EventFinished::Reason::Done};
-		m_events.notifyFinished(event);
-	}
-
-	auto &statisticsStream = m_environment->statisticsStream();
-
-	Json::Value statistics;
-	statistics["Configuration"] = m_configuration->toJSON();
-	statistics["Events"] = m_events.toJSON();
-
-	statisticsStream << statistics;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -396,63 +197,30 @@ void FeedbackLoop::mergeEncodings()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FeedbackLoop::generateFeedback(size_t constraintsToExtract, bool startOver)
+void FeedbackLoop::prepareExtraction()
 {
-	if (startOver)
-	{
-		m_program.clear();
-		m_program.seekg(0, std::ios::beg);
+	m_program.clear();
+	m_program.seekg(0, std::ios::beg);
 
-		std::stringstream metaEncoding;
-		metaEncoding
-			<< "#const horizon=" << m_configuration->horizon << "." << std::endl
-			<< MetaEncoding << std::endl
-			<< m_program.rdbuf() << std::endl;
+	std::stringstream metaEncoding;
+	metaEncoding
+		<< "#const horizon=" << m_configuration->horizon << "." << std::endl
+		<< MetaEncoding << std::endl
+		<< m_program.rdbuf() << std::endl;
 
-		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
+	std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(),
+		[&](const auto &learnedConstraint)
 		{
-			deprecated::GeneralizedConstraint(constraint).print(metaEncoding);
+			const auto timeMin = std::get<0>(learnedConstraint.timeRange());
+
+			learnedConstraint.printGeneralized(metaEncoding, -timeMin);
 			metaEncoding << std::endl;
 		});
 
-		metaEncoding.clear();
-		metaEncoding.seekg(0, std::ios::beg);
+	metaEncoding.clear();
+	metaEncoding.seekg(0, std::ios::beg);
 
-		ClaspConstraintLogger claspConstraintLogger(metaEncoding, m_extractedConstraints);
-
-		claspConstraintLogger.fill(1000);
-
-		std::for_each(m_extractedConstraints.cbegin(), m_extractedConstraints.cend(),
-			[&](const auto &constraint)
-			{
-				std::cout << constraint << std::endl;
-			});
-
-		std::cout << std::endl << std::endl;
-
-		std::for_each(m_extractedConstraints.cbegin(), m_extractedConstraints.cend(),
-			[&](const auto &constraint)
-			{
-				const auto timeMin = std::get<0>(constraint.timeRange());
-
-				constraint.printGeneralized(std::cout, -timeMin);
-				std::cout << std::endl;
-			});
-
-		exit(0);
-
-		/*const auto stillRunning = solveAsync.wait(m_configuration->extractionTimeout.count() / 1000.0);
-
-		if (stillRunning)
-			std::cout << "still searching" << std::endl;
-		else
-			std::cout << "search finished" << std::endl;*/
-
-
-
-		// TODO: handle already running feedback extraction
-		m_feedback.clear();
-	}
+	m_claspConstraintLogger = std::make_unique<ClaspConstraintLogger>(metaEncoding, m_extractedConstraints);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -585,7 +353,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const deprecated::GeneralizedC
 
 	std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 	{
-		deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
+		//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 		proofEncoding << std::endl;
 	});
 
@@ -636,7 +404,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedC
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
+			//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 			proofEncoding << std::endl;
 		});
 
@@ -697,7 +465,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedC
 
 		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
 		{
-			deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
+			//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 			proofEncoding << std::endl;
 		});
 
