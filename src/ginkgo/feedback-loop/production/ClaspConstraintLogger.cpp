@@ -17,12 +17,14 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, Constraints &constraints)
+ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, ConstraintBuffer &constraintBuffer,
+	const Configuration<Plain> &configuration)
 :	m_state{State::Full},
 	m_clingoControl{{"--heuristic=Domain", "--dom-mod=1,16", "--loops=no", "--reverse-arcs=0", "--otfs=0", "--stats"}},
-	m_constraints(constraints),
+	m_constraintBuffer(constraintBuffer),
 	m_currentConstraintID{0},
-	m_seenSymbols{0}
+	m_seenSymbols{0},
+	m_configuration(configuration)
 {
 	m_clingoControl.add("base", {}, program.str().c_str());
 	m_clingoControl.ground({{"base", {}}});
@@ -42,7 +44,7 @@ ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, Constra
 
 	const auto handleFinished = [](auto result)
 		{
-			std::cout << "search finished" << std::endl;
+			std::cout << "[Info ] Terminated constraint extraction" << std::endl;
 		};
 
 	m_clingoSolveAsync = std::make_unique<Clingo::SolveAsync>(m_clingoControl.solve_async(handleModel, handleFinished));
@@ -56,7 +58,7 @@ void ClaspConstraintLogger::fill(size_t constraintBufferSize)
 		std::lock_guard<std::mutex> lock(m_constraintBufferMutex);
 		m_constraintBufferSize = constraintBufferSize;
 
-		if (m_constraints.size() >= constraintBufferSize)
+		if (m_constraintBuffer.size() >= constraintBufferSize)
 			return;
 
 		m_state = State::Filling;
@@ -66,6 +68,18 @@ void ClaspConstraintLogger::fill(size_t constraintBufferSize)
 
 	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
 	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Full;});
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ClaspConstraintLogger::terminate()
+{
+	{
+		std::lock_guard<std::mutex> lock(m_constraintBufferMutex);
+		m_state = State::Terminated;
+	}
+
+	m_constraintBufferCondition.notify_one();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,17 +140,35 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 	}
 
 	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
-	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Filling;});
+	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Filling || m_state == State::Terminated;});
+
+	if (m_state == State::Terminated)
+		return;
 
 	Constraint constraint(m_currentConstraintID, std::move(literals));
 	constraint.setLBDOriginal(lbdOriginal);
 	constraint.setLBDAfterResolution(lbdAfterResolution);
 
-	m_constraints.insert(constraint);
+	const auto timeRange = constraint.timeRange();
+	const auto degree = std::get<1>(timeRange) - std::get<0>(timeRange);
+
+	if (degree > m_configuration.maxDegree)
+	{
+		std::cout << "\033[1;33mwarning: skipped conflict (degree too high)\033[0m" << std::endl;
+		return;
+	}
+
+	if (constraint.literals().size() > m_configuration.maxNumberOfLiterals)
+	{
+		std::cout << "\033[1;33mwarning: skipped conflict (too many literals)\033[0m" << std::endl;
+		return;
+	}
+
+	m_constraintBuffer.insert(constraint);
 
 	m_currentConstraintID++;
 
-	if (m_constraints.size() >= m_constraintBufferSize)
+	if (m_constraintBuffer.size() >= m_constraintBufferSize)
 	{
 		m_state = State::Full;
 

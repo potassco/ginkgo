@@ -9,6 +9,7 @@
 #include <clasp/solver.h>
 #include <clingo.hh>
 
+#include <ginkgo/feedback-loop/production/Configuration.h>
 #include <ginkgo/solving/Literal.h>
 #include <ginkgo/solving/Constraint.h>
 
@@ -28,15 +29,17 @@ namespace production
 class ClaspConstraintLogger: public Clasp::EventHandler
 {
 	public:
-		ClaspConstraintLogger(std::stringstream &program, Constraints &constraints);
+		ClaspConstraintLogger(std::stringstream &program, ConstraintBuffer &constraintBuffer, const Configuration<Plain> &configuration);
 
 		void fill(size_t constraintBufferSize);
+		void terminate();
 
 	private:
 		enum class State
 		{
 			Filling,
-			Full
+			Full,
+			Terminated
 		};
 
 	private:
@@ -52,7 +55,7 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 
 		Clasp::EventHandler *m_childEventHandler;
 
-		Constraints &m_constraints;
+		ConstraintBuffer &m_constraintBuffer;
 		size_t m_currentConstraintID;
 
 		Symbols m_symbols;
@@ -61,6 +64,8 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 		size_t m_constraintBufferSize;
 		std::condition_variable m_constraintBufferCondition;
 		std::mutex m_constraintBufferMutex;
+
+		const Configuration<Plain> &m_configuration;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -130,52 +130,116 @@ void FeedbackLoop::run()
 
 	m_events.startTimer();
 
-	while (true)
+	if (m_environment->logLevel() == LogLevel::Debug)
+		std::cout << "[Info ] Starting initial constraint extraction" << std::endl;
+
+	prepareExtraction();
+
+	m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
+
+	if (m_environment->logLevel() == LogLevel::Debug)
+		std::cout << "[Info ] Finished initial constraint extraction" << std::endl;
+
+	if (m_extractedConstraints.empty())
+		// No more constraints, exiting
+		return;
+
+	// TODO: reimplement statistics
+
+	// Remove constraints with a too high degree
+	// TODO: reimplement
+
+	// Remove all “terminal” literal
+	// TODO: reimplement
+
+	// Remove all constraints subsumed by previously proven constraints
+	// TODO: reimplement
+
+	// Sort in descending order so that we can efficiently pop elements from the back
+	// TODO: reimplement
+
+	while (!m_extractedConstraints.empty())
 	{
-		prepareExtraction();
+		// TODO: don’t copy constraint
+		const auto candidate = *m_extractedConstraints.begin();
+		m_extractedConstraints.erase(m_extractedConstraints.begin());
 
 		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
 
-		if (m_extractedConstraints.empty())
-			// No more constraints, exiting
-			break;
+		const auto timeRange = candidate.timeRange();
+		const auto timeMin = std::get<0>(timeRange);
+		const auto timeMax = std::get<1>(timeRange);
+		const auto degree = timeMax - timeMin;
 
-		// TODO: reimplement statistics
+		if (m_environment->logLevel() == LogLevel::Debug)
+			std::cout << "[Info ] Testing hypothesis (degree: " << degree
+				<< ", #literals: " << candidate.literals().size() << ")" << std::endl;
 
-		// Remove constraints with a too high degree
-		// TODO: reimplement
+		auto proofResult = ProofResult::Unknown;
 
-		// Remove all “terminal” literal
-		// TODO: reimplement
-
-		// Remove all constraints subsumed by previously proven constraints
-		// TODO: reimplement
-
-		// Sort in descending order so that we can efficiently pop elements from the back
-		// TODO: reimplement
-
-		while (!m_extractedConstraints.empty())
+		switch (m_configuration->proofMethod)
 		{
-			const auto constraint = *m_extractedConstraints.begin();
-			m_extractedConstraints.erase(m_extractedConstraints.begin());
-
-			m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
-
-			std::cout << "\033[1;30mTesting constraint:\033[0m ";
-
-			const auto timeMin = std::get<0>(constraint.timeRange());
-
-			constraint.printGeneralized(std::cout, -timeMin);
-
-			std::cout << std::endl;
-
-			// TODO: reimplement
+			case ProofMethod::StateWise:
+				proofResult = testHypothesisStateWise(candidate, EventHypothesisTested::Purpose::Prove);
+				break;
+			// TODO: reimplement inductive proof method
+			default:
+				std::cerr << "[Error] Unknown proof method" << std::endl;
+				break;
 		}
 
+		if (proofResult == ProofResult::Unknown)
+		{
+			std::cerr << "[Error] Invalid proof result" << std::endl;
+			continue;
+		}
+
+		if (proofResult == ProofResult::Unproven)
+		{
+			if (m_environment->logLevel() == LogLevel::Debug)
+				std::cout << "[Info ] \033[1;31mHypothesis unproven\033[0m" << std::endl;
+
+			continue;
+		}
+
+		if (proofResult == ProofResult::GroundingTimeout || proofResult == ProofResult::SolvingTimeout)
+		{
+			if (m_environment->logLevel() == LogLevel::Debug)
+				std::cout << "[Info ] \033[1;33mTimeout proving hypothesis\033[0m" << std::endl;
+
+			continue;
+		}
+
+		// TODO: reimplement minimization
+		// TODO: reimplement constraint subsumption
+
+		m_provenConstraints.push_back(candidate);
+
+		std::cout << "[Info ] \033[1;32mHypothesis proven\033[0m" << " ("
+			<< m_provenConstraints.size() << "/"
+			<< m_configuration->constraintsToProve << ")" << std::endl;
+
+		// TODO: reimplement testing policies
+
+		auto &directConstraintsStream = m_environment->directConstraintsStream();
+		auto &generalizedConstraintsStream = m_environment->generalizedConstraintsStream();
+
+		candidate.print(directConstraintsStream);
+		directConstraintsStream << std::endl;
+
+		candidate.printGeneralized(generalizedConstraintsStream, -timeMin);
+		generalizedConstraintsStream << std::endl;
+
 		// Stop if we have proven enough constraints
-		if (m_learnedConstraints.size() >= m_configuration->constraintsToProve)
+		if (m_configuration->constraintsToProve > 0
+		    && m_provenConstraints.size() >= m_configuration->constraintsToProve)
+		{
 			break;
+		}
 	}
+
+	// Gracefully terminate clasp constraint logger to avoid deadlocks
+	m_claspConstraintLogger->terminate();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +272,7 @@ void FeedbackLoop::prepareExtraction()
 		<< MetaEncoding << std::endl
 		<< m_program.rdbuf() << std::endl;
 
-	std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(),
+	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &learnedConstraint)
 		{
 			const auto timeMin = std::get<0>(learnedConstraint.timeRange());
@@ -220,7 +284,7 @@ void FeedbackLoop::prepareExtraction()
 	metaEncoding.clear();
 	metaEncoding.seekg(0, std::ios::beg);
 
-	m_claspConstraintLogger = std::make_unique<ClaspConstraintLogger>(metaEncoding, m_extractedConstraints);
+	m_claspConstraintLogger = std::make_unique<ClaspConstraintLogger>(metaEncoding, m_extractedConstraints, *m_configuration);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,9 +325,9 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 
 		switch (m_configuration->proofMethod)
 		{
-			case ProofMethod::StateWise:
-				proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Minimize);
-				break;
+			//case ProofMethod::StateWise:
+			//	proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Minimize);
+			//	break;
 			case ProofMethod::Inductive:
 				proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Minimize);
 				break;
@@ -332,30 +396,40 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisStateWise(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
 
 	std::stringstream proofEncoding;
-	proofEncoding
-		<< m_program.rdbuf();
+	proofEncoding << m_program.rdbuf();
 
 	if (m_configuration->fluentClosureUsage == FluentClosureUsage::UseFluentClosure)
 		proofEncoding << FluentClosureEncoding;
 	else
 		proofEncoding << StateGeneratorEncoding;
 
+	const auto timeRange = candidate.timeRange();
+	const auto timeMin = std::get<0>(timeRange);
+	const auto timeMax = std::get<1>(timeRange);
+	const auto degree = timeMax - timeMin;
+
 	proofEncoding
-		<< "#const degree=" << generalizedHypothesis.degree() << "." << std::endl
-		<< "hypothesisConstraint(T) " << generalizedHypothesis << std::endl
+		<< "#const degree=" << degree << "." << std::endl
+		<< "hypothesisConstraint(T) ";
+
+	candidate.printGeneralized(proofEncoding, -timeMin);
+
+	proofEncoding
+		<< std::endl
 		<< StateWiseProofEncoding << std::endl;
 
-	std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
-	{
-		//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
-		proofEncoding << std::endl;
-	});
+	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
+		[&](const auto &constraint)
+		{
+			constraint.printGeneralized(proofEncoding, -timeMin);
+			proofEncoding << std::endl;
+		});
 
 	proofEncoding.clear();
 	proofEncoding.seekg(0, std::ios::beg);
@@ -402,7 +476,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedC
 			<< std::endl
 			<< InductiveProofBaseEncoding << std::endl;
 
-		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
+		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(), [&](const auto &constraint)
 		{
 			//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 			proofEncoding << std::endl;
@@ -463,7 +537,7 @@ ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedC
 			<< std::endl
 			<< InductiveProofStepEncoding << std::endl;
 
-		std::for_each(m_learnedConstraints.cbegin(), m_learnedConstraints.cend(), [&](const auto &constraint)
+		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(), [&](const auto &constraint)
 		{
 			//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
 			proofEncoding << std::endl;

@@ -48,7 +48,7 @@ class FeedbackLoop
 		void mergeEncodings();
 		void prepareExtraction();
 		deprecated::GeneralizedConstraint minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement);
-		ProofResult testHypothesisStateWise(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
+		ProofResult testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
 		ProofResult testHypothesisInduction(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
 
 		std::unique_ptr<Environment> m_environment;
@@ -56,8 +56,8 @@ class FeedbackLoop
 
 		std::unique_ptr<ClaspConstraintLogger> m_claspConstraintLogger;
 
-		Constraints m_extractedConstraints;
-		Constraints m_learnedConstraints;
+		ConstraintBuffer m_extractedConstraints;
+		Constraints m_provenConstraints;
 
 		Events m_events;
 

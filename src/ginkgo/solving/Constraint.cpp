@@ -28,13 +28,6 @@ size_t Constraint::id() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Literals &Constraint::literals()
-{
-	return m_literals;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 const Literals &Constraint::literals() const
 {
 	return m_literals;
@@ -128,6 +121,17 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 {
 	stream << ":- ";
 
+	const auto printTimeVariable =
+		[&](const auto time)
+		{
+			stream << "T";
+
+			if (time > 0)
+				stream << "+" << time;
+			else if (time < 0)
+				stream << "-" << -time;
+		};
+
 	const auto printNormalizedLiteral =
 		[&](const auto &literal)
 		{
@@ -159,14 +163,7 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 			if (outputFormat == OutputFormat::Normalized)
 				stream << time;
 			else if (outputFormat == OutputFormat::Generalized)
-			{
-				stream << "T";
-
-				if (time > 0)
-					stream << "+" << time;
-				else if (time < 0)
-					stream << "-" << -time;
-			}
+				printTimeVariable(time);
 
 			stream << ")";
 		};
@@ -187,7 +184,22 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 			printNormalizedLiteral(literal);
 	}
 
-	stream << ".  %lbd = " << m_lbdAfterResolution;
+	if (outputFormat == OutputFormat::Generalized)
+	{
+		// TODO: don’t copy
+		const auto timeRange = this->timeRange();
+		const int timeMin = std::get<0>(timeRange) + offset;
+		const int timeMax = std::get<1>(timeRange) + offset;
+
+		for (auto time = timeMin; time <= timeMax; time++)
+		{
+			stream << ", time(";
+			printTimeVariable(time);
+			stream << ")";
+		}
+	}
+
+	stream << ". %lbd = " << m_lbdAfterResolution;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
