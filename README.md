@@ -54,4 +54,3 @@ Use the option ```--help``` for a full list of options of each of the respective
 ## Contributors
 
 * [Patrick Lühne](https://www.luehne.de)
-* Torsten Schaub (encodings)
