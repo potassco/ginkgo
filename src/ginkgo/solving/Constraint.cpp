@@ -28,6 +28,13 @@ size_t Constraint::id() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Literals &Constraint::literals()
+{
+	return m_literals;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const Literals &Constraint::literals() const
 {
 	return m_literals;
@@ -79,11 +86,11 @@ std::tuple<size_t, size_t> Constraint::timeRange() const
 	{
 		BOOST_ASSERT(!literal.symbol().clingoSymbol.arguments().empty());
 
-		const auto &timeArgument = literal.symbol().clingoSymbol.arguments().back();
+		const auto &timeArgument = literal.symbol()->clingoSymbol.arguments().back();
 		const size_t time = timeArgument.number();
 
 		// Actions require at least one preceding time step in order to check preconditions
-		if (std::strcmp(literal.symbol().clingoSymbol.name(), "apply") == 0 || std::strcmp(literal.symbol().clingoSymbol.name(), "del") == 0)
+		if (std::strcmp(literal.symbol()->clingoSymbol.name(), "apply") == 0 || std::strcmp(literal.symbol()->clingoSymbol.name(), "del") == 0)
 			timeMin = std::min(timeMin, time - 1);
 		else
 			timeMin = std::min(timeMin, time);
@@ -135,7 +142,7 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 	const auto printNormalizedLiteral =
 		[&](const auto &literal)
 		{
-			const auto &clingoSymbol = literal.symbol().clingoSymbol;
+			const auto &clingoSymbol = literal.symbol()->clingoSymbol;
 
 			stream << clingoSymbol.name();
 
@@ -179,7 +186,7 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 			stream << "not ";
 
 		if (outputFormat == OutputFormat::Normal)
-			stream << literal.symbol().clingoSymbol;
+			stream << literal.symbol()->clingoSymbol;
 		else
 			printNormalizedLiteral(literal);
 	}

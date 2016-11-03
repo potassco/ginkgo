@@ -133,8 +133,8 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 	{
 		const auto literal = ~*i;
 
-		const auto &symbol = m_symbols.at(literal.var());
-		const auto sign = (symbol.claspLiteral == literal ? Literal::Sign::Positive : Literal::Sign::Negative);
+		const auto *symbol = &m_symbols.at(literal.var());
+		const auto sign = (symbol->claspLiteral == literal ? Literal::Sign::Positive : Literal::Sign::Negative);
 
 		literals.emplace_back(Literal(sign, symbol));
 	}

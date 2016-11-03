@@ -9,7 +9,7 @@ namespace ginkgo
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Literal::Literal(Literal::Sign sign, const Symbol &symbol)
+Literal::Literal(Literal::Sign sign, const Symbol *symbol)
 :	m_sign{sign},
 	m_symbol(symbol)
 {
@@ -24,7 +24,7 @@ Literal::Sign Literal::sign() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const Symbol &Literal::symbol() const
+const Symbol *Literal::symbol() const
 {
 	return m_symbol;
 }

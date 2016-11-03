@@ -161,7 +161,7 @@ void FeedbackLoop::run()
 	while (!m_extractedConstraints.empty())
 	{
 		// TODO: don’t copy constraint
-		const auto candidate = *m_extractedConstraints.begin();
+		auto candidate = *m_extractedConstraints.begin();
 		m_extractedConstraints.erase(m_extractedConstraints.begin());
 
 		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
@@ -212,7 +212,11 @@ void FeedbackLoop::run()
 			continue;
 		}
 
-		// TODO: reimplement minimization
+		if (m_configuration->minimizationStrategy == MinimizationStrategy::SimpleMinimization)
+			candidate = minimizeConstraint(candidate, 0);
+		else if (m_configuration->minimizationStrategy == MinimizationStrategy::LinearMinimization)
+			candidate = minimizeConstraint(candidate, 1);
+
 		// TODO: reimplement constraint subsumption
 
 		m_provenConstraints.push_back(candidate);
@@ -291,10 +295,10 @@ void FeedbackLoop::prepareExtraction()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement)
+Constraint FeedbackLoop::minimizeConstraint(const Constraint &provenGeneralizedConstraint, size_t linearIncrement)
 {
-	const auto literalsBefore = provenGeneralizedConstraint.numberOfLiterals();
-	const auto degreeBefore = provenGeneralizedConstraint.degree();
+	//const auto literalsBefore = provenGeneralizedConstraint.numberOfLiterals();
+	//const auto degreeBefore = provenGeneralizedConstraint.degree();
 	size_t requiredTests = 0;
 
 	// If nothing works, keep the original constraint
@@ -306,15 +310,16 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 	// Start with windows of size 1
 	size_t windowSize = 1;
 
-	for (size_t i = 0; i < result.numberOfLiterals();)
+	for (size_t i = 0; i < result.literals().size();)
 	{
 		if (m_environment->logLevel() == LogLevel::Debug)
 			std::cout << "[Info ] Trying to eliminate " << windowSize << " literals starting at " << i << std::endl;
 
-		deprecated::GeneralizedConstraint hypothesis(result.originalConstraint()->withoutLiterals(i, windowSize));
+		Constraint candidate = result;
+		candidate.literals().erase(candidate.literals().begin() + i, candidate.literals().begin() + i + windowSize);
 
 		// Skip candidates that have become empty due to removing literals
-		if (hypothesis.numberOfLiterals() == 0)
+		if (candidate.literals().empty())
 		{
 			if (m_environment->logLevel() == LogLevel::Debug)
 				std::cout << "[Info ] Skipped empty candidate property" << std::endl;
@@ -327,12 +332,12 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 
 		switch (m_configuration->proofMethod)
 		{
-			//case ProofMethod::StateWise:
-			//	proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Minimize);
-			//	break;
-			//case ProofMethod::Inductive:
-			//	proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Minimize);
-			//	break;
+			case ProofMethod::StateWise:
+				proofResult = testHypothesisStateWise(candidate, EventHypothesisTested::Purpose::Minimize);
+				break;
+			case ProofMethod::Inductive:
+				proofResult = testHypothesisInductively(candidate, EventHypothesisTested::Purpose::Minimize);
+				break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
 				break;
@@ -362,7 +367,7 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 		}
 
 		// If proven, then just keep the minimized candidate and try to minimize further
-		result = hypothesis;
+		result = candidate;
 
 		// Also increase the window size by 1
 		windowSize += linearIncrement;
@@ -371,27 +376,12 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 	if (m_environment->logLevel() == LogLevel::Debug)
 	{
 		std::cout << "[Info ] \033[1;34mEliminated "
-			<< (provenGeneralizedConstraint.numberOfLiterals() - result.numberOfLiterals())
-			<< "/" << provenGeneralizedConstraint.numberOfLiterals()
+			<< (provenGeneralizedConstraint.literals().size() - result.literals().size())
+			<< "/" << provenGeneralizedConstraint.literals().size()
 			<< " literals through minimization\033[0m" << std::endl;
 	}
 
-	// Statistics
-	{
-		const auto literalsAfter = result.numberOfLiterals();
-		const auto degreeAfter = result.degree();
-
-		EventMinimized event =
-		{
-			literalsBefore - literalsAfter,
-			result.numberOfLiterals(),
-			degreeBefore - degreeAfter,
-			degreeAfter,
-			requiredTests
-		};
-
-		m_events.notifyMinimized(event);
-	}
+	// TODO: reimplement statistics
 
 	return result;
 }

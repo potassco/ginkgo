@@ -26,14 +26,14 @@ class Literal
 		};
 
 	public:
-		Literal(Sign sign, const Symbol &symbol);
+		Literal(Sign sign, const Symbol *symbol);
 
 		Sign sign() const;
-		const Symbol &symbol() const;
+		const Symbol *symbol() const;
 
 	private:
 		Sign m_sign;
-		const Symbol &m_symbol;
+		const Symbol *m_symbol;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -47,7 +47,7 @@ class FeedbackLoop
 	private:
 		void mergeEncodings();
 		void prepareExtraction();
-		deprecated::GeneralizedConstraint minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement);
+		Constraint minimizeConstraint(const Constraint &provenGeneralizedConstraint, size_t linearIncrement);
 		ProofResult testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
 		ProofResult testHypothesisInductively(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
 

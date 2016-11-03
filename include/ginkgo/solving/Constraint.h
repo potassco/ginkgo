@@ -21,6 +21,7 @@ class Constraint
 
 		size_t id() const;
 
+		Literals &literals();
 		const Literals &literals() const;
 
 		void setLBDOriginal(size_t lbdOriginal);
