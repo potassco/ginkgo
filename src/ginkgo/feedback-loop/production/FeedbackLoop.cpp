@@ -182,7 +182,9 @@ void FeedbackLoop::run()
 			case ProofMethod::StateWise:
 				proofResult = testHypothesisStateWise(candidate, EventHypothesisTested::Purpose::Prove);
 				break;
-			// TODO: reimplement inductive proof method
+			case ProofMethod::Inductive:
+				proofResult = testHypothesisInductively(candidate, EventHypothesisTested::Purpose::Prove);
+				break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
 				break;
@@ -328,9 +330,9 @@ deprecated::GeneralizedConstraint FeedbackLoop::minimizeConstraint(const depreca
 			//case ProofMethod::StateWise:
 			//	proofResult = testHypothesisStateWise(hypothesis, EventHypothesisTested::Purpose::Minimize);
 			//	break;
-			case ProofMethod::Inductive:
-				proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Minimize);
-				break;
+			//case ProofMethod::Inductive:
+			//	proofResult = testHypothesisInduction(hypothesis, EventHypothesisTested::Purpose::Minimize);
+			//	break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
 				break;
@@ -427,6 +429,9 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &constraint)
 		{
+			const auto timeRange = constraint.timeRange();
+			const auto timeMin = std::get<0>(timeRange);
+
 			constraint.printGeneralized(proofEncoding, -timeMin);
 			proofEncoding << std::endl;
 		});
@@ -455,10 +460,15 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
+
+	const auto timeRange = candidate.timeRange();
+	const auto timeMin = std::get<0>(timeRange);
+	const auto timeMax = std::get<1>(timeRange);
+	const auto degree = timeMax - timeMin;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// Induction Base
@@ -467,20 +477,24 @@ ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedC
 		std::stringstream proofEncoding;
 		proofEncoding
 			<< m_program.rdbuf()
-			<< "#const degree=" << generalizedHypothesis.degree() << "." << std::endl
+			<< "#const degree=" << degree << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		generalizedHypothesis.print(proofEncoding);
+		candidate.printGeneralized(proofEncoding, -timeMin);
 
 		proofEncoding
 			<< std::endl
 			<< InductiveProofBaseEncoding << std::endl;
 
-		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(), [&](const auto &constraint)
-		{
-			//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
-			proofEncoding << std::endl;
-		});
+		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
+			[&](const auto &constraint)
+			{
+				const auto timeRange = constraint.timeRange();
+				const auto timeMin = std::get<0>(timeRange);
+
+				constraint.printGeneralized(proofEncoding, -timeMin);
+				proofEncoding << std::endl;
+			});
 
 		proofEncoding.clear();
 		proofEncoding.seekg(0, std::ios::beg);
@@ -528,20 +542,24 @@ ProofResult FeedbackLoop::testHypothesisInduction(const deprecated::GeneralizedC
 			proofEncoding << StateGeneratorEncoding;
 
 		proofEncoding
-			<< "#const degree=" << (generalizedHypothesis.degree() + 1) << "." << std::endl
+			<< "#const degree=" << (degree + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		generalizedHypothesis.print(proofEncoding);
+		candidate.printGeneralized(proofEncoding, -timeMin);
 
 		proofEncoding
 			<< std::endl
 			<< InductiveProofStepEncoding << std::endl;
 
-		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(), [&](const auto &constraint)
-		{
-			//deprecated::GeneralizedConstraint(constraint).print(proofEncoding);
-			proofEncoding << std::endl;
-		});
+		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
+			[&](const auto &constraint)
+			{
+				const auto timeRange = constraint.timeRange();
+				const auto timeMin = std::get<0>(timeRange);
+
+				constraint.printGeneralized(proofEncoding, -timeMin);
+				proofEncoding << std::endl;
+			});
 
 		proofEncoding.clear();
 		proofEncoding.seekg(0, std::ios::beg);

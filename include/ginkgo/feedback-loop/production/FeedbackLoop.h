@@ -49,7 +49,7 @@ class FeedbackLoop
 		void prepareExtraction();
 		deprecated::GeneralizedConstraint minimizeConstraint(const deprecated::GeneralizedConstraint &provenGeneralizedConstraint, size_t linearIncrement);
 		ProofResult testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
-		ProofResult testHypothesisInduction(const deprecated::GeneralizedConstraint &generalizedHypothesis, EventHypothesisTested::Purpose purpose);
+		ProofResult testHypothesisInductively(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
 
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;
