@@ -1,7 +1,6 @@
 #include <catch.hpp>
 
-#include <ginkgo/solving/__deprecated__Constraint.h>
-#include <ginkgo/solving/__deprecated__GeneralizedConstraint.h>
+/*
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -231,3 +230,5 @@ TEST_CASE("[constraints] Generalized constraint subsumption works with actions",
 	REQUIRE(generalizedA.subsumes(c));
 	REQUIRE_FALSE(generalizedA.subsumes(d));
 }
+
+*/

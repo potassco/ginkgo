@@ -5,8 +5,6 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 
-#include <ginkgo/solving/__deprecated__Constraints.h>
-
 #include <ginkgo/feedback-loop/consumption/FeedbackType.h>
 
 namespace ginkgo

@@ -10,7 +10,6 @@
 #include <ginkgo/feedback-loop/production/Events.h>
 #include <ginkgo/feedback-loop/production/ProofResult.h>
 #include <ginkgo/solving/Constraint.h>
-#include <ginkgo/solving/__deprecated__GeneralizedConstraint.h>
 
 namespace ginkgo
 {
