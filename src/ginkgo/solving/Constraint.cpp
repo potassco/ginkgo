@@ -84,7 +84,7 @@ std::tuple<size_t, size_t> Constraint::timeRange() const
 
 	for (const auto &literal : m_literals)
 	{
-		BOOST_ASSERT(!literal.symbol().clingoSymbol.arguments().empty());
+		BOOST_ASSERT(!literal.symbol()->clingoSymbol.arguments().empty());
 
 		const auto &timeArgument = literal.symbol()->clingoSymbol.arguments().back();
 		const size_t time = timeArgument.number();
