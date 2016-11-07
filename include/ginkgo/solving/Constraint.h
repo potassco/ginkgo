@@ -36,8 +36,8 @@ class Constraint
 		size_t degree() const;
 
 		void print(std::ostream &stream) const;
-		void printNormalized(std::ostream &stream, int offset) const;
-		void printGeneralized(std::ostream &stream, int offset) const;
+		void printNormalized(std::ostream &stream) const;
+		void printGeneralized(std::ostream &stream) const;
 
 	private:
 		enum class OutputFormat

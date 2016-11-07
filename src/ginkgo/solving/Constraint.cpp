@@ -138,16 +138,16 @@ void Constraint::print(std::ostream &stream) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::printNormalized(std::ostream &stream, int offset) const
+void Constraint::printNormalized(std::ostream &stream) const
 {
-	print(stream, OutputFormat::Normalized, offset);
+	print(stream, OutputFormat::Normalized, -m_timeRange.min);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::printGeneralized(std::ostream &stream, int offset) const
+void Constraint::printGeneralized(std::ostream &stream) const
 {
-	print(stream, OutputFormat::Generalized, offset);
+	print(stream, OutputFormat::Generalized, -m_timeRange.min);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

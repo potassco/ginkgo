@@ -228,7 +228,7 @@ void FeedbackLoop::run()
 		candidate.print(directConstraintsStream);
 		directConstraintsStream << std::endl;
 
-		candidate.printGeneralized(generalizedConstraintsStream, -candidate.timeRange().min);
+		candidate.printGeneralized(generalizedConstraintsStream);
 		generalizedConstraintsStream << std::endl;
 
 		// Stop if we have proven enough constraints
@@ -276,7 +276,7 @@ void FeedbackLoop::prepareExtraction()
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &learnedConstraint)
 		{
-			learnedConstraint.printGeneralized(metaEncoding, -learnedConstraint.timeRange().min);
+			learnedConstraint.printGeneralized(metaEncoding);
 			metaEncoding << std::endl;
 		});
 
@@ -397,7 +397,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 		<< "#const degree=" << candidate.degree() << "." << std::endl
 		<< "hypothesisConstraint(T) ";
 
-	candidate.printGeneralized(proofEncoding, -candidate.timeRange().min);
+	candidate.printGeneralized(proofEncoding);
 
 	proofEncoding
 		<< std::endl
@@ -406,7 +406,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &constraint)
 		{
-			constraint.printGeneralized(proofEncoding, -constraint.timeRange().min);
+			constraint.printGeneralized(proofEncoding);
 			proofEncoding << std::endl;
 		});
 
@@ -449,7 +449,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 			<< "#const degree=" << candidate.degree() << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		candidate.printGeneralized(proofEncoding, -candidate.timeRange().min);
+		candidate.printGeneralized(proofEncoding);
 
 		proofEncoding
 			<< std::endl
@@ -458,7 +458,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 			[&](const auto &constraint)
 			{
-				constraint.printGeneralized(proofEncoding, -constraint.timeRange().min);
+				constraint.printGeneralized(proofEncoding);
 				proofEncoding << std::endl;
 			});
 
@@ -511,7 +511,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 			<< "#const degree=" << (candidate.degree() + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		candidate.printGeneralized(proofEncoding, -candidate.timeRange().min);
+		candidate.printGeneralized(proofEncoding);
 
 		proofEncoding
 			<< std::endl
@@ -520,7 +520,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 			[&](const auto &constraint)
 			{
-				constraint.printGeneralized(proofEncoding, -constraint.timeRange().min);
+				constraint.printGeneralized(proofEncoding);
 				proofEncoding << std::endl;
 			});
 
