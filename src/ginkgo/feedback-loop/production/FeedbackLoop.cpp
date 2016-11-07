@@ -230,6 +230,9 @@ void FeedbackLoop::run()
 		candidate.printGeneralized(generalizedConstraintsStream);
 		generalizedConstraintsStream << std::endl;
 
+		candidate.printGeneralized(m_program);
+		m_program << std::endl;
+
 		// Stop if we have proven enough constraints
 		if (m_configuration->constraintsToProve > 0
 		    && m_provenConstraints.size() >= m_configuration->constraintsToProve)
@@ -257,6 +260,13 @@ void FeedbackLoop::mergePrograms()
 		TextFile inputFile(inputFileName);
 		m_program << inputFile.read().rdbuf() << std::endl;
 	}
+
+	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
+		[&](const auto &provenConstraint)
+		{
+			provenConstraint.printGeneralized(m_program);
+			m_program << std::endl;
+		});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,13 +281,6 @@ void FeedbackLoop::prepareExtraction()
 		<< "#const horizon=" << m_configuration->horizon << "." << std::endl
 		<< MetaEncoding << std::endl
 		<< m_program.rdbuf() << std::endl;
-
-	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
-		[&](const auto &learnedConstraint)
-		{
-			learnedConstraint.printGeneralized(metaEncoding);
-			metaEncoding << std::endl;
-		});
 
 	metaEncoding.clear();
 	metaEncoding.seekg(0, std::ios::beg);
@@ -402,16 +405,6 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 		<< std::endl
 		<< StateWiseProofEncoding << std::endl;
 
-	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
-		[&](const auto &constraint)
-		{
-			constraint.printGeneralized(proofEncoding);
-			proofEncoding << std::endl;
-		});
-
-	proofEncoding.clear();
-	proofEncoding.seekg(0, std::ios::beg);
-
 	// TODO: add warning/error message handler
 	// TODO: handle grounding/solving timeouts
 	// TODO: make timeout configurable
@@ -453,16 +446,6 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		proofEncoding
 			<< std::endl
 			<< InductiveProofBaseEncoding << std::endl;
-
-		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
-			[&](const auto &constraint)
-			{
-				constraint.printGeneralized(proofEncoding);
-				proofEncoding << std::endl;
-			});
-
-		proofEncoding.clear();
-		proofEncoding.seekg(0, std::ios::beg);
 
 		// TODO: add warning/error message handler
 		// TODO: handle grounding/solving timeouts
@@ -515,13 +498,6 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		proofEncoding
 			<< std::endl
 			<< InductiveProofStepEncoding << std::endl;
-
-		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
-			[&](const auto &constraint)
-			{
-				constraint.printGeneralized(proofEncoding);
-				proofEncoding << std::endl;
-			});
 
 		proofEncoding.clear();
 		proofEncoding.seekg(0, std::ios::beg);
