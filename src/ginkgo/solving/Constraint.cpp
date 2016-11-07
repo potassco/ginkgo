@@ -212,10 +212,8 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 
 	if (outputFormat == OutputFormat::Generalized)
 	{
-		// TODO: don’t copy
-		const auto timeRange = this->timeRange();
-		const auto timeMin = static_cast<int>(timeRange.min) + offset;
-		const auto timeMax = static_cast<int>(timeRange.max) + offset;
+		const auto timeMin = static_cast<int>(m_timeRange.min) + offset;
+		const auto timeMax = static_cast<int>(m_timeRange.max) + offset;
 
 		for (auto time = timeMin; time <= timeMax; time++)
 		{

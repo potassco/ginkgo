@@ -65,12 +65,8 @@ struct sortConstraints
 {
 	bool operator()(const Constraint &c1, const Constraint &c2)
 	{
-		// TODO: don’t copy
-		const auto timeRange1 = c1.timeRange();
-		const auto timeRange2 = c2.timeRange();
-
-		const auto degree1 = timeRange1.max - timeRange1.min;
-		const auto degree2 = timeRange2.max - timeRange2.min;
+		const auto degree1 = c1.timeRange().max - c1.timeRange().min;
+		const auto degree2 = c2.timeRange().max - c2.timeRange().min;
 
 		if (degree1 != degree2)
 			return degree1 < degree2;
