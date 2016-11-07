@@ -138,13 +138,6 @@ void Constraint::print(std::ostream &stream) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::printNormalized(std::ostream &stream) const
-{
-	print(stream, OutputFormat::Normalized, -m_timeRange.min);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void Constraint::printGeneralized(std::ostream &stream) const
 {
 	print(stream, OutputFormat::Generalized, -m_timeRange.min);
@@ -195,9 +188,7 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 			const auto &timeArgument = clingoSymbol.arguments().back();
 			const int time = timeArgument.number() + offset;
 
-			if (outputFormat == OutputFormat::Normalized)
-				stream << time;
-			else if (outputFormat == OutputFormat::Generalized)
+			if (outputFormat == OutputFormat::Generalized)
 				printTimeVariable(time);
 
 			stream << ")";
