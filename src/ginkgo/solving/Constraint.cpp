@@ -14,9 +14,31 @@ namespace ginkgo
 Constraint::Constraint(size_t id, Literals &&literals)
 :	m_id{id},
 	m_literals{std::move(literals)},
+	m_timeRange{computeTimeRange()},
 	m_lbdOriginal{0},
 	m_lbdAfterResolution{0}
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Constraint Constraint::withoutLiterals(size_t start, size_t number)
+{
+	BOOST_ASSERT(start + number <= m_literals.size());
+
+	const auto numberOfLiterals = m_literals.size() - number;
+
+	Literals literals;
+	literals.reserve(numberOfLiterals);
+
+	std::copy(m_literals.begin(), m_literals.begin() + start, std::back_inserter(literals));
+	std::copy(m_literals.begin() + start + number, m_literals.end(), std::back_inserter(literals));
+
+	Constraint result(m_id, std::move(literals));
+	result.m_lbdOriginal = m_lbdOriginal;
+	result.m_lbdAfterResolution = m_lbdAfterResolution;
+
+	return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,16 +50,23 @@ size_t Constraint::id() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Literals &Constraint::literals()
+const Literals &Constraint::literals() const
 {
 	return m_literals;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const Literals &Constraint::literals() const
+const Range<size_t> &Constraint::timeRange() const
 {
-	return m_literals;
+	return m_timeRange;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+size_t Constraint::degree() const
+{
+	return m_timeRange.max - m_timeRange.min;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +99,7 @@ size_t Constraint::lbdAfterResolution() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::tuple<size_t, size_t> Constraint::timeRange() const
+Range<size_t> Constraint::computeTimeRange() const
 {
 	// Currently, normalization only works for plasp-formatted encodings
 	/*std::for_each(m_literals.cbegin(), m_literals.cend(), [](const auto &literal)
@@ -79,8 +108,7 @@ std::tuple<size_t, size_t> Constraint::timeRange() const
 			"Identifier unsupported");
 	});*/
 
-	size_t timeMin = std::numeric_limits<size_t>::max();
-	size_t timeMax = std::numeric_limits<size_t>::min();
+	Range<size_t> timeRange{std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::min()};
 
 	for (const auto &literal : m_literals)
 	{
@@ -91,14 +119,14 @@ std::tuple<size_t, size_t> Constraint::timeRange() const
 
 		// Actions require at least one preceding time step in order to check preconditions
 		if (std::strcmp(literal.symbol()->clingoSymbol.name(), "apply") == 0 || std::strcmp(literal.symbol()->clingoSymbol.name(), "del") == 0)
-			timeMin = std::min(timeMin, time - 1);
+			timeRange.min = std::min(timeRange.min, time - 1);
 		else
-			timeMin = std::min(timeMin, time);
+			timeRange.min = std::min(timeRange.min, time);
 
-		timeMax = std::max(timeMax, time);
+		timeRange.max = std::max(timeRange.max, time);
 	}
 
-	return std::make_tuple(timeMin, timeMax);
+	return timeRange;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,8 +223,8 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 	{
 		// TODO: don’t copy
 		const auto timeRange = this->timeRange();
-		const int timeMin = std::get<0>(timeRange) + offset;
-		const int timeMax = std::get<1>(timeRange) + offset;
+		const auto timeMin = static_cast<int>(timeRange.min) + offset;
+		const auto timeMax = static_cast<int>(timeRange.max) + offset;
 
 		for (auto time = timeMin; time <= timeMax; time++)
 		{

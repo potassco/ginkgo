@@ -108,7 +108,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	const uint32_t lbdMax = 127;
 	const auto lbdOriginal = constraintInfo.lbd();
-	uint32_t lbdAfterResolution = constraintInfo.lbd();
+	auto lbdAfterResolution = constraintInfo.lbd();
 
 	const auto allowedVariables = Clasp::VarInfo::Input | Clasp::VarInfo::Output;
 
@@ -149,10 +149,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 	constraint.setLBDOriginal(lbdOriginal);
 	constraint.setLBDAfterResolution(lbdAfterResolution);
 
-	const auto timeRange = constraint.timeRange();
-	const auto degree = std::get<1>(timeRange) - std::get<0>(timeRange);
-
-	if (degree > m_configuration.maxDegree)
+	if (constraint.degree() > m_configuration.maxDegree)
 	{
 		std::cout << "\033[1;33mwarning: skipped conflict (degree too high)\033[0m" << std::endl;
 		return;

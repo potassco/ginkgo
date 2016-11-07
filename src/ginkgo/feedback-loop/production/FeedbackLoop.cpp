@@ -166,13 +166,8 @@ void FeedbackLoop::run()
 
 		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
 
-		const auto timeRange = candidate.timeRange();
-		const auto timeMin = std::get<0>(timeRange);
-		const auto timeMax = std::get<1>(timeRange);
-		const auto degree = timeMax - timeMin;
-
 		if (m_environment->logLevel() == LogLevel::Debug)
-			std::cout << "[Info ] Testing hypothesis (degree: " << degree
+			std::cout << "[Info ] Testing hypothesis (degree: " << candidate.degree()
 				<< ", #literals: " << candidate.literals().size() << ")" << std::endl;
 
 		auto proofResult = ProofResult::Unknown;
@@ -233,7 +228,7 @@ void FeedbackLoop::run()
 		candidate.print(directConstraintsStream);
 		directConstraintsStream << std::endl;
 
-		candidate.printGeneralized(generalizedConstraintsStream, -timeMin);
+		candidate.printGeneralized(generalizedConstraintsStream, -candidate.timeRange().min);
 		generalizedConstraintsStream << std::endl;
 
 		// Stop if we have proven enough constraints
@@ -281,9 +276,7 @@ void FeedbackLoop::prepareExtraction()
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &learnedConstraint)
 		{
-			const auto timeMin = std::get<0>(learnedConstraint.timeRange());
-
-			learnedConstraint.printGeneralized(metaEncoding, -timeMin);
+			learnedConstraint.printGeneralized(metaEncoding, -learnedConstraint.timeRange().min);
 			metaEncoding << std::endl;
 		});
 
@@ -315,8 +308,7 @@ Constraint FeedbackLoop::minimizeConstraint(const Constraint &provenGeneralizedC
 		if (m_environment->logLevel() == LogLevel::Debug)
 			std::cout << "[Info ] Trying to eliminate " << windowSize << " literals starting at " << i << std::endl;
 
-		Constraint candidate = result;
-		candidate.literals().erase(candidate.literals().begin() + i, candidate.literals().begin() + i + windowSize);
+		Constraint candidate = result.withoutLiterals(i, windowSize);
 
 		// Skip candidates that have become empty due to removing literals
 		if (candidate.literals().empty())
@@ -401,16 +393,11 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 	else
 		proofEncoding << StateGeneratorEncoding;
 
-	const auto timeRange = candidate.timeRange();
-	const auto timeMin = std::get<0>(timeRange);
-	const auto timeMax = std::get<1>(timeRange);
-	const auto degree = timeMax - timeMin;
-
 	proofEncoding
-		<< "#const degree=" << degree << "." << std::endl
+		<< "#const degree=" << candidate.degree() << "." << std::endl
 		<< "hypothesisConstraint(T) ";
 
-	candidate.printGeneralized(proofEncoding, -timeMin);
+	candidate.printGeneralized(proofEncoding, -candidate.timeRange().min);
 
 	proofEncoding
 		<< std::endl
@@ -419,10 +406,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &constraint)
 		{
-			const auto timeRange = constraint.timeRange();
-			const auto timeMin = std::get<0>(timeRange);
-
-			constraint.printGeneralized(proofEncoding, -timeMin);
+			constraint.printGeneralized(proofEncoding, -constraint.timeRange().min);
 			proofEncoding << std::endl;
 		});
 
@@ -455,11 +439,6 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
 
-	const auto timeRange = candidate.timeRange();
-	const auto timeMin = std::get<0>(timeRange);
-	const auto timeMax = std::get<1>(timeRange);
-	const auto degree = timeMax - timeMin;
-
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	// Induction Base
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -467,10 +446,10 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		std::stringstream proofEncoding;
 		proofEncoding
 			<< m_program.rdbuf()
-			<< "#const degree=" << degree << "." << std::endl
+			<< "#const degree=" << candidate.degree() << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		candidate.printGeneralized(proofEncoding, -timeMin);
+		candidate.printGeneralized(proofEncoding, -candidate.timeRange().min);
 
 		proofEncoding
 			<< std::endl
@@ -479,10 +458,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 			[&](const auto &constraint)
 			{
-				const auto timeRange = constraint.timeRange();
-				const auto timeMin = std::get<0>(timeRange);
-
-				constraint.printGeneralized(proofEncoding, -timeMin);
+				constraint.printGeneralized(proofEncoding, -constraint.timeRange().min);
 				proofEncoding << std::endl;
 			});
 
@@ -532,10 +508,10 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 			proofEncoding << StateGeneratorEncoding;
 
 		proofEncoding
-			<< "#const degree=" << (degree + 1) << "." << std::endl
+			<< "#const degree=" << (candidate.degree() + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		candidate.printGeneralized(proofEncoding, -timeMin);
+		candidate.printGeneralized(proofEncoding, -candidate.timeRange().min);
 
 		proofEncoding
 			<< std::endl
@@ -544,10 +520,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate,
 		std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 			[&](const auto &constraint)
 			{
-				const auto timeRange = constraint.timeRange();
-				const auto timeMin = std::get<0>(timeRange);
-
-				constraint.printGeneralized(proofEncoding, -timeMin);
+				constraint.printGeneralized(proofEncoding, -constraint.timeRange().min);
 				proofEncoding << std::endl;
 			});
 
