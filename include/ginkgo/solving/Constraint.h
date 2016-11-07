@@ -19,6 +19,13 @@ class Constraint
 {
 	public:
 		Constraint(size_t id, Literals &&literals);
+		~Constraint() = default;
+
+		Constraint(const Constraint &other) = default;
+		Constraint &operator=(const Constraint &other) = default;
+
+		Constraint(Constraint &&other) = default;
+		Constraint &operator=(Constraint &&other) = default;
 
 		Constraint withoutLiterals(size_t start, size_t number);
 

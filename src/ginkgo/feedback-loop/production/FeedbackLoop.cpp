@@ -160,8 +160,7 @@ void FeedbackLoop::run()
 
 	while (!m_extractedConstraints.empty())
 	{
-		// TODO: don’t copy constraint
-		auto candidate = *m_extractedConstraints.begin();
+		auto candidate = std::move(*m_extractedConstraints.begin());
 		m_extractedConstraints.erase(m_extractedConstraints.begin());
 
 		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
