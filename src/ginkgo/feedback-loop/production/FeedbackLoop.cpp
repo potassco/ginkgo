@@ -126,7 +126,7 @@ void FeedbackLoop::run()
 {
 	setlocale(LC_NUMERIC, "C");
 
-	mergeEncodings();
+	mergePrograms();
 
 	m_events.startTimer();
 
@@ -244,7 +244,7 @@ void FeedbackLoop::run()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void FeedbackLoop::mergeEncodings()
+void FeedbackLoop::mergePrograms()
 {
 	if (!m_program.str().empty())
 	{

@@ -44,7 +44,7 @@ class FeedbackLoop
 		void run();
 
 	private:
-		void mergeEncodings();
+		void mergePrograms();
 		void prepareExtraction();
 		Constraint minimizeConstraint(const Constraint &provenGeneralizedConstraint, size_t linearIncrement);
 		ProofResult testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
