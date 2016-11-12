@@ -3,5 +3,4 @@
 	url = https://github.com/philsquared/Catch
 [submodule "lib/clingo"]
 	path = lib/clingo
-	url = https://github.com/pluehne/clingo
-	branch = cmake
+	url = https://github.com/potassco/clingo
