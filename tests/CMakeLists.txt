@@ -6,7 +6,7 @@ include_directories(
 	${Boost_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIR}
 	${PROJECT_SOURCE_DIR}/include
-	catch/single_include
+	${PROJECT_SOURCE_DIR}/lib/catch/single_include
 )
 
 set(libraries
