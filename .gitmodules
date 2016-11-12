@@ -1,3 +1,7 @@
 [submodule "tests/catch"]
 	path = tests/catch
-	url = https://github.com/philsquared/Catch.git
+	url = https://github.com/philsquared/Catch
+[submodule "lib/clingo"]
+	path = lib/clingo
+	url = https://github.com/pluehne/clingo
+	branch = cmake
