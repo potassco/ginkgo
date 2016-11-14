@@ -45,4 +45,4 @@ script:
   - mkdir -p build/debug
   - cd build/debug
   - cmake ../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$_CXX -DCMAKE_C_COMPILER=$_CC -DGINKGO_BUILD_TESTS=ON
-  - make -j3 && make -j3 run-tests
+  - make -j3 ginkgo-produce ginkgo-consume ginkgo-analyze && make -j3 run-tests
