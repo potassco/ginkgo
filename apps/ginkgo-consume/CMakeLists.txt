@@ -17,9 +17,8 @@ set(sources
 
 set(libraries
 	${Boost_LIBRARIES}
-	${Clingo_LIBRARIES}
 	${JSONCPP_LIBRARY}
-	ginkgo
+    ginkgo
 )
 
 add_executable(${target} ${sources})

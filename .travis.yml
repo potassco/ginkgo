@@ -36,20 +36,8 @@ matrix:
             - *default_packages
             - g++-6
 script:
-  - mkdir dependencies
-  - cd dependencies
-  - git clone https://github.com/potassco/clingo.git
-  - cd clingo
-  - mkdir build
-  - echo "CXX = '"$_CXX"'" > build/debug.py
-  - echo "CC = '"$_CC"'" >> build/debug.py
-  - echo "CXXFLAGS = ['-std=c++11', '-O2', '-W', '-Wall']" >> build/debug.py
-  - echo "LINKFLAGS = ['-std=c++11']" >> build/debug.py
-  - scons -j3 libclingo
-  - cd ../..
-  - git submodule init
-  - git submodule update
-  - mkdir build
-  - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_CXX_COMPILER=$_CXX -DClingo_LIBRARY=/home/travis/build/potassco/ginkgo/dependencies/clingo/build/debug/libclingo.so -DClingo_libgringo_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libgringo -DClingo_libclasp_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/libclasp -DClingo_libpotassco_INCLUDE_DIR=/home/travis/build/potassco/ginkgo/dependencies/clingo/liblp
+  - git submodule update --init --recursive
+  - mkdir -p build/debug
+  - cd build/debug
+  - cmake ../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$_CXX -DCMAKE_C_COMPILER=$_CC -DBUILD_TESTS=ON
   - make -j3 && make -j3 run-tests

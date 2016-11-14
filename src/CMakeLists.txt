@@ -89,8 +89,10 @@ endif()
 
 set(libraries
 	${Boost_LIBRARIES}
-	${Clingo_LIBRARIES}
 	${JSONCPP_LIBRARY}
+	libclasp
+	libclingo
+	libgringo
 	pthread
 )
 
