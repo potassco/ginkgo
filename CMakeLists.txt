@@ -16,7 +16,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-add_definitions(-std=c++14 -DCLASP_USE_STD_THREAD=1 -DWITH_THREADS=1)
+add_definitions(-std=c++14)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
