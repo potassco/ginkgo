@@ -42,6 +42,8 @@ class Constraint
 		const Range<size_t> &timeRange() const;
 		size_t degree() const;
 
+		bool subsumes(const Constraint &other) const;
+
 		void print(std::ostream &stream) const;
 		void printGeneralized(std::ostream &stream) const;
 

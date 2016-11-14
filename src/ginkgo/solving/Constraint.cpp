@@ -18,6 +18,7 @@ Constraint::Constraint(size_t id, Literals &&literals)
 	m_lbdOriginal{0},
 	m_lbdAfterResolution{0}
 {
+	std::sort(m_literals.begin(), m_literals.end());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +128,13 @@ Range<size_t> Constraint::computeTimeRange() const
 	}
 
 	return timeRange;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool Constraint::subsumes(const Constraint &other) const
+{
+	return std::includes(m_literals.cbegin(), m_literals.cend(), other.m_literals.cbegin(), other.m_literals.cend());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

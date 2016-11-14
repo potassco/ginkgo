@@ -31,6 +31,14 @@ class Literal
 		Sign sign() const;
 		const Symbol *symbol() const;
 
+		friend bool operator<(const Literal &lhs, const Literal &rhs)
+		{
+			if (lhs.m_symbol->clingoSymbol != rhs.m_symbol->clingoSymbol)
+				return lhs.m_symbol->clingoSymbol < rhs.m_symbol->clingoSymbol;
+
+			return lhs.m_sign < rhs.m_sign;
+		}
+
 	private:
 		Sign m_sign;
 		const Symbol *m_symbol;

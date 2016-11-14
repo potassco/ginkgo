@@ -161,6 +161,20 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		return;
 	}
 
+	const auto subsumed =
+		std::find_if(m_constraintBuffer.cbegin(), m_constraintBuffer.cend(),
+		[&constraint](const auto &otherConstraint)
+		{
+			return otherConstraint.subsumes(constraint);
+		})
+		!= m_constraintBuffer.cend();
+
+	if (subsumed)
+	{
+		std::cout << "\033[1;33mwarning: skipped conflict (subsumed by previous one)\033[0m" << std::endl;
+		return;
+	}
+
 	m_constraintBuffer.insert(constraint);
 
 	m_currentConstraintID++;
