@@ -44,5 +44,5 @@ script:
   - git submodule update --init --recursive
   - mkdir -p build/debug
   - cd build/debug
-  - cmake ../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$_CXX -DCMAKE_C_COMPILER=$_CC -DBUILD_TESTS=ON
+  - cmake ../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=$_CXX -DCMAKE_C_COMPILER=$_CC -DGINKGO_BUILD_TESTS=ON
   - make -j3 && make -j3 run-tests
