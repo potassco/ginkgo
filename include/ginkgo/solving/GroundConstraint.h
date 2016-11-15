@@ -42,8 +42,6 @@ class GroundConstraint
 		const Range<size_t> &timeRange() const;
 		size_t degree() const;
 
-		bool subsumes(const GroundConstraint &other) const;
-
 		void print(std::ostream &stream) const;
 		void printGeneralized(std::ostream &stream) const;
 
@@ -89,6 +87,10 @@ struct sortGroundConstraints
 
 using GroundConstraints = std::vector<GroundConstraint>;
 using GroundConstraintBuffer = std::set<GroundConstraint, sortGroundConstraints>;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

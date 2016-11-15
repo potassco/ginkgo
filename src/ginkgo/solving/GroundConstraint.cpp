@@ -102,13 +102,6 @@ size_t GroundConstraint::lbdAfterResolution() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool GroundConstraint::subsumes(const GroundConstraint &other) const
-{
-	return std::includes(m_literals.cbegin(), m_literals.cend(), other.m_literals.cbegin(), other.m_literals.cend());
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void GroundConstraint::print(std::ostream &stream) const
 {
 	print(stream, OutputFormat::Normal);
@@ -211,6 +204,14 @@ std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constrain
 	constraint.print(stream);
 
 	return stream;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs)
+{
+	return std::includes(lhs.literals().cbegin(), lhs.literals().cend(),
+		rhs.literals().cbegin(), rhs.literals().cend());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

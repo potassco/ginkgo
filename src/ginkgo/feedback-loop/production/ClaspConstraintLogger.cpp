@@ -159,11 +159,10 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		return;
 	}
 
-	const auto subsumed =
-		std::find_if(m_constraintBuffer.cbegin(), m_constraintBuffer.cend(),
+	const auto subsumed = std::find_if(m_constraintBuffer.cbegin(), m_constraintBuffer.cend(),
 		[&constraint](const auto &otherConstraint)
 		{
-			return otherConstraint.subsumes(constraint);
+			return subsumes(otherConstraint, constraint);
 		})
 		!= m_constraintBuffer.cend();
 
