@@ -57,8 +57,6 @@ class GroundConstraint
 	private:
 		void print(std::ostream &stream, OutputFormat outputFormat, int offset = 0) const;
 
-		Range<size_t> computeTimeRange() const;
-
 		size_t m_id;
 
 		Literals m_literals;

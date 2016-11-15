@@ -2,6 +2,8 @@
 
 #include <boost/assert.hpp>
 
+#include <ginkgo/solving/Constraint.h>
+
 namespace ginkgo
 {
 
@@ -14,7 +16,7 @@ namespace ginkgo
 GroundConstraint::GroundConstraint(size_t id, Literals &&literals)
 :	m_id{id},
 	m_literals{std::move(literals)},
-	m_timeRange{computeTimeRange()},
+	m_timeRange{computeTimeRange(m_literals)},
 	m_lbdOriginal{0},
 	m_lbdAfterResolution{0}
 {
@@ -96,38 +98,6 @@ void GroundConstraint::setLBDAfterResolution(size_t lbdAfterResolution)
 size_t GroundConstraint::lbdAfterResolution() const
 {
 	return m_lbdAfterResolution;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Range<size_t> GroundConstraint::computeTimeRange() const
-{
-	// Currently, normalization only works for plasp-formatted encodings
-	/*std::for_each(m_literals.cbegin(), m_literals.cend(), [](const auto &literal)
-	{
-		BOOST_ASSERT_MSG(Literal::SupportedTimeIdentifiers.find(*literal.name()) != Literal::SupportedTimeIdentifiers.end(),
-			"Identifier unsupported");
-	});*/
-
-	Range<size_t> timeRange{std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::min()};
-
-	for (const auto &literal : m_literals)
-	{
-		BOOST_ASSERT(!literal.symbol()->clingoSymbol.arguments().empty());
-
-		const auto &timeArgument = literal.symbol()->clingoSymbol.arguments().back();
-		const size_t time = timeArgument.number();
-
-		// Actions require at least one preceding time step in order to check preconditions
-		if (std::strcmp(literal.symbol()->clingoSymbol.name(), "apply") == 0 || std::strcmp(literal.symbol()->clingoSymbol.name(), "del") == 0)
-			timeRange.min = std::min(timeRange.min, time - 1);
-		else
-			timeRange.min = std::min(timeRange.min, time);
-
-		timeRange.max = std::max(timeRange.max, time);
-	}
-
-	return timeRange;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
