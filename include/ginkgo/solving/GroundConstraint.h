@@ -1,5 +1,5 @@
-#ifndef __SOLVING__CONSTRAINT_H
-#define __SOLVING__CONSTRAINT_H
+#ifndef __SOLVING__GROUND_CONSTRAINT_H
+#define __SOLVING__GROUND_CONSTRAINT_H
 
 #include <set>
 
@@ -11,23 +11,23 @@ namespace ginkgo
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Constraint
+// GroundConstraint
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Constraint
+class GroundConstraint
 {
 	public:
-		Constraint(size_t id, Literals &&literals);
-		~Constraint() = default;
+		GroundConstraint(size_t id, Literals &&literals);
+		~GroundConstraint() = default;
 
-		Constraint(const Constraint &other) = default;
-		Constraint &operator=(const Constraint &other) = default;
+		GroundConstraint(const GroundConstraint &other) = default;
+		GroundConstraint &operator=(const GroundConstraint &other) = default;
 
-		Constraint(Constraint &&other) = default;
-		Constraint &operator=(Constraint &&other) = default;
+		GroundConstraint(GroundConstraint &&other) = default;
+		GroundConstraint &operator=(GroundConstraint &&other) = default;
 
-		Constraint withoutLiterals(size_t start, size_t number);
+		GroundConstraint withoutLiterals(size_t start, size_t number);
 
 		size_t id() const;
 
@@ -42,7 +42,7 @@ class Constraint
 		const Range<size_t> &timeRange() const;
 		size_t degree() const;
 
-		bool subsumes(const Constraint &other) const;
+		bool subsumes(const GroundConstraint &other) const;
 
 		void print(std::ostream &stream) const;
 		void printGeneralized(std::ostream &stream) const;
@@ -70,9 +70,9 @@ class Constraint
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct sortConstraints
+struct sortGroundConstraints
 {
-	bool operator()(const Constraint &c1, const Constraint &c2)
+	bool operator()(const GroundConstraint &c1, const GroundConstraint &c2)
 	{
 		const auto degree1 = c1.timeRange().max - c1.timeRange().min;
 		const auto degree2 = c2.timeRange().max - c2.timeRange().min;
@@ -89,12 +89,12 @@ struct sortConstraints
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using Constraints = std::vector<Constraint>;
-using ConstraintBuffer = std::set<Constraint, sortConstraints>;
+using GroundConstraints = std::vector<GroundConstraint>;
+using GroundConstraintBuffer = std::set<GroundConstraint, sortGroundConstraints>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::ostream &operator<<(std::ostream &stream, const Constraint &constraint);
+std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

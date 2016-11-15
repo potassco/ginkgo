@@ -1,4 +1,4 @@
-#include <ginkgo/solving/Constraint.h>
+#include <ginkgo/solving/GroundConstraint.h>
 
 #include <boost/assert.hpp>
 
@@ -7,11 +7,11 @@ namespace ginkgo
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Constraint
+// GroundConstraint
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Constraint::Constraint(size_t id, Literals &&literals)
+GroundConstraint::GroundConstraint(size_t id, Literals &&literals)
 :	m_id{id},
 	m_literals{std::move(literals)},
 	m_timeRange{computeTimeRange()},
@@ -23,7 +23,7 @@ Constraint::Constraint(size_t id, Literals &&literals)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Constraint Constraint::withoutLiterals(size_t start, size_t number)
+GroundConstraint GroundConstraint::withoutLiterals(size_t start, size_t number)
 {
 	BOOST_ASSERT(start + number <= m_literals.size());
 
@@ -35,7 +35,7 @@ Constraint Constraint::withoutLiterals(size_t start, size_t number)
 	std::copy(m_literals.begin(), m_literals.begin() + start, std::back_inserter(literals));
 	std::copy(m_literals.begin() + start + number, m_literals.end(), std::back_inserter(literals));
 
-	Constraint result(m_id, std::move(literals));
+	GroundConstraint result(m_id, std::move(literals));
 	result.m_lbdOriginal = m_lbdOriginal;
 	result.m_lbdAfterResolution = m_lbdAfterResolution;
 
@@ -44,63 +44,63 @@ Constraint Constraint::withoutLiterals(size_t start, size_t number)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-size_t Constraint::id() const
+size_t GroundConstraint::id() const
 {
 	return m_id;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const Literals &Constraint::literals() const
+const Literals &GroundConstraint::literals() const
 {
 	return m_literals;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const Range<size_t> &Constraint::timeRange() const
+const Range<size_t> &GroundConstraint::timeRange() const
 {
 	return m_timeRange;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-size_t Constraint::degree() const
+size_t GroundConstraint::degree() const
 {
 	return m_timeRange.max - m_timeRange.min;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::setLBDOriginal(size_t lbdOriginal)
+void GroundConstraint::setLBDOriginal(size_t lbdOriginal)
 {
 	m_lbdOriginal = lbdOriginal;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-size_t Constraint::lbdOriginal() const
+size_t GroundConstraint::lbdOriginal() const
 {
 	return m_lbdOriginal;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::setLBDAfterResolution(size_t lbdAfterResolution)
+void GroundConstraint::setLBDAfterResolution(size_t lbdAfterResolution)
 {
 	m_lbdAfterResolution = lbdAfterResolution;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-size_t Constraint::lbdAfterResolution() const
+size_t GroundConstraint::lbdAfterResolution() const
 {
 	return m_lbdAfterResolution;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Range<size_t> Constraint::computeTimeRange() const
+Range<size_t> GroundConstraint::computeTimeRange() const
 {
 	// Currently, normalization only works for plasp-formatted encodings
 	/*std::for_each(m_literals.cbegin(), m_literals.cend(), [](const auto &literal)
@@ -132,28 +132,28 @@ Range<size_t> Constraint::computeTimeRange() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Constraint::subsumes(const Constraint &other) const
+bool GroundConstraint::subsumes(const GroundConstraint &other) const
 {
 	return std::includes(m_literals.cbegin(), m_literals.cend(), other.m_literals.cbegin(), other.m_literals.cend());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::print(std::ostream &stream) const
+void GroundConstraint::print(std::ostream &stream) const
 {
 	print(stream, OutputFormat::Normal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::printGeneralized(std::ostream &stream) const
+void GroundConstraint::printGeneralized(std::ostream &stream) const
 {
 	print(stream, OutputFormat::Generalized, -m_timeRange.min);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputFormat, int offset) const
+void GroundConstraint::print(std::ostream &stream, GroundConstraint::OutputFormat outputFormat, int offset) const
 {
 	stream << ":- ";
 
@@ -236,7 +236,7 @@ void Constraint::print(std::ostream &stream, Constraint::OutputFormat outputForm
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::ostream &operator<<(std::ostream &stream, const Constraint &constraint)
+std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint)
 {
 	constraint.print(stream);
 

@@ -290,7 +290,7 @@ void FeedbackLoop::prepareExtraction()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Constraint FeedbackLoop::minimizeConstraint(const Constraint &provenGeneralizedConstraint, size_t linearIncrement)
+GroundConstraint FeedbackLoop::minimizeConstraint(const GroundConstraint &provenGeneralizedConstraint, size_t linearIncrement)
 {
 	//const auto literalsBefore = provenGeneralizedConstraint.numberOfLiterals();
 	//const auto degreeBefore = provenGeneralizedConstraint.degree();
@@ -310,7 +310,7 @@ Constraint FeedbackLoop::minimizeConstraint(const Constraint &provenGeneralizedC
 		if (m_environment->logLevel() == LogLevel::Debug)
 			std::cout << "[Info ] Trying to eliminate " << windowSize << " literals starting at " << i << std::endl;
 
-		Constraint candidate = result.withoutLiterals(i, windowSize);
+		GroundConstraint candidate = result.withoutLiterals(i, windowSize);
 
 		// Skip candidates that have become empty due to removing literals
 		if (candidate.literals().empty())
@@ -382,7 +382,7 @@ Constraint FeedbackLoop::minimizeConstraint(const Constraint &provenGeneralizedC
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testHypothesisStateWise(const GroundConstraint &candidate, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -426,7 +426,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const Constraint &candidate, E
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisInductively(const Constraint &candidate, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testHypothesisInductively(const GroundConstraint &candidate, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);

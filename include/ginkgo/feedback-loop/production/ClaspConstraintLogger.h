@@ -11,7 +11,7 @@
 
 #include <ginkgo/feedback-loop/production/Configuration.h>
 #include <ginkgo/solving/Literal.h>
-#include <ginkgo/solving/Constraint.h>
+#include <ginkgo/solving/GroundConstraint.h>
 
 namespace ginkgo
 {
@@ -29,7 +29,7 @@ namespace production
 class ClaspConstraintLogger: public Clasp::EventHandler
 {
 	public:
-		ClaspConstraintLogger(std::stringstream &program, ConstraintBuffer &constraintBuffer, const Configuration<Plain> &configuration);
+		ClaspConstraintLogger(std::stringstream &program, GroundConstraintBuffer &constraintBuffer, const Configuration<Plain> &configuration);
 
 		void fill(size_t constraintBufferSize);
 		void terminate();
@@ -55,7 +55,7 @@ class ClaspConstraintLogger: public Clasp::EventHandler
 
 		Clasp::EventHandler *m_childEventHandler;
 
-		ConstraintBuffer &m_constraintBuffer;
+		GroundConstraintBuffer &m_constraintBuffer;
 		size_t m_currentConstraintID;
 
 		Symbols m_symbols;

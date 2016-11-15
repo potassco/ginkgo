@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <ginkgo/solving/Constraint.h>
-
 namespace ginkgo
 {
 namespace feedbackLoop
@@ -17,7 +15,7 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, ConstraintBuffer &constraintBuffer,
+ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, GroundConstraintBuffer &constraintBuffer,
 	const Configuration<Plain> &configuration)
 :	m_state{State::Full},
 	m_clingoControl{{"--heuristic=Domain", "--dom-mod=1,16", "--loops=no", "--reverse-arcs=0", "--otfs=0", "--stats"}},
@@ -145,7 +143,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 	if (m_state == State::Terminated)
 		return;
 
-	Constraint constraint(m_currentConstraintID, std::move(literals));
+	GroundConstraint constraint(m_currentConstraintID, std::move(literals));
 	constraint.setLBDOriginal(lbdOriginal);
 	constraint.setLBDAfterResolution(lbdAfterResolution);
 

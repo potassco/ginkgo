@@ -9,7 +9,7 @@
 #include <ginkgo/feedback-loop/production/Environment.h>
 #include <ginkgo/feedback-loop/production/Events.h>
 #include <ginkgo/feedback-loop/production/ProofResult.h>
-#include <ginkgo/solving/Constraint.h>
+#include <ginkgo/solving/GroundConstraint.h>
 
 namespace ginkgo
 {
@@ -46,17 +46,17 @@ class FeedbackLoop
 	private:
 		void mergePrograms();
 		void prepareExtraction();
-		Constraint minimizeConstraint(const Constraint &provenGeneralizedConstraint, size_t linearIncrement);
-		ProofResult testHypothesisStateWise(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
-		ProofResult testHypothesisInductively(const Constraint &candidate, EventHypothesisTested::Purpose purpose);
+		GroundConstraint minimizeConstraint(const GroundConstraint &provenGeneralizedConstraint, size_t linearIncrement);
+		ProofResult testHypothesisStateWise(const GroundConstraint &candidate, EventHypothesisTested::Purpose purpose);
+		ProofResult testHypothesisInductively(const GroundConstraint &candidate, EventHypothesisTested::Purpose purpose);
 
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;
 
 		std::unique_ptr<ClaspConstraintLogger> m_claspConstraintLogger;
 
-		ConstraintBuffer m_extractedConstraints;
-		Constraints m_provenConstraints;
+		GroundConstraintBuffer m_extractedConstraints;
+		GroundConstraints m_provenConstraints;
 
 		Events m_events;
 
