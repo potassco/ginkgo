@@ -27,22 +27,6 @@ file(GLOB solving_headers "../include/ginkgo/solving/*.h")
 file(GLOB utils_sources "ginkgo/utils/*.cpp")
 file(GLOB utils_headers "../include/ginkgo/utils/*.h")
 
-include_directories(
-	${Boost_INCLUDE_DIRS}
-	${Clingo_INCLUDE_DIRS}
-	${JSONCPP_INCLUDE_DIR}
-)
-
-if(BUILD_GTK3_GUI_TOOLS)
-	include_directories(
-		${GTKmm_INCLUDE_DIRS}
-	)
-endif()
-
-include_directories(
-	${PROJECT_SOURCE_DIR}/include
-)
-
 set(sources
 	${core_sources}
 	${core_headers}
@@ -73,9 +57,7 @@ set(sources
 )
 
 if(BUILD_GTK3_GUI_TOOLS)
-	set(sources
-		${sources}
-
+	list(append sources
 		${direct-feedback-evaluation_sources}
 		${direct-feedback-evaluation_headers}
 
@@ -85,6 +67,16 @@ if(BUILD_GTK3_GUI_TOOLS)
 		${feedback-loop-evaluation_sources}
 		${feedback-loop-evaluation_headers}
 	)
+endif()
+
+set(includes
+    ${PROJECT_SOURCE_DIR}/include
+	${Boost_INCLUDE_DIRS}
+	${JSONCPP_INCLUDE_DIR}
+)
+
+if(BUILD_GTK3_GUI_TOOLS)
+	list(append includes ${GTKmm_INCLUDE_DIRS})
 endif()
 
 set(libraries
@@ -97,12 +89,9 @@ set(libraries
 )
 
 if(BUILD_GTK3_GUI_TOOLS)
-	set(libraries
-		${libraries}
-
-		${GTKmm_LIBRARIES}
-	)
+	list(append libraries ${GTKmm_LIBRARIES})
 endif()
 
 add_library(${target} ${sources})
+target_include_directories(${target} PUBLIC ${includes})
 target_link_libraries(${target} ${libraries})
