@@ -26,14 +26,14 @@ TEST_CASE("[constraints] The time arguments of temporal literals are parsed corr
 	const auto c = ginkgo::parseGroundConstraint({"holds(a, 100)", "holds(b, 1)", "holds(c, 50)"});
 	const auto d = ginkgo::parseGroundConstraint({"holds(a, 12)", "holds(b, 8)", "holds(c, 100)"});
 
-	REQUIRE(a.timeRange().min == 0);
-	REQUIRE(a.timeRange().max == 0);
-	REQUIRE(b.timeRange().min == 0);
-	REQUIRE(b.timeRange().max == 2);
-	REQUIRE(c.timeRange().min == 1);
-	REQUIRE(c.timeRange().max == 100);
-	REQUIRE(d.timeRange().min == 8);
-	REQUIRE(d.timeRange().max == 100);
+	CHECK(a.timeRange().min == 0);
+	CHECK(a.timeRange().max == 0);
+	CHECK(b.timeRange().min == 0);
+	CHECK(b.timeRange().max == 2);
+	CHECK(c.timeRange().min == 1);
+	CHECK(c.timeRange().max == 100);
+	CHECK(d.timeRange().min == 8);
+	CHECK(d.timeRange().max == 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
