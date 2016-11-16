@@ -192,7 +192,7 @@ void ClaspConstraintLogger::readSymbolTable(const Clasp::OutputTable &outputTabl
 	if (m_seenSymbols == outputTable.size())
 		return;
 
-	const char *noName = "<?>";
+	const auto *noName = "<?>";
 
 	std::for_each(outputTable.pred_begin(), outputTable.pred_end(),
 		[&](const auto &predicate)
