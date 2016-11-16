@@ -17,7 +17,7 @@ namespace ginkgo
 
 Range<size_t> computeTimeRange(const Literals &literals);
 bool subsumes(const Literals &lhs, const Literals &rhs);
-bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset);
+bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset, int rhsOffset);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -60,14 +60,14 @@ bool subsumes(const Literals &lhs, const Literals &rhs)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset)
+bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset, int rhsOffset)
 {
-	if (lhsOffset == 0)
+	if (lhsOffset == 0 && rhsOffset == 0)
 		return subsumes(lhs, rhs);
 
 	// TODO: implement more efficiently
 	const auto equalsShifted =
-		[lhsOffset](const auto &lhs, const auto &rhs)
+		[lhsOffset, rhsOffset](const auto &lhs, const auto &rhs)
 		{
 			if (lhs.sign != rhs.sign)
 				return false;
@@ -88,21 +88,22 @@ bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset)
 			const auto lhsTimeArgument = lhsSymbol.arguments().back().number();
 			const auto rhsTimeArgument = rhsSymbol.arguments().back().number();
 
-			return lhsTimeArgument + lhsOffset == rhsTimeArgument;
+			return lhsTimeArgument + lhsOffset == rhsTimeArgument + rhsOffset;
 		};
 
-	const auto unmatchedLiteral = std::find_if(lhs.cbegin(), lhs.cend(),
-		[&](const auto lhsLiteral)
-		{
-			return std::find_if(rhs.cbegin(), rhs.cend(),
-				[&](const auto rhsLiteral)
-				{
-					return !equalsShifted(lhsLiteral, rhsLiteral);
-				})
-				== rhs.cend();
-		});
+	for (const auto &lhsLiteral : lhs)
+	{
+		const auto matchingLiteral = std::find_if(rhs.cbegin(), rhs.cend(),
+			[&](const auto rhsLiteral)
+			{
+				return equalsShifted(lhsLiteral, rhsLiteral);
+			});
 
-	return unmatchedLiteral == lhs.cend();
+		if (matchingLiteral == rhs.cend())
+			return false;
+	}
+
+	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
