@@ -112,6 +112,33 @@ std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constrain
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+GroundConstraint parseGroundConstraint(const std::initializer_list<std::string> &constraint)
+{
+	Literals literals;
+
+	std::for_each(constraint.begin(), constraint.end(),
+		[&](const auto &argument)
+		{
+			auto sign = Literal::Sign::Positive;
+			const auto *literalName = argument.c_str();
+
+			if (argument.find("not ") != std::string::npos)
+			{
+				sign = Literal::Sign::Negative;
+				literalName = literalName + 4;
+			}
+
+			const auto symbol = Clingo::parse_term(literalName);
+			literals.emplace_back(Literal(sign, symbol));
+		});
+
+	std::sort(literals.begin(), literals.end());
+
+	return GroundConstraint(0, std::move(literals), 0, 0);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs)
 {
 	return subsumes(lhs.literals(), rhs.literals());
