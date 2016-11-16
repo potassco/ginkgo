@@ -19,27 +19,14 @@ namespace ginkgo
 class GroundConstraint
 {
 	public:
-		GroundConstraint(size_t id, Literals &&literals);
-		~GroundConstraint() = default;
+		GroundConstraint(size_t id, Literals &&literals, size_t lbdOriginal, size_t lbdAfterResolution);
 
-		GroundConstraint(const GroundConstraint &other) = default;
-		GroundConstraint &operator=(const GroundConstraint &other) = default;
-
-		GroundConstraint(GroundConstraint &&other) = default;
-		GroundConstraint &operator=(GroundConstraint &&other) = default;
-
-		GroundConstraint withoutLiterals(size_t start, size_t number);
+		GroundConstraint withoutLiterals(size_t start, size_t number) const;
 
 		size_t id() const;
-
 		const Literals &literals() const;
-
-		void setLBDOriginal(size_t lbdOriginal);
 		size_t lbdOriginal() const;
-
-		void setLBDAfterResolution(size_t lbdAfterResolution);
 		size_t lbdAfterResolution() const;
-
 		const Range<size_t> &timeRange() const;
 		size_t degree() const;
 

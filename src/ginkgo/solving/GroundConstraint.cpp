@@ -13,19 +13,21 @@ namespace ginkgo
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GroundConstraint::GroundConstraint(size_t id, Literals &&literals)
+GroundConstraint::GroundConstraint(size_t id, Literals &&literals, size_t lbdOriginal,
+	size_t lbdAfterResolution)
 :	m_id{id},
 	m_literals{std::move(literals)},
 	m_timeRange{computeTimeRange(m_literals)},
-	m_lbdOriginal{0},
-	m_lbdAfterResolution{0}
+	m_lbdOriginal{lbdOriginal},
+	m_lbdAfterResolution{lbdAfterResolution}
 {
-	std::sort(m_literals.begin(), m_literals.end());
+	BOOST_ASSERT_MSG(std::is_sorted(literals.cbegin(), literals.cend()),
+		"Literal vector must be sorted");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GroundConstraint GroundConstraint::withoutLiterals(size_t start, size_t number)
+GroundConstraint GroundConstraint::withoutLiterals(size_t start, size_t number) const
 {
 	BOOST_ASSERT(start + number <= m_literals.size());
 
@@ -34,12 +36,10 @@ GroundConstraint GroundConstraint::withoutLiterals(size_t start, size_t number)
 	Literals literals;
 	literals.reserve(numberOfLiterals);
 
-	std::copy(m_literals.begin(), m_literals.begin() + start, std::back_inserter(literals));
-	std::copy(m_literals.begin() + start + number, m_literals.end(), std::back_inserter(literals));
+	std::copy(m_literals.cbegin(), m_literals.cbegin() + start, std::back_inserter(literals));
+	std::copy(m_literals.cbegin() + start + number, m_literals.cend(), std::back_inserter(literals));
 
-	GroundConstraint result(m_id, std::move(literals));
-	result.m_lbdOriginal = m_lbdOriginal;
-	result.m_lbdAfterResolution = m_lbdAfterResolution;
+	GroundConstraint result(m_id, std::move(literals), m_lbdOriginal, m_lbdAfterResolution);
 
 	return result;
 }
@@ -74,23 +74,9 @@ size_t GroundConstraint::degree() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GroundConstraint::setLBDOriginal(size_t lbdOriginal)
-{
-	m_lbdOriginal = lbdOriginal;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 size_t GroundConstraint::lbdOriginal() const
 {
 	return m_lbdOriginal;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void GroundConstraint::setLBDAfterResolution(size_t lbdAfterResolution)
-{
-	m_lbdAfterResolution = lbdAfterResolution;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

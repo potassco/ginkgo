@@ -137,15 +137,15 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 		literals.emplace_back(Literal(sign, symbol));
 	}
 
+	std::sort(literals.begin(), literals.end());
+
 	std::unique_lock<std::mutex> lock(m_constraintBufferMutex);
 	m_constraintBufferCondition.wait(lock, [&](){return m_state == State::Filling || m_state == State::Terminated;});
 
 	if (m_state == State::Terminated)
 		return;
 
-	GroundConstraint constraint(m_currentConstraintID, std::move(literals));
-	constraint.setLBDOriginal(lbdOriginal);
-	constraint.setLBDAfterResolution(lbdAfterResolution);
+	GroundConstraint constraint(m_currentConstraintID, std::move(literals), lbdOriginal, lbdAfterResolution);
 
 	if (constraint.degree() > m_configuration.maxDegree)
 	{
