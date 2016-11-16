@@ -2,20 +2,13 @@ set(target tests)
 
 file(GLOB core_sources "*.cpp")
 
-include_directories(
-	${Boost_INCLUDE_DIRS}
-	${JSONCPP_INCLUDE_DIR}
-	${PROJECT_SOURCE_DIR}/include
+set(includes
 	${PROJECT_SOURCE_DIR}/lib/catch/single_include
 )
 
-set(libraries
-	${Boost_LIBRARIES}
-	ginkgo
-)
-
 add_executable(${target} ${core_sources})
-target_link_libraries(${target} ${libraries})
+target_include_directories(${target} PRIVATE ${includes})
+target_link_libraries(${target} ginkgo)
 
 add_custom_target(run-tests
 	COMMAND ${CMAKE_BINARY_DIR}/bin/tests
