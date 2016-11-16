@@ -146,8 +146,14 @@ std::ostream &operator<<(std::ostream &stream, const GeneralizedConstraint &cons
 
 bool subsumes(const GeneralizedConstraint &lhs, const GeneralizedConstraint &rhs)
 {
-	// TODO: implement
-	throw std::runtime_error("not implemented");
+	const auto lhsOffset = lhs.offset();
+
+	// Shift the generalized constraint and test it against the other constraint
+	for (auto rhsOffset = -rhs.offset(); rhsOffset + lhs.degree() <= rhs.degree(); rhsOffset++)
+		if (subsumes(lhs.literals(), rhs.literals(), lhsOffset, -rhsOffset))
+			return true;
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
