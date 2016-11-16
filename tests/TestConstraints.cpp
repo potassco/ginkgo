@@ -101,15 +101,14 @@ TEST_CASE("[constraints] Literals are eliminated as specified", "[constraints]")
 	REQUIRE(b.withoutLiterals(0)->subsumes(c));
 	REQUIRE(c.subsumes(*b.withoutLiterals(0)));
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE("[constraints] Constraits subsume themselves", "[constraints]")
 {
 	const auto a = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)", "holds(d, 0)", "holds(e, 0)"});
-	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "not holds(c, 0)", "holds(d, 0)", "not holds(e, 0)"});
 	const auto ga = ginkgo::GeneralizedConstraint(a);
+	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "not holds(c, 0)", "holds(d, 0)", "not holds(e, 0)"});
 	const auto gb = ginkgo::GeneralizedConstraint(b);
 
 	CHECK(ginkgo::subsumes(a, a));
