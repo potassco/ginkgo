@@ -69,7 +69,7 @@ size_t GeneralizedConstraint::degree() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void print(std::ostream &stream, const GeneralizedConstraint &constraint)
+std::ostream &operator<<(std::ostream &stream, const GeneralizedConstraint &constraint)
 {
 	stream << ":- ";
 
@@ -138,13 +138,7 @@ void print(std::ostream &stream, const GeneralizedConstraint &constraint)
 	}
 
 	stream << ".";
-}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-std::ostream &operator<<(std::ostream &stream, const GeneralizedConstraint &constraint)
-{
-	print(stream, constraint);
 	return stream;
 }
 

@@ -65,7 +65,6 @@ using GroundConstraintBuffer = std::set<GroundConstraint, sortGroundConstraints>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void print(std::ostream &stream, const GroundConstraint &constraint);
 std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint);
 
 bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs);

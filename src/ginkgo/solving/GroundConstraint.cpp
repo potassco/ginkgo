@@ -88,7 +88,7 @@ size_t GroundConstraint::lbdAfterResolution() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void print(std::ostream &stream, const GroundConstraint &constraint)
+std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint)
 {
 	stream << ":- ";
 
@@ -106,13 +106,7 @@ void print(std::ostream &stream, const GroundConstraint &constraint)
 	}
 
 	stream << ".";
-}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint)
-{
-	print(stream, constraint);
 	return stream;
 }
 

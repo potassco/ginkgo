@@ -226,14 +226,9 @@ void FeedbackLoop::run()
 		auto &directConstraintsStream = m_environment->directConstraintsStream();
 		auto &generalizedConstraintsStream = m_environment->generalizedConstraintsStream();
 
-		print(directConstraintsStream, candidate);
-		directConstraintsStream << std::endl;
-
-		print(generalizedConstraintsStream, candidate);
-		generalizedConstraintsStream << std::endl;
-
-		print(m_program, candidate);
-		m_program << std::endl;
+		directConstraintsStream << extractedConstraint << std::endl;
+		generalizedConstraintsStream << candidate << std::endl;
+		m_program << candidate << std::endl;
 
 		// Stop if we have proven enough constraints
 		if (m_configuration->constraintsToProve > 0
@@ -266,8 +261,7 @@ void FeedbackLoop::mergePrograms()
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &provenConstraint)
 		{
-			print(m_program, provenConstraint);
-			m_program << std::endl;
+			m_program << provenConstraint << std::endl;
 		});
 }
 
@@ -401,10 +395,8 @@ ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &ca
 		<< "#const degree=" << candidate.degree() << "." << std::endl
 		<< "hypothesisConstraint(T) ";
 
-	print(proofEncoding, candidate);
-
 	proofEncoding
-		<< std::endl
+		<< candidate << std::endl
 		<< StateWiseProofEncoding << std::endl;
 
 	// TODO: add warning/error message handler
@@ -443,10 +435,8 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 			<< "#const degree=" << candidate.degree() << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		print(proofEncoding, candidate);
-
 		proofEncoding
-			<< std::endl
+			<< candidate << std::endl
 			<< InductiveProofBaseEncoding << std::endl;
 
 		// TODO: add warning/error message handler
@@ -495,10 +485,8 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 			<< "#const degree=" << (candidate.degree() + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		print(proofEncoding, candidate);
-
 		proofEncoding
-			<< std::endl
+			<< candidate << std::endl
 			<< InductiveProofStepEncoding << std::endl;
 
 		proofEncoding.clear();

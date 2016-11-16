@@ -41,7 +41,6 @@ using GeneralizedConstraints = std::vector<GeneralizedConstraint>;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void print(std::ostream &stream, const GeneralizedConstraint &constraint);
 std::ostream &operator<<(std::ostream &stream, const GeneralizedConstraint &constraint);
 
 bool subsumes(const GeneralizedConstraint &lhs, const GeneralizedConstraint &rhs);
