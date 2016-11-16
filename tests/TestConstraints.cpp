@@ -87,19 +87,20 @@ TEST_CASE("[constraints] Constraints are correctly generalized and subsumed", "[
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
 TEST_CASE("[constraints] Literals are eliminated as specified", "[constraints]")
 {
-	ginkgo::deprecated::SymbolTable symbolTable;
-	ginkgo::deprecated::Constraint a(0, ":- a, b, c, d, e.", symbolTable);
-	ginkgo::deprecated::Constraint b(0, ":- a, b, c, e.", symbolTable);
-	ginkgo::deprecated::Constraint c(0, ":- b, c, e.", symbolTable);
+	const auto a = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)", "holds(d, 0)", "holds(e, 0)"});
+	const auto ga = ginkgo::GeneralizedConstraint(a);
+	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)", "holds(e, 0)"});
+	const auto gb = ginkgo::GeneralizedConstraint(b);
+	const auto c = ginkgo::parseGroundConstraint({"holds(b, 0)", "holds(c, 0)", "holds(e, 0)"});
+	const auto gc = ginkgo::GeneralizedConstraint(c);
 
-	REQUIRE(a.withoutLiterals(3)->subsumes(b));
-	REQUIRE(b.subsumes(*a.withoutLiterals(3)));
+	CHECK(ginkgo::subsumes(a.withoutLiterals(3, 1), b));
+	CHECK(ginkgo::subsumes(b, a.withoutLiterals(3, 1)));
 
-	REQUIRE(b.withoutLiterals(0)->subsumes(c));
-	REQUIRE(c.subsumes(*b.withoutLiterals(0)));
+	CHECK(ginkgo::subsumes(b.withoutLiterals(0, 1), c));
+	CHECK(ginkgo::subsumes(c, b.withoutLiterals(0, 1)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
