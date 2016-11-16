@@ -30,14 +30,6 @@ struct Literal
 	{
 	}
 
-	friend bool operator<(const Literal &lhs, const Literal &rhs)
-	{
-		if (lhs.symbol != rhs.symbol)
-			return lhs.symbol < rhs.symbol;
-
-		return lhs.sign < rhs.sign;
-	}
-
 	Sign sign;
 	Clingo::Symbol symbol;
 };
@@ -45,6 +37,16 @@ struct Literal
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 using Literals = std::vector<Literal>;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+inline bool operator<(const Literal &lhs, const Literal &rhs)
+{
+	if (lhs.symbol != rhs.symbol)
+		return lhs.symbol < rhs.symbol;
+
+	return lhs.sign < rhs.sign;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
