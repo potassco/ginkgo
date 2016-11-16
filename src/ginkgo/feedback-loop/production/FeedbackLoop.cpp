@@ -160,8 +160,10 @@ void FeedbackLoop::run()
 
 	while (!m_extractedConstraints.empty())
 	{
-		auto candidate = std::move(*m_extractedConstraints.begin());
+		auto extractedConstraint = std::move(*m_extractedConstraints.begin());
 		m_extractedConstraints.erase(m_extractedConstraints.begin());
+
+		GeneralizedConstraint candidate(extractedConstraint);
 
 		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
 
@@ -174,10 +176,10 @@ void FeedbackLoop::run()
 		switch (m_configuration->proofMethod)
 		{
 			case ProofMethod::StateWise:
-				proofResult = testHypothesisStateWise(candidate, EventHypothesisTested::Purpose::Prove);
+				proofResult = testCandidateStateWise(candidate, EventHypothesisTested::Purpose::Prove);
 				break;
 			case ProofMethod::Inductive:
-				proofResult = testHypothesisInductively(candidate, EventHypothesisTested::Purpose::Prove);
+				proofResult = testCandidateInductively(candidate, EventHypothesisTested::Purpose::Prove);
 				break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
@@ -227,10 +229,10 @@ void FeedbackLoop::run()
 		print(directConstraintsStream, candidate);
 		directConstraintsStream << std::endl;
 
-		printGeneralized(generalizedConstraintsStream, candidate);
+		print(generalizedConstraintsStream, candidate);
 		generalizedConstraintsStream << std::endl;
 
-		printGeneralized(m_program, candidate);
+		print(m_program, candidate);
 		m_program << std::endl;
 
 		// Stop if we have proven enough constraints
@@ -264,7 +266,7 @@ void FeedbackLoop::mergePrograms()
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &provenConstraint)
 		{
-			printGeneralized(m_program, provenConstraint);
+			print(m_program, provenConstraint);
 			m_program << std::endl;
 		});
 }
@@ -290,17 +292,17 @@ void FeedbackLoop::prepareExtraction()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GroundConstraint FeedbackLoop::minimizeConstraint(const GroundConstraint &provenGeneralizedConstraint, size_t linearIncrement)
+GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstraint &provenConstraint, size_t linearIncrement)
 {
 	//const auto literalsBefore = provenGeneralizedConstraint.numberOfLiterals();
 	//const auto degreeBefore = provenGeneralizedConstraint.degree();
 	size_t requiredTests = 0;
 
 	// If nothing works, keep the original constraint
-	auto result = provenGeneralizedConstraint;
+	auto result = provenConstraint;
 
 	if (m_environment->logLevel() == LogLevel::Debug)
-		std::cout << "[Info ] Trying to minimize " << provenGeneralizedConstraint << std::endl;
+		std::cout << "[Info ] Trying to minimize " << provenConstraint << std::endl;
 
 	// Start with windows of size 1
 	size_t windowSize = 1;
@@ -310,7 +312,7 @@ GroundConstraint FeedbackLoop::minimizeConstraint(const GroundConstraint &proven
 		if (m_environment->logLevel() == LogLevel::Debug)
 			std::cout << "[Info ] Trying to eliminate " << windowSize << " literals starting at " << i << std::endl;
 
-		GroundConstraint candidate = result.withoutLiterals(i, windowSize);
+		auto candidate = result.withoutLiterals(i, windowSize);
 
 		// Skip candidates that have become empty due to removing literals
 		if (candidate.literals().empty())
@@ -327,10 +329,10 @@ GroundConstraint FeedbackLoop::minimizeConstraint(const GroundConstraint &proven
 		switch (m_configuration->proofMethod)
 		{
 			case ProofMethod::StateWise:
-				proofResult = testHypothesisStateWise(candidate, EventHypothesisTested::Purpose::Minimize);
+				proofResult = testCandidateStateWise(candidate, EventHypothesisTested::Purpose::Minimize);
 				break;
 			case ProofMethod::Inductive:
-				proofResult = testHypothesisInductively(candidate, EventHypothesisTested::Purpose::Minimize);
+				proofResult = testCandidateInductively(candidate, EventHypothesisTested::Purpose::Minimize);
 				break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
@@ -370,8 +372,8 @@ GroundConstraint FeedbackLoop::minimizeConstraint(const GroundConstraint &proven
 	if (m_environment->logLevel() == LogLevel::Debug)
 	{
 		std::cout << "[Info ] \033[1;34mEliminated "
-			<< (provenGeneralizedConstraint.literals().size() - result.literals().size())
-			<< "/" << provenGeneralizedConstraint.literals().size()
+			<< (provenConstraint.literals().size() - result.literals().size())
+			<< "/" << provenConstraint.literals().size()
 			<< " literals through minimization\033[0m" << std::endl;
 	}
 
@@ -382,7 +384,7 @@ GroundConstraint FeedbackLoop::minimizeConstraint(const GroundConstraint &proven
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisStateWise(const GroundConstraint &candidate, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &candidate, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -399,7 +401,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GroundConstraint &candid
 		<< "#const degree=" << candidate.degree() << "." << std::endl
 		<< "hypothesisConstraint(T) ";
 
-	printGeneralized(proofEncoding, candidate);
+	print(proofEncoding, candidate);
 
 	proofEncoding
 		<< std::endl
@@ -426,7 +428,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GroundConstraint &candid
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testHypothesisInductively(const GroundConstraint &candidate, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &candidate, EventHypothesisTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -441,7 +443,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const GroundConstraint &cand
 			<< "#const degree=" << candidate.degree() << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		printGeneralized(proofEncoding, candidate);
+		print(proofEncoding, candidate);
 
 		proofEncoding
 			<< std::endl
@@ -493,7 +495,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const GroundConstraint &cand
 			<< "#const degree=" << (candidate.degree() + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		printGeneralized(proofEncoding, candidate);
+		print(proofEncoding, candidate);
 
 		proofEncoding
 			<< std::endl

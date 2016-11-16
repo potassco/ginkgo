@@ -90,67 +90,7 @@ size_t GroundConstraint::lbdAfterResolution() const
 
 void print(std::ostream &stream, const GroundConstraint &constraint)
 {
-	print(stream, constraint, ConstraintOutputFormat::Normal);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void printGeneralized(std::ostream &stream, const GroundConstraint &constraint)
-{
-	print(stream, constraint, ConstraintOutputFormat::Generalized, -constraint.timeRange().min);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void print(std::ostream &stream, const GroundConstraint &constraint,
-	ConstraintOutputFormat outputFormat, int offset)
-{
 	stream << ":- ";
-
-	const auto printTimeVariable =
-		[&](const auto time)
-		{
-			stream << "T";
-
-			if (time > 0)
-				stream << "+" << time;
-			else if (time < 0)
-				stream << "-" << -time;
-		};
-
-	const auto printNormalizedLiteral =
-		[&](const auto &literal)
-		{
-			const auto &clingoSymbol = literal.symbol()->clingoSymbol;
-
-			stream << clingoSymbol.name();
-
-			if (clingoSymbol.arguments().empty())
-				return;
-
-			stream << "(";
-
-			for (auto i = clingoSymbol.arguments().begin(); i != clingoSymbol.arguments().end() - 1; i++)
-			{
-				const auto &argument = *i;
-
-				if (i != clingoSymbol.arguments().begin())
-					stream << ",";
-
-				stream << argument;
-			}
-
-			if (clingoSymbol.arguments().size() > 1)
-				stream << ",";
-
-			const auto &timeArgument = clingoSymbol.arguments().back();
-			const int time = timeArgument.number() + offset;
-
-			if (outputFormat == ConstraintOutputFormat::Generalized)
-				printTimeVariable(time);
-
-			stream << ")";
-		};
 
 	for (auto i = constraint.literals().cbegin(); i != constraint.literals().cend(); i++)
 	{
@@ -162,26 +102,10 @@ void print(std::ostream &stream, const GroundConstraint &constraint,
 		if (literal.sign() == Literal::Sign::Negative)
 			stream << "not ";
 
-		if (outputFormat == ConstraintOutputFormat::Normal)
-			stream << literal.symbol()->clingoSymbol;
-		else
-			printNormalizedLiteral(literal);
+		stream << literal.symbol()->clingoSymbol;
 	}
 
-	if (outputFormat == ConstraintOutputFormat::Generalized)
-	{
-		const auto timeMin = static_cast<int>(constraint.timeRange().min) + offset;
-		const auto timeMax = static_cast<int>(constraint.timeRange().max) + offset;
-
-		for (auto time = timeMin; time <= timeMax; time++)
-		{
-			stream << ", time(";
-			printTimeVariable(time);
-			stream << ")";
-		}
-	}
-
-	stream << ". %lbd = " << constraint.lbdAfterResolution();
+	stream << ".";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

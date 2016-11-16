@@ -3,7 +3,6 @@
 
 #include <set>
 
-#include <ginkgo/solving/Constraint.h>
 #include <ginkgo/solving/Literal.h>
 #include <ginkgo/utils/Range.h>
 
@@ -67,9 +66,6 @@ using GroundConstraintBuffer = std::set<GroundConstraint, sortGroundConstraints>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void print(std::ostream &stream, const GroundConstraint &constraint);
-void printGeneralized(std::ostream &stream, const GroundConstraint &constraint);
-void print(std::ostream &stream, const GroundConstraint &constraint,
-	ConstraintOutputFormat outputFormat, int offset = 0);
 std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint);
 
 bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs);
