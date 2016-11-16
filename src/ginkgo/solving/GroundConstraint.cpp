@@ -125,7 +125,7 @@ GroundConstraint parseGroundConstraint(const std::initializer_list<std::string> 
 			if (argument.find("not ") != std::string::npos)
 			{
 				sign = Literal::Sign::Negative;
-				literalName = literalName + 4;
+				literalName += 4;
 			}
 
 			const auto symbol = Clingo::parse_term(literalName);

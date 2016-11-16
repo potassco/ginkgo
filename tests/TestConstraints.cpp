@@ -158,23 +158,21 @@ TEST_CASE("[constraints] Ground constraints are correctly subsumed by other ones
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
 TEST_CASE("[constraints] Constraint subsumption is negation-sensitive", "[constraints]")
 {
-	ginkgo::deprecated::SymbolTable symbolTable;
-	ginkgo::deprecated::Constraint a(0, ":- a, not b, c, d, e.", symbolTable);
-	ginkgo::deprecated::Constraint b(0, ":- a, not b, c, d, not e.", symbolTable);
-	ginkgo::deprecated::Constraint c(0, ":- a, not b, c, d.", symbolTable);
+	const auto a = ginkgo::parseGroundConstraint({"holds(a, 0)", "not holds(b, 0)", "holds(c, 0)", "holds(d, 0)", "holds(e, 0)"});
+	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "not holds(b, 0)", "holds(c, 0)", "holds(d, 0)", "not holds(e, 0)"});
+	const auto c = ginkgo::parseGroundConstraint({"holds(a, 0)", "not holds(b, 0)", "holds(c, 0)", "holds(d, 0)"});
 
-	REQUIRE(c.subsumes(a));
-	REQUIRE(c.subsumes(b));
+	CHECK(ginkgo::subsumes(c, a));
+	CHECK(ginkgo::subsumes(c, b));
 
-	REQUIRE_FALSE(a.subsumes(c));
-	REQUIRE_FALSE(b.subsumes(c));
+	CHECK_FALSE(ginkgo::subsumes(a, c));
+	CHECK_FALSE(ginkgo::subsumes(b, c));
 
-	REQUIRE_FALSE(b.subsumes(a));
-	REQUIRE_FALSE(a.subsumes(b));
-}*/
+	CHECK_FALSE(ginkgo::subsumes(b, a));
+	CHECK_FALSE(ginkgo::subsumes(a, b));
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
