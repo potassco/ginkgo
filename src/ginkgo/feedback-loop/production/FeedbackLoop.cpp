@@ -224,13 +224,13 @@ void FeedbackLoop::run()
 		auto &directConstraintsStream = m_environment->directConstraintsStream();
 		auto &generalizedConstraintsStream = m_environment->generalizedConstraintsStream();
 
-		candidate.print(directConstraintsStream);
+		print(directConstraintsStream, candidate);
 		directConstraintsStream << std::endl;
 
-		candidate.printGeneralized(generalizedConstraintsStream);
+		printGeneralized(generalizedConstraintsStream, candidate);
 		generalizedConstraintsStream << std::endl;
 
-		candidate.printGeneralized(m_program);
+		printGeneralized(m_program, candidate);
 		m_program << std::endl;
 
 		// Stop if we have proven enough constraints
@@ -264,7 +264,7 @@ void FeedbackLoop::mergePrograms()
 	std::for_each(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
 		[&](const auto &provenConstraint)
 		{
-			provenConstraint.printGeneralized(m_program);
+			printGeneralized(m_program, provenConstraint);
 			m_program << std::endl;
 		});
 }
@@ -399,7 +399,7 @@ ProofResult FeedbackLoop::testHypothesisStateWise(const GroundConstraint &candid
 		<< "#const degree=" << candidate.degree() << "." << std::endl
 		<< "hypothesisConstraint(T) ";
 
-	candidate.printGeneralized(proofEncoding);
+	printGeneralized(proofEncoding, candidate);
 
 	proofEncoding
 		<< std::endl
@@ -441,7 +441,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const GroundConstraint &cand
 			<< "#const degree=" << candidate.degree() << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		candidate.printGeneralized(proofEncoding);
+		printGeneralized(proofEncoding, candidate);
 
 		proofEncoding
 			<< std::endl
@@ -493,7 +493,7 @@ ProofResult FeedbackLoop::testHypothesisInductively(const GroundConstraint &cand
 			<< "#const degree=" << (candidate.degree() + 1) << "." << std::endl
 			<< "hypothesisConstraint(T) ";
 
-		candidate.printGeneralized(proofEncoding);
+		printGeneralized(proofEncoding, candidate);
 
 		proofEncoding
 			<< std::endl

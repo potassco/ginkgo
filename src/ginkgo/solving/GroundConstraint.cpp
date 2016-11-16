@@ -102,21 +102,22 @@ size_t GroundConstraint::lbdAfterResolution() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GroundConstraint::print(std::ostream &stream) const
+void print(std::ostream &stream, const GroundConstraint &constraint)
 {
-	print(stream, OutputFormat::Normal);
+	print(stream, constraint, ConstraintOutputFormat::Normal);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GroundConstraint::printGeneralized(std::ostream &stream) const
+void printGeneralized(std::ostream &stream, const GroundConstraint &constraint)
 {
-	print(stream, OutputFormat::Generalized, -m_timeRange.min);
+	print(stream, constraint, ConstraintOutputFormat::Generalized, -constraint.timeRange().min);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void GroundConstraint::print(std::ostream &stream, GroundConstraint::OutputFormat outputFormat, int offset) const
+void print(std::ostream &stream, const GroundConstraint &constraint,
+	ConstraintOutputFormat outputFormat, int offset)
 {
 	stream << ":- ";
 
@@ -159,32 +160,32 @@ void GroundConstraint::print(std::ostream &stream, GroundConstraint::OutputForma
 			const auto &timeArgument = clingoSymbol.arguments().back();
 			const int time = timeArgument.number() + offset;
 
-			if (outputFormat == OutputFormat::Generalized)
+			if (outputFormat == ConstraintOutputFormat::Generalized)
 				printTimeVariable(time);
 
 			stream << ")";
 		};
 
-	for (auto i = m_literals.cbegin(); i != m_literals.cend(); i++)
+	for (auto i = constraint.literals().cbegin(); i != constraint.literals().cend(); i++)
 	{
 		const auto &literal = *i;
 
-		if (i != m_literals.cbegin())
+		if (i != constraint.literals().cbegin())
 			stream << ", ";
 
 		if (literal.sign() == Literal::Sign::Negative)
 			stream << "not ";
 
-		if (outputFormat == OutputFormat::Normal)
+		if (outputFormat == ConstraintOutputFormat::Normal)
 			stream << literal.symbol()->clingoSymbol;
 		else
 			printNormalizedLiteral(literal);
 	}
 
-	if (outputFormat == OutputFormat::Generalized)
+	if (outputFormat == ConstraintOutputFormat::Generalized)
 	{
-		const auto timeMin = static_cast<int>(m_timeRange.min) + offset;
-		const auto timeMax = static_cast<int>(m_timeRange.max) + offset;
+		const auto timeMin = static_cast<int>(constraint.timeRange().min) + offset;
+		const auto timeMax = static_cast<int>(constraint.timeRange().max) + offset;
 
 		for (auto time = timeMin; time <= timeMax; time++)
 		{
@@ -194,15 +195,14 @@ void GroundConstraint::print(std::ostream &stream, GroundConstraint::OutputForma
 		}
 	}
 
-	stream << ". %lbd = " << m_lbdAfterResolution;
+	stream << ". %lbd = " << constraint.lbdAfterResolution();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint)
 {
-	constraint.print(stream);
-
+	print(stream, constraint);
 	return stream;
 }
 

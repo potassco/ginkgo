@@ -3,6 +3,7 @@
 
 #include <set>
 
+#include <ginkgo/solving/Constraint.h>
 #include <ginkgo/solving/Literal.h>
 #include <ginkgo/utils/Range.h>
 
@@ -42,19 +43,7 @@ class GroundConstraint
 		const Range<size_t> &timeRange() const;
 		size_t degree() const;
 
-		void print(std::ostream &stream) const;
-		void printGeneralized(std::ostream &stream) const;
-
 	private:
-		enum class OutputFormat
-		{
-			Normal,
-			Generalized
-		};
-
-	private:
-		void print(std::ostream &stream, OutputFormat outputFormat, int offset = 0) const;
-
 		size_t m_id;
 
 		Literals m_literals;
@@ -90,11 +79,13 @@ using GroundConstraintBuffer = std::set<GroundConstraint, sortGroundConstraints>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
+void print(std::ostream &stream, const GroundConstraint &constraint);
+void printGeneralized(std::ostream &stream, const GroundConstraint &constraint);
+void print(std::ostream &stream, const GroundConstraint &constraint,
+	ConstraintOutputFormat outputFormat, int offset = 0);
 std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constraint);
+
+bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
