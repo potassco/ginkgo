@@ -52,37 +52,42 @@ TEST_CASE("[constraints] Literal identifiers are collected correctly", "[constra
 	REQUIRE_FALSE(a.containsIdentifier("7"));
 	REQUIRE(a.containsIdentifier("apply"));
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE("[constraints] Constraints are correctly generalized and subsumed", "[constraints]")
 {
-	ginkgo::deprecated::SymbolTable symbolTable;
-	auto a = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- holds(a, 0), holds(b, 0), holds(c, 0).", symbolTable);
-	auto b = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- holds(a, 5), holds(b, 5), holds(c, 5).", symbolTable);
-	auto c = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- holds(a, 4), holds(b, 5), holds(c, 7).", symbolTable);
+	const auto a = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)"});
+	const auto ga = ginkgo::GeneralizedConstraint(a);
+	const auto b = ginkgo::parseGroundConstraint({"holds(a, 5)", "holds(b, 5)", "holds(c, 5)"});
+	const auto gb = ginkgo::GeneralizedConstraint(b);
+	const auto c = ginkgo::parseGroundConstraint({"holds(a, 4)", "holds(b, 5)", "holds(c, 7)"});
+	const auto gc = ginkgo::GeneralizedConstraint(c);
 
-	REQUIRE(ginkgo::deprecated::GeneralizedConstraint(b).subsumes(*a));
-	REQUIRE(ginkgo::deprecated::GeneralizedConstraint(a).subsumes(*b));
-	REQUIRE_FALSE(ginkgo::deprecated::GeneralizedConstraint(a).subsumes(*c));
-	REQUIRE_FALSE(ginkgo::deprecated::GeneralizedConstraint(c).subsumes(*a));
+	CHECK(ginkgo::subsumes(gb, a));
+	CHECK(ginkgo::subsumes(ga, b));
+	CHECK_FALSE(ginkgo::subsumes(ga, c));
+	CHECK_FALSE(ginkgo::subsumes(gc, a));
 
-	std::stringstream outputB;
-	ginkgo::deprecated::GeneralizedConstraint(a).print(outputB);
+	std::stringstream ob;
+	ob << gb;
 
-	REQUIRE(outputB.str() == ":- time(T), holds(a, T), holds(b, T), holds(c, T).");
+	CHECK(ob.str() == ":- holds(a,T), holds(b,T), holds(c,T), time(T).");
 
-	auto d = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- apply(a, 6), holds(b, 6), holds(c, 6).", symbolTable);
+	const auto d = ginkgo::parseGroundConstraint({"apply(a, 6)", "holds(b, 6)", "holds(c, 6)"});
+	const auto gd = ginkgo::GeneralizedConstraint(d);
 
 	// Actions may not be applied in time step 0 → ensure shift by one
-	std::stringstream outputD;
-	ginkgo::deprecated::GeneralizedConstraint(d).print(outputD);
+	std::stringstream od;
+	od << gd;
 
-	REQUIRE(outputD.str() == ":- time(T), time(T+1), apply(a, T+1), holds(b, T+1), holds(c, T+1).");
+	CHECK(od.str() == ":- apply(a,T+1), holds(b,T+1), holds(c,T+1), time(T), time(T+1).");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
 TEST_CASE("[constraints] Literals are eliminated as specified", "[constraints]")
 {
 	ginkgo::deprecated::SymbolTable symbolTable;
