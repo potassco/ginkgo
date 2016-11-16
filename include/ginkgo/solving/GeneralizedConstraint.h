@@ -19,7 +19,7 @@ namespace ginkgo
 class GeneralizedConstraint
 {
 	public:
-		GeneralizedConstraint(GroundConstraint &groundConstraint);
+		GeneralizedConstraint(const GroundConstraint &groundConstraint);
 
 		GeneralizedConstraint withoutLiterals(size_t start, size_t number) const;
 

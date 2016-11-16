@@ -13,7 +13,7 @@ namespace ginkgo
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GeneralizedConstraint::GeneralizedConstraint(GroundConstraint &groundConstraint)
+GeneralizedConstraint::GeneralizedConstraint(const GroundConstraint &groundConstraint)
 :	m_literals{groundConstraint.literals()},
 	m_offset{-static_cast<int>(groundConstraint.timeRange().min)},
 	m_degree(groundConstraint.timeRange().max - groundConstraint.timeRange().min)
