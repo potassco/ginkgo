@@ -1,9 +1,11 @@
 #include <catch.hpp>
 
-/*
+#include <ginkgo/solving/GeneralizedConstraint.h>
+#include <ginkgo/solving/GroundConstraint.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
 TEST_CASE("[constraints] Duplicate literals in constraints are eliminated", "[constraints]")
 {
 	ginkgo::deprecated::SymbolTable symbolTable;
@@ -13,25 +15,30 @@ TEST_CASE("[constraints] Duplicate literals in constraints are eliminated", "[co
 	REQUIRE(a.literals().size() == 3);
 	REQUIRE(b.literals().size() == 3);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE("[constraints] The time arguments of temporal literals are parsed correctly", "[constraints]")
 {
-	ginkgo::deprecated::SymbolTable symbolTable;
-	ginkgo::deprecated::Constraint a(0, ":- holds(a, 0), holds(b, 0), holds(c, 0).", symbolTable);
-	ginkgo::deprecated::Constraint b(0, ":- holds(a, 0), holds(b, 1), holds(c, 2).", symbolTable);
-	ginkgo::deprecated::Constraint c(0, ":- holds(a, 100), holds(b, 1), holds(c, 50).", symbolTable);
-	ginkgo::deprecated::Constraint d(0, ":- holds(a, 12), holds(b, 8), holds(c, 100).", symbolTable);
+	const auto a = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)"});
+	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 2)"});
+	const auto c = ginkgo::parseGroundConstraint({"holds(a, 100)", "holds(b, 1)", "holds(c, 50)"});
+	const auto d = ginkgo::parseGroundConstraint({"holds(a, 12)", "holds(b, 8)", "holds(c, 100)"});
 
-	REQUIRE(a.timeRange() == std::make_tuple(0, 0));
-	REQUIRE(b.timeRange() == std::make_tuple(0, 2));
-	REQUIRE(c.timeRange() == std::make_tuple(1, 100));
-	REQUIRE(d.timeRange() == std::make_tuple(8, 100));
+	REQUIRE(a.timeRange().min == 0);
+	REQUIRE(a.timeRange().max == 0);
+	REQUIRE(b.timeRange().min == 0);
+	REQUIRE(b.timeRange().max == 2);
+	REQUIRE(c.timeRange().min == 1);
+	REQUIRE(c.timeRange().max == 100);
+	REQUIRE(d.timeRange().min == 8);
+	REQUIRE(d.timeRange().max == 100);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
 TEST_CASE("[constraints] Literal identifiers are collected correctly", "[constraints]")
 {
 	ginkgo::deprecated::SymbolTable symbolTable;
