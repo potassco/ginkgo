@@ -23,7 +23,7 @@ Range<size_t> computeTimeRange(const Literals &literals)
 	// Currently, normalization only works for plasp-formatted encodings
 	std::for_each(literals.cbegin(), literals.cend(), [](const auto &literal)
 	{
-		BOOST_ASSERT_MSG(supportedTimeIdentifiers.find(literal.symbol()->clingoSymbol.name())
+		BOOST_ASSERT_MSG(supportedTimeIdentifiers.find(literal.symbol.name())
 			!= supportedTimeIdentifiers.end(), "Identifier unsupported");
 	});
 
