@@ -173,57 +173,52 @@ TEST_CASE("[constraints] Constraint subsumption is negation-sensitive", "[constr
 
 	REQUIRE_FALSE(b.subsumes(a));
 	REQUIRE_FALSE(a.subsumes(b));
-}
+}*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("[constraints] Generalized constraints are correctly subsumed by other generalized constraints", "[constraints]")
+TEST_CASE("[constraints] Ground constraints are correctly subsumed by generalized constraints", "[constraints]")
 {
-	ginkgo::deprecated::SymbolTable symbolTable;
+	const auto a = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)"});
+	const auto ga = ginkgo::GeneralizedConstraint(a);
+	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 2)"});
+	const auto gb = ginkgo::GeneralizedConstraint(b);
+	const auto c = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)", "apply(spam, 37)"});
+	const auto d = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 1)", "holds(spam, 37)"});
+	const auto e = ginkgo::parseGroundConstraint({"holds(a, 1)", "holds(b, 1)", "holds(c, 1)", "holds(spam, 37)"});
+	const auto f = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 2)", "holds(spam, 37)"});
+	const auto g = ginkgo::parseGroundConstraint({"holds(a, 23)", "holds(b, 24)", "holds(c, 25)", "holds(spam, 0)", "holds(spam, 37)"});
+	const auto h = ginkgo::parseGroundConstraint({"holds(a, 24)", "holds(b, 24)", "holds(c, 24)", "holds(spam, 0)", "holds(spam, 37)"});
+	const auto i = ginkgo::parseGroundConstraint({"holds(a, 37)", "holds(b, 37)", "holds(c, 37)", "holds(spam, 0)", "holds(spam, 37)"});
+	const auto j = ginkgo::parseGroundConstraint({"holds(a, 35)", "holds(b, 36)", "holds(c, 37)", "holds(spam, 0)", "holds(spam, 37)"});
+	const auto k = ginkgo::parseGroundConstraint({"holds(a, 60)", "holds(b, 60)", "holds(c, 60)", "holds(spam, 20)"});
+	const auto l = ginkgo::parseGroundConstraint({"holds(a, 60)", "holds(b, 60)", "holds(c, 60)", "holds(spam, 60)"});
+	const auto m = ginkgo::parseGroundConstraint({"holds(a, 60)", "holds(b, 60)", "holds(c, 60)", "holds(spam, 80)"});
 
-	auto a = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- holds(a, 0), holds(b, 0), holds(c, 0).", symbolTable);
-	auto b = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- holds(a, 0), holds(b, 1), holds(c, 2).", symbolTable);
+	CHECK(ginkgo::subsumes(ga, c));
+	CHECK_FALSE(ginkgo::subsumes(ga, d));
+	CHECK(ginkgo::subsumes(ga, e));
+	CHECK_FALSE(ginkgo::subsumes(ga, f));
+	CHECK_FALSE(ginkgo::subsumes(ga, g));
+	CHECK(ginkgo::subsumes(ga, h));
+	CHECK(ginkgo::subsumes(ga, i));
+	CHECK_FALSE(ginkgo::subsumes(ga, j));
+	CHECK(ginkgo::subsumes(ga, k));
+	CHECK(ginkgo::subsumes(ga, l));
+	CHECK(ginkgo::subsumes(ga, m));
 
-	auto generalizedA = ginkgo::deprecated::GeneralizedConstraint(a);
-	auto generalizedB = ginkgo::deprecated::GeneralizedConstraint(b);
-
-	ginkgo::deprecated::Constraint c(0, ":- holds(a, 0), holds(b, 0), holds(c, 0), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint d(0, ":- holds(a, 0), holds(b, 1), holds(c, 1), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint e(0, ":- holds(a, 1), holds(b, 1), holds(c, 1), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint f(0, ":- holds(a, 0), holds(b, 1), holds(c, 2), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint g(0, ":- holds(a, 23), holds(b, 24), holds(c, 25), holds(spam, 0), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint h(0, ":- holds(a, 24), holds(b, 24), holds(c, 24), holds(spam, 0), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint i(0, ":- holds(a, 37), holds(b, 37), holds(c, 37), holds(spam, 0), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint j(0, ":- holds(a, 35), holds(b, 36), holds(c, 37), holds(spam, 0), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint k(0, ":- holds(a, 60), holds(b, 60), holds(c, 60), holds(spam, 20).", symbolTable);
-	ginkgo::deprecated::Constraint l(0, ":- holds(a, 60), holds(b, 60), holds(c, 60), holds(spam, 60).", symbolTable);
-	ginkgo::deprecated::Constraint m(0, ":- holds(a, 60), holds(b, 60), holds(c, 60), holds(spam, 80).", symbolTable);
-
-	REQUIRE(generalizedA.subsumes(c));
-	REQUIRE_FALSE(generalizedA.subsumes(d));
-	REQUIRE(generalizedA.subsumes(e));
-	REQUIRE_FALSE(generalizedA.subsumes(f));
-	REQUIRE_FALSE(generalizedA.subsumes(g));
-	REQUIRE(generalizedA.subsumes(h));
-	REQUIRE(generalizedA.subsumes(i));
-	REQUIRE_FALSE(generalizedA.subsumes(j));
-	REQUIRE(generalizedA.subsumes(k));
-	REQUIRE(generalizedA.subsumes(l));
-	REQUIRE(generalizedA.subsumes(m));
-
-	REQUIRE_FALSE(generalizedB.subsumes(c));
-	REQUIRE_FALSE(generalizedB.subsumes(d));
-	REQUIRE_FALSE(generalizedB.subsumes(e));
-	REQUIRE(generalizedB.subsumes(f));
-	REQUIRE(generalizedB.subsumes(g));
-	REQUIRE_FALSE(generalizedB.subsumes(h));
-	REQUIRE_FALSE(generalizedB.subsumes(i));
-	REQUIRE(generalizedB.subsumes(j));
-	REQUIRE_FALSE(generalizedB.subsumes(k));
-	REQUIRE_FALSE(generalizedB.subsumes(l));
-	REQUIRE_FALSE(generalizedB.subsumes(m));
+	CHECK_FALSE(ginkgo::subsumes(gb, c));
+	CHECK_FALSE(ginkgo::subsumes(gb, d));
+	CHECK_FALSE(ginkgo::subsumes(gb, e));
+	CHECK(ginkgo::subsumes(gb, f));
+	CHECK(ginkgo::subsumes(gb, g));
+	CHECK_FALSE(ginkgo::subsumes(gb, h));
+	CHECK_FALSE(ginkgo::subsumes(gb, i));
+	CHECK(ginkgo::subsumes(gb, j));
+	CHECK_FALSE(ginkgo::subsumes(gb, k));
+	CHECK_FALSE(ginkgo::subsumes(gb, l));
+	CHECK_FALSE(ginkgo::subsumes(gb, m));
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
