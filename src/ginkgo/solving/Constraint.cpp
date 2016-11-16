@@ -54,8 +54,7 @@ Range<size_t> computeTimeRange(const Literals &literals)
 
 bool subsumes(const Literals &lhs, const Literals &rhs)
 {
-	return std::includes(lhs.cbegin(), lhs.cend(),
-		rhs.cbegin(), rhs.cend());
+	return std::includes(rhs.cbegin(), rhs.cend(), lhs.cbegin(), lhs.cend());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
