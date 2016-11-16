@@ -114,8 +114,7 @@ std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constrain
 
 bool subsumes(const GroundConstraint &lhs, const GroundConstraint &rhs)
 {
-	return std::includes(lhs.literals().cbegin(), lhs.literals().cend(),
-		rhs.literals().cbegin(), rhs.literals().cend());
+	return subsumes(lhs.literals(), rhs.literals());
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

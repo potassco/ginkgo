@@ -50,4 +50,59 @@ Range<size_t> computeTimeRange(const Literals &literals)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool subsumes(const Literals &lhs, const Literals &rhs)
+{
+	return std::includes(lhs.cbegin(), lhs.cend(),
+		rhs.cbegin(), rhs.cend());
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset)
+{
+	if (lhsOffset == 0)
+		return subsumes(lhs, rhs);
+
+	// TODO: implement more efficiently
+	const auto equalsShifted =
+		[lhsOffset](const auto &lhs, const auto &rhs)
+		{
+			if (lhs.sign() != rhs.sign())
+				return false;
+
+			const auto lhsClingoSymbol = lhs.symbol()->clingoSymbol;
+			const auto rhsClingoSymbol = rhs.symbol()->clingoSymbol;
+
+			if (lhsClingoSymbol.name() != rhsClingoSymbol.name())
+				return false;
+
+			if (lhsClingoSymbol.arguments().size() != rhsClingoSymbol.arguments().size())
+				return false;
+
+			for (size_t i = 0; i < lhsClingoSymbol.arguments().size() - 1; i++)
+				if (lhsClingoSymbol.arguments()[i] != rhsClingoSymbol.arguments()[i])
+					return false;
+
+			const auto lhsTimeArgument = lhsClingoSymbol.arguments().back().number();
+			const auto rhsTimeArgument = rhsClingoSymbol.arguments().back().number();
+
+			return lhsTimeArgument + lhsOffset == rhsTimeArgument;
+		};
+
+	const auto unmatchedLiteral = std::find_if(lhs.cbegin(), lhs.cend(),
+		[&](const auto lhsLiteral)
+		{
+			return std::find_if(rhs.cbegin(), rhs.cend(),
+				[&](const auto rhsLiteral)
+				{
+					return !equalsShifted(lhsLiteral, rhsLiteral);
+				})
+				== rhs.cend();
+		});
+
+	return unmatchedLiteral == lhs.cend();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }

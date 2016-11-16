@@ -152,4 +152,16 @@ bool subsumes(const GeneralizedConstraint &lhs, const GeneralizedConstraint &rhs
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool subsumes(const GeneralizedConstraint &lhs, const GroundConstraint &rhs)
+{
+	// Shift the generalized constraint and test it against the other constraint
+	for (auto offset = rhs.timeRange().min; offset + lhs.degree() <= rhs.timeRange().max; offset++)
+		if (subsumes(lhs.literals(), rhs.literals(), offset))
+			return true;
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
