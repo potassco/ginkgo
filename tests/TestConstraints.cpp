@@ -223,24 +223,19 @@ TEST_CASE("[constraints] Generalized constraints are correctly subsumed by other
 	REQUIRE_FALSE(generalizedB.subsumes(l));
 	REQUIRE_FALSE(generalizedB.subsumes(m));
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST_CASE("[constraints] Generalized constraint subsumption works with actions", "[constraints]")
 {
-	ginkgo::deprecated::SymbolTable symbolTable;
+	const auto a = ginkgo::parseGroundConstraint({"apply(a, 1)", "holds(b, 2)", "holds(c, 4)"});
+	const auto ga = ginkgo::GeneralizedConstraint(a);
+	const auto b = ginkgo::parseGroundConstraint({"apply(a, 5)", "holds(b, 6)", "holds(c, 8)", "holds(spam, 37)"});
+	const auto c = ginkgo::parseGroundConstraint({"apply(a, 34)", "holds(b, 35)", "holds(c, 37)", "holds(spam, 37)"});
+	const auto d = ginkgo::parseGroundConstraint({"apply(a, 8)", "holds(b, 6)", "holds(c, 8)", "holds(spam, 37)"});
 
-	auto a = std::make_shared<ginkgo::deprecated::Constraint>(0, ":- apply(a, 1), holds(b, 2), holds(c, 4).", symbolTable);
-
-	auto generalizedA = ginkgo::deprecated::GeneralizedConstraint(a);
-
-	ginkgo::deprecated::Constraint b(0, ":- apply(a, 5), holds(b, 6), holds(c, 8), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint c(0, ":- apply(a, 34), holds(b, 35), holds(c, 37), holds(spam, 37).", symbolTable);
-	ginkgo::deprecated::Constraint d(0, ":- apply(a, 8), holds(b, 6), holds(c, 8), holds(spam, 37).", symbolTable);
-
-	REQUIRE(generalizedA.subsumes(b));
-	REQUIRE(generalizedA.subsumes(c));
-	REQUIRE_FALSE(generalizedA.subsumes(d));
+	CHECK(ginkgo::subsumes(ga, b));
+	CHECK(ginkgo::subsumes(ga, c));
+	CHECK_FALSE(ginkgo::subsumes(ga, d));
 }
-
-*/
