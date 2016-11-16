@@ -31,13 +31,15 @@ Range<size_t> computeTimeRange(const Literals &literals)
 
 	for (const auto &literal : literals)
 	{
-		BOOST_ASSERT(!literal.symbol()->clingoSymbol.arguments().empty());
+		const auto symbol = literal.symbol;
 
-		const auto &timeArgument = literal.symbol()->clingoSymbol.arguments().back();
+		BOOST_ASSERT(!symbol.arguments().empty());
+
+		const auto &timeArgument = symbol.arguments().back();
 		const size_t time = timeArgument.number();
 
 		// Actions require at least one preceding time step in order to check preconditions
-		if (std::strcmp(literal.symbol()->clingoSymbol.name(), "apply") == 0 || std::strcmp(literal.symbol()->clingoSymbol.name(), "del") == 0)
+		if (std::strcmp(symbol.name(), "apply") == 0 || std::strcmp(symbol.name(), "del") == 0)
 			timeRange.min = std::min(timeRange.min, time - 1);
 		else
 			timeRange.min = std::min(timeRange.min, time);
@@ -67,24 +69,24 @@ bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset)
 	const auto equalsShifted =
 		[lhsOffset](const auto &lhs, const auto &rhs)
 		{
-			if (lhs.sign() != rhs.sign())
+			if (lhs.sign != rhs.sign)
 				return false;
 
-			const auto lhsClingoSymbol = lhs.symbol()->clingoSymbol;
-			const auto rhsClingoSymbol = rhs.symbol()->clingoSymbol;
+			const auto lhsSymbol = lhs.symbol;
+			const auto rhsSymbol = rhs.symbol;
 
-			if (lhsClingoSymbol.name() != rhsClingoSymbol.name())
+			if (lhsSymbol.name() != rhsSymbol.name())
 				return false;
 
-			if (lhsClingoSymbol.arguments().size() != rhsClingoSymbol.arguments().size())
+			if (lhsSymbol.arguments().size() != rhsSymbol.arguments().size())
 				return false;
 
-			for (size_t i = 0; i < lhsClingoSymbol.arguments().size() - 1; i++)
-				if (lhsClingoSymbol.arguments()[i] != rhsClingoSymbol.arguments()[i])
+			for (size_t i = 0; i < lhsSymbol.arguments().size() - 1; i++)
+				if (lhsSymbol.arguments()[i] != rhsSymbol.arguments()[i])
 					return false;
 
-			const auto lhsTimeArgument = lhsClingoSymbol.arguments().back().number();
-			const auto rhsTimeArgument = rhsClingoSymbol.arguments().back().number();
+			const auto lhsTimeArgument = lhsSymbol.arguments().back().number();
+			const auto rhsTimeArgument = rhsSymbol.arguments().back().number();
 
 			return lhsTimeArgument + lhsOffset == rhsTimeArgument;
 		};

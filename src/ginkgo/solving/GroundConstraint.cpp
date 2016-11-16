@@ -99,10 +99,10 @@ std::ostream &operator<<(std::ostream &stream, const GroundConstraint &constrain
 		if (i != constraint.literals().cbegin())
 			stream << ", ";
 
-		if (literal.sign() == Literal::Sign::Negative)
+		if (literal.sign == Literal::Sign::Negative)
 			stream << "not ";
 
-		stream << literal.symbol()->clingoSymbol;
+		stream << literal.symbol;
 	}
 
 	stream << ".";

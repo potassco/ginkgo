@@ -87,29 +87,29 @@ std::ostream &operator<<(std::ostream &stream, const GeneralizedConstraint &cons
 	const auto printNormalizedLiteral =
 		[&](const auto &literal)
 		{
-			const auto &clingoSymbol = literal.symbol()->clingoSymbol;
+			const auto symbol = literal.symbol;
 
-			stream << clingoSymbol.name();
+			stream << symbol.name();
 
-			if (clingoSymbol.arguments().empty())
+			if (symbol.arguments().empty())
 				return;
 
 			stream << "(";
 
-			for (auto i = clingoSymbol.arguments().begin(); i != clingoSymbol.arguments().end() - 1; i++)
+			for (auto i = symbol.arguments().begin(); i != symbol.arguments().end() - 1; i++)
 			{
 				const auto &argument = *i;
 
-				if (i != clingoSymbol.arguments().begin())
+				if (i != symbol.arguments().begin())
 					stream << ",";
 
 				stream << argument;
 			}
 
-			if (clingoSymbol.arguments().size() > 1)
+			if (symbol.arguments().size() > 1)
 				stream << ",";
 
-			const auto &timeArgument = clingoSymbol.arguments().back();
+			const auto &timeArgument = symbol.arguments().back();
 			const int time = timeArgument.number() + constraint.offset();
 
 			printTimeVariable(time);
@@ -124,7 +124,7 @@ std::ostream &operator<<(std::ostream &stream, const GeneralizedConstraint &cons
 		if (i != constraint.literals().cbegin())
 			stream << ", ";
 
-		if (literal.sign() == Literal::Sign::Negative)
+		if (literal.sign == Literal::Sign::Negative)
 			stream << "not ";
 
 		printNormalizedLiteral(literal);
