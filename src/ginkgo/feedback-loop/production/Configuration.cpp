@@ -38,17 +38,7 @@ Configuration<Plain> Configuration<Plain>::fromJSON(const Json::Value &json)
 {
 	Configuration<Plain> configuration;
 
-	// TODO: Remove legacy support
-	const auto obtainJsonInputFiles =
-		[&]()
-		{
-			if (json.get("InputFiles", Json::nullValue) != Json::nullValue)
-				return json["InputFiles"];
-
-			return json["Encodings"];
-		};
-
-	const auto &jsonInputFiles = obtainJsonInputFiles();
+	const auto &jsonInputFiles = json["InputFiles"];
 
 	BOOST_ASSERT_MSG(jsonInputFiles.size() == 2,
 		"Inconsistent number of input files, should be 2 (instance + encoding)");
