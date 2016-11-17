@@ -214,9 +214,12 @@ void FeedbackLoop::run()
 
 		m_provenConstraints.push_back(candidate);
 
-		std::cout << "[Info ] \033[1;32mHypothesis proven\033[0m" << " ("
-			<< m_provenConstraints.size() << "/"
-			<< m_configuration->constraintsToProve << ")" << std::endl;
+		std::cout << "[Info ] \033[1;32mHypothesis proven\033[0m" << " (" << m_provenConstraints.size();
+
+		if (m_configuration->constraintsToProve > 0)
+			std::cout << "/" << m_configuration->constraintsToProve;
+
+		std::cout << ")" << std::endl;
 
 		// TODO: reimplement testing policies
 
