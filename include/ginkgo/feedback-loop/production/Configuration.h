@@ -50,9 +50,11 @@ struct ConfigurationBase
 	// Maximum number of literals of hypotheses to test
 	typename S<size_t>::Set maxNumberOfLiterals;
 	// Timeout applied to hypothesis validation
-	typename S<std::chrono::milliseconds>::Set hypothesisTestingTimeout;
+	// TODO: rename
+	typename S<std::chrono::duration<double>>::Set hypothesisTestingTimeout;
 	// Timeout applied to knowledge extraction
-	typename S<std::chrono::milliseconds>::Set extractionTimeout;
+	// TODO: remove
+	typename S<std::chrono::duration<double>>::Set extractionTimeout;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
