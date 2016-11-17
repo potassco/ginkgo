@@ -153,10 +153,21 @@ void FeedbackLoop::run()
 	{
 		auto extractedConstraint = std::move(*m_extractedConstraints.begin());
 		m_extractedConstraints.erase(m_extractedConstraints.begin());
+		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
+
+		const auto subsumed = std::find_if(m_provenConstraints.cbegin(), m_provenConstraints.cend(),
+			[&](const auto &provenConstraint)
+			{
+				return subsumes(provenConstraint, extractedConstraint);
+			}) != m_provenConstraints.cend();
+
+		if (subsumed)
+		{
+			std::cout << "\033[1;33mskipped conflict (subsumed by already proven generalized constraint)\033[0m" << std::endl;
+			continue;
+		}
 
 		GeneralizedConstraint candidate(extractedConstraint);
-
-		m_claspConstraintLogger->fill(m_configuration->constraintsToExtract);
 
 		if (m_environment->logLevel() == LogLevel::Debug)
 			std::cout << "[Info ] Testing hypothesis (degree: " << candidate.degree()
