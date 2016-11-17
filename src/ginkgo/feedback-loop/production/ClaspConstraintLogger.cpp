@@ -37,7 +37,7 @@ ClaspConstraintLogger::ClaspConstraintLogger(std::stringstream &program, GroundC
 
 	const auto handleModel = [](auto model)
 		{
-			std::cout << "model found" << std::endl;
+			std::cout << "[Info ] Model found" << std::endl;
 
 			return true;
 		};
@@ -100,7 +100,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 	const Clasp::ConstraintInfo &constraintInfo)
 {
 	if (solver.id() != 0)
-		throw std::runtime_error("warning: multi-threading currently unsupported");
+		throw std::runtime_error("multi-threading currently unsupported");
 
 	const auto &outputTable = solver.sharedContext()->output;
 
@@ -116,13 +116,13 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	if (lbdOriginal > lbdMax)
 	{
-		std::cout << "\033[1;31mskipped conflict (LBD too high: " << lbdOriginal << ", maximum allowed: " << lbdMax << ")\033[0m" << std::endl;
+		std::cout << "[Info ] \033[1;31mskipped conflict (LBD too high: " << lbdOriginal << ", maximum allowed: " << lbdMax << ")\033[0m" << std::endl;
 		return;
 	}
 
 	if (!solver.resolveToFlagged(claspLiterals, allowedVariables, output, lbdAfterResolution))
 	{
-		std::cout << "\033[1;33mwarning: skipped conflict (cannot be resolved to selected variables)\033[0m" << std::endl;
+		std::cout << "[Info ] \033[1;33mwarning: skipped conflict (cannot be resolved to selected variables)\033[0m" << std::endl;
 		return;
 	}
 
@@ -152,19 +152,19 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	if (constraint.degree() > m_configuration.maxDegree)
 	{
-		std::cout << "\033[1;33mskipped conflict (degree too high)\033[0m" << std::endl;
+		std::cout << "[Info ] \033[1;33mskipped conflict (degree too high)\033[0m" << std::endl;
 		return;
 	}
 
 	if (constraint.literals().size() > m_configuration.maxNumberOfLiterals)
 	{
-		std::cout << "\033[1;33mskipped conflict (too many literals)\033[0m" << std::endl;
+		std::cout << "[Info ] \033[1;33mskipped conflict (too many literals)\033[0m" << std::endl;
 		return;
 	}
 
 	if (contains(constraint.literals(), "terminal"))
 	{
-		std::cout << "\033[1;33mskipped conflict (contains “terminal” literal)\033[0m" << std::endl;
+		std::cout << "[Info ] \033[1;33mskipped conflict (contains “terminal” literal)\033[0m" << std::endl;
 		return;
 	}
 
@@ -177,7 +177,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	if (subsumed)
 	{
-		std::cout << "\033[1;33mskipped conflict (subsumed by previous one)\033[0m" << std::endl;
+		std::cout << "[Info ] \033[1;33mskipped conflict (subsumed by previous one)\033[0m" << std::endl;
 		return;
 	}
 

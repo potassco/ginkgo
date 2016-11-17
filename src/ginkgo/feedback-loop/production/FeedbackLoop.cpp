@@ -160,7 +160,7 @@ void FeedbackLoop::run()
 
 		if (subsumed)
 		{
-			std::cout << "\033[1;33mskipped conflict (subsumed by already proven generalized constraint)\033[0m" << std::endl;
+			std::cout << "[Info ] \033[1;33mskipped conflict (subsumed by already proven generalized constraint)\033[0m" << std::endl;
 			continue;
 		}
 
