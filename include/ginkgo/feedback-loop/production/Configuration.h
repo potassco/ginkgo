@@ -51,9 +51,6 @@ struct ConfigurationBase
 	typename S<size_t>::Set maxNumberOfLiterals;
 	// Timeout applied to candidate validation
 	typename S<std::chrono::duration<double>>::Set candidateTestingTimeout;
-	// Timeout applied to knowledge extraction
-	// TODO: remove
-	typename S<std::chrono::duration<double>>::Set extractionTimeout;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +101,6 @@ Configuration<Aggregated> Configuration<Aggregated>::aggregate(
 	aggregatedConfiguration.maxDegree.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).maxDegree;}, selector);
 	aggregatedConfiguration.maxNumberOfLiterals.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).maxNumberOfLiterals;}, selector);
 	aggregatedConfiguration.candidateTestingTimeout.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).candidateTestingTimeout;}, selector);
-	aggregatedConfiguration.extractionTimeout.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).extractionTimeout;}, selector);
 
 	return aggregatedConfiguration;
 }

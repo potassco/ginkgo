@@ -24,7 +24,6 @@ int main(int argc, char **argv)
 		("constraints-to-prove", po::value<size_t>()->default_value(0), "Finish after <n> proven constraints")
 		("max-degree", po::value<size_t>()->default_value(5), "Maximum degree of candidates to test")
 		("max-number-of-literals", po::value<size_t>()->default_value(10), "Maximum number of literals of candidates to test")
-		("extraction-timeout", po::value<double>()->default_value(600.0), "Knowledge extraction timeout (seconds)")
 		("candidate-testing-timeout", po::value<double>()->default_value(10.0), "Candidate testing timeout (seconds)")
 		("log-level", po::value<ginkgo::feedbackLoop::production::LogLevel>()->default_value(ginkgo::feedbackLoop::production::LogLevel::Normal), "Output (Debug = detailed output)");
 
@@ -75,7 +74,6 @@ int main(int argc, char **argv)
 	checkVariable("constraints-to-prove", "Number of constraints to prove unspecified");
 	checkVariable("max-degree", "Maximum degree of literals unspecified");
 	checkVariable("max-number-of-literals", "Maximum number of literals unspecified");
-	checkVariable("extraction-timeout", "Knowledge extraction timeout unspecified");
 	checkVariable("candidate-testing-timeout", "Candidate testing timeout unspecified");
 
 	const auto inputFileNames = variablesMap["input"].as<std::vector<std::string>>();
@@ -100,7 +98,6 @@ int main(int argc, char **argv)
 	configuration->constraintsToProve = variablesMap["constraints-to-prove"].as<size_t>();
 	configuration->maxDegree = variablesMap["max-degree"].as<size_t>();
 	configuration->maxNumberOfLiterals = variablesMap["max-number-of-literals"].as<size_t>();
-	configuration->extractionTimeout = std::chrono::duration<double>(variablesMap["extraction-timeout"].as<double>());
 	configuration->candidateTestingTimeout = std::chrono::duration<double>(variablesMap["candidate-testing-timeout"].as<double>());
 
 	configuration->instance = inputFileNames[0];
