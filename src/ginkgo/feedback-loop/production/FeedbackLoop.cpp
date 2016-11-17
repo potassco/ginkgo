@@ -146,9 +146,6 @@ void FeedbackLoop::run()
 
 	// TODO: reimplement statistics
 
-	// Remove all constraints subsumed by previously proven constraints
-	// TODO: reimplement
-
 	while (!m_extractedConstraints.empty())
 	{
 		auto extractedConstraint = std::move(*m_extractedConstraints.begin());
@@ -214,8 +211,6 @@ void FeedbackLoop::run()
 			candidate = minimizeConstraint(candidate, 0);
 		else if (m_configuration->minimizationStrategy == MinimizationStrategy::LinearMinimization)
 			candidate = minimizeConstraint(candidate, 1);
-
-		// TODO: reimplement constraint subsumption
 
 		m_provenConstraints.push_back(candidate);
 
