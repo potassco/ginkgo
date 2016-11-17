@@ -107,4 +107,15 @@ bool subsumes(const Literals &lhs, const Literals &rhs, int lhsOffset, int rhsOf
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool contains(const Literals &literals, const char *predicateName)
+{
+	return std::find_if(literals.cbegin(), literals.cend(),
+		[&](const auto literal)
+		{
+			return std::strcmp(predicateName, literal.symbol.name()) == 0;
+		}) != literals.cend();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }
