@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 		("constraints-to-prove", po::value<size_t>()->default_value(0), "Finish after <n> proven constraints")
 		("max-degree", po::value<size_t>()->default_value(5), "Maximum degree of candidates to test")
 		("max-number-of-literals", po::value<size_t>()->default_value(10), "Maximum number of literals of candidates to test")
-		("candidate-testing-timeout", po::value<double>()->default_value(10.0), "Candidate testing timeout (seconds)")
+		("candidate-testing-timeout", po::value<double>()->default_value(3.0), "Candidate testing timeout (seconds)")
 		("log-level", po::value<ginkgo::feedbackLoop::production::LogLevel>()->default_value(ginkgo::feedbackLoop::production::LogLevel::Normal), "Output (Debug = detailed output)");
 
 	po::positional_options_description positionalOptionsDescription;
