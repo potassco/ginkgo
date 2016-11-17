@@ -114,7 +114,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	if (lbdOriginal > lbdMax)
 	{
-		std::cout << "\033[1;31mwarning: skipped conflict (LBD too high: " << lbdOriginal << ", maximum allowed: " << lbdMax << ")\033[0m" << std::endl;
+		std::cout << "\033[1;31mskipped conflict (LBD too high: " << lbdOriginal << ", maximum allowed: " << lbdMax << ")\033[0m" << std::endl;
 		return;
 	}
 
@@ -150,13 +150,13 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	if (constraint.degree() > m_configuration.maxDegree)
 	{
-		std::cout << "\033[1;33mwarning: skipped conflict (degree too high)\033[0m" << std::endl;
+		std::cout << "\033[1;33mskipped conflict (degree too high)\033[0m" << std::endl;
 		return;
 	}
 
 	if (constraint.literals().size() > m_configuration.maxNumberOfLiterals)
 	{
-		std::cout << "\033[1;33mwarning: skipped conflict (too many literals)\033[0m" << std::endl;
+		std::cout << "\033[1;33mskipped conflict (too many literals)\033[0m" << std::endl;
 		return;
 	}
 
@@ -169,7 +169,7 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 
 	if (subsumed)
 	{
-		std::cout << "\033[1;33mwarning: skipped conflict (subsumed by previous one)\033[0m" << std::endl;
+		std::cout << "\033[1;33mskipped conflict (subsumed by previous one)\033[0m" << std::endl;
 		return;
 	}
 

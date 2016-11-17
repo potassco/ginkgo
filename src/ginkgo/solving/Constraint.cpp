@@ -21,11 +21,12 @@ static const std::set<std::string> supportedTimeIdentifiers =
 Range<size_t> computeTimeRange(const Literals &literals)
 {
 	// Currently, normalization only works for plasp-formatted encodings
-	std::for_each(literals.cbegin(), literals.cend(), [](const auto &literal)
-	{
-		BOOST_ASSERT_MSG(supportedTimeIdentifiers.find(literal.symbol.name())
-			!= supportedTimeIdentifiers.end(), "Identifier unsupported");
-	});
+	std::for_each(literals.cbegin(), literals.cend(),
+		[](const auto &literal)
+		{
+			BOOST_ASSERT_MSG(supportedTimeIdentifiers.find(literal.symbol.name())
+				!= supportedTimeIdentifiers.end(), "Identifier unsupported");
+		});
 
 	Range<size_t> timeRange{std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::min()};
 
