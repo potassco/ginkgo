@@ -67,14 +67,6 @@ int main(int argc, char **argv)
 	checkVariable("input", "No instance encoding specified");
 	checkVariable("output", "No output prefix specified");
 	checkVariable("horizon", "Horizon (maximum time steps) unspecified");
-	checkVariable("proof-method", "Proof method unspecified");
-	checkVariable("minimization-strategy", "Minimization strategy unspecified");
-	checkVariable("fluent-closure-usage", "Fluent closure usage unspecified");
-	checkVariable("constraints-to-extract", "Number of constraints to extract unspecified");
-	checkVariable("constraints-to-prove", "Number of constraints to prove unspecified");
-	checkVariable("max-degree", "Maximum degree of literals unspecified");
-	checkVariable("max-number-of-literals", "Maximum number of literals unspecified");
-	checkVariable("candidate-testing-timeout", "Candidate testing timeout unspecified");
 
 	const auto inputFileNames = variablesMap["input"].as<std::vector<std::string>>();
 
