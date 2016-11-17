@@ -149,9 +149,6 @@ void FeedbackLoop::run()
 	// Remove all constraints subsumed by previously proven constraints
 	// TODO: reimplement
 
-	// Sort in descending order so that we can efficiently pop elements from the back
-	// TODO: reimplement
-
 	while (!m_extractedConstraints.empty())
 	{
 		auto extractedConstraint = std::move(*m_extractedConstraints.begin());
