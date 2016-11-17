@@ -1,4 +1,4 @@
-#include <ginkgo/feedback-loop/production/EventHypothesisTested.h>
+#include <ginkgo/feedback-loop/production/EventCandidateTested.h>
 
 #include <iostream>
 
@@ -16,18 +16,18 @@ namespace production
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// EventHypothesisTested
+// EventCandidateTested
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EventHypothesisTested EventHypothesisTested::fromJSON(const Json::Value &json)
+EventCandidateTested EventCandidateTested::fromJSON(const Json::Value &json)
 {
-	EventHypothesisTested result;
+	EventCandidateTested result;
 
 	result.proofType = fromString<ProofType>(json["ProofType"].asString());
 	result.purpose = fromString<Purpose>(json["Purpose"].asString());
-	result.hypothesisDegree = json["HypothesisDegree"].asUInt64();
-	result.hypothesisLiterals = json["HypothesisLiterals"].asUInt64();
+	result.candidateDegree = json["CandidateDegree"].asUInt64();
+	result.candidateLiterals = json["CandidateLiterals"].asUInt64();
 	result.proofResult = fromString<ProofResult>(json["ProofResult"].asString());
 	result.groundingTime = json["GroundingTime"].asDouble();
 	result.claspJSONOutput = json["ClaspOutput"];
@@ -37,14 +37,14 @@ EventHypothesisTested EventHypothesisTested::fromJSON(const Json::Value &json)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Json::Value EventHypothesisTested::toJSON() const
+Json::Value EventCandidateTested::toJSON() const
 {
 	Json::Value result;
 
 	result["ProofType"] = toString(proofType);
 	result["Purpose"] = toString(purpose);
-	result["HypothesisDegree"] = static_cast<Json::UInt64>(hypothesisDegree);
-	result["HypothesisLiterals"] = static_cast<Json::UInt64>(hypothesisLiterals);
+	result["CandidateDegree"] = static_cast<Json::UInt64>(candidateDegree);
+	result["CandidateLiterals"] = static_cast<Json::UInt64>(candidateLiterals);
 	result["ProofResult"] = toString(proofResult);
 	result["GroundingTime"] = groundingTime;
 	result["ClaspOutput"] = claspJSONOutput;
@@ -54,14 +54,14 @@ Json::Value EventHypothesisTested::toJSON() const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-using PurposeNames = boost::bimap<EventHypothesisTested::Purpose, std::string>;
+using PurposeNames = boost::bimap<EventCandidateTested::Purpose, std::string>;
 static PurposeNames purposeNames = boost::assign::list_of<PurposeNames::relation>
-	(EventHypothesisTested::Purpose::Prove, "Prove")
-	(EventHypothesisTested::Purpose::Minimize, "Minimize");
+	(EventCandidateTested::Purpose::Prove, "Prove")
+	(EventCandidateTested::Purpose::Minimize, "Minimize");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::ostream &operator<<(std::ostream &ostream, const EventHypothesisTested::Purpose &purpose)
+std::ostream &operator<<(std::ostream &ostream, const EventCandidateTested::Purpose &purpose)
 {
 	const auto match = purposeNames.left.find(purpose);
 
@@ -73,7 +73,7 @@ std::ostream &operator<<(std::ostream &ostream, const EventHypothesisTested::Pur
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::istream &operator>>(std::istream &istream, EventHypothesisTested::Purpose &purpose)
+std::istream &operator>>(std::istream &istream, EventCandidateTested::Purpose &purpose)
 {
 	std::string purposeName;
 	istream >> purposeName;
@@ -81,7 +81,7 @@ std::istream &operator>>(std::istream &istream, EventHypothesisTested::Purpose &
 	const auto match = purposeNames.right.find(purposeName);
 
 	if (match == purposeNames.right.end())
-		purpose = EventHypothesisTested::Purpose::Unknown;
+		purpose = EventCandidateTested::Purpose::Unknown;
 	else
 		purpose = (*match).second;
 

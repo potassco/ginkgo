@@ -65,7 +65,7 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 	BOOST_ASSERT(penalty > 0.0);
 
 	const auto &timedEventFinished = productionEvents.eventFinished();
-	const auto &timedEventsHypothesisTested = productionEvents.eventsHypothesisTested();
+	const auto &timedEventsCandidateTested = productionEvents.eventsCandidateTested();
 	const auto &timedEventsFeedbackExtracted = productionEvents.eventsFeedbackExtracted();
 	const auto &timedEventsMinimized = productionEvents.eventsMinimized();
 	const auto &timedEventsConstraintsRemoved = productionEvents.eventsConstraintsRemoved();
@@ -76,10 +76,10 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 	productionAnalysis.runtime = eventFinishedTime;
 	productionAnalysis.finishedNormally = eventFinished.reason == production::EventFinished::Reason::Done;
 
-	const auto purposeProve = production::EventHypothesisTested::Purpose::Prove;
-	const auto purposeMinimize = production::EventHypothesisTested::Purpose::Minimize;
+	const auto purposeProve = production::EventCandidateTested::Purpose::Prove;
+	const auto purposeMinimize = production::EventCandidateTested::Purpose::Minimize;
 
-	std::for_each(timedEventsHypothesisTested.cbegin(), timedEventsHypothesisTested.cend(),
+	std::for_each(timedEventsCandidateTested.cbegin(), timedEventsCandidateTested.cend(),
 		[&](const auto &timedEvent)
 		{
 			const auto &event = std::get<1>(timedEvent);
@@ -90,15 +90,15 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 				{
 					productionAnalysis.proofs++;
 
-					productionAnalysis.hypothesisDegreeMin = std::min(productionAnalysis.hypothesisDegreeMin, event.hypothesisDegree);
-					productionAnalysis.hypothesisDegreeTotal += event.hypothesisDegree;
-					productionAnalysis.hypothesisDegreeMax = std::max(productionAnalysis.hypothesisDegreeMax, event.hypothesisDegree);
+					productionAnalysis.candidateDegreeMin = std::min(productionAnalysis.candidateDegreeMin, event.candidateDegree);
+					productionAnalysis.candidateDegreeTotal += event.candidateDegree;
+					productionAnalysis.candidateDegreeMax = std::max(productionAnalysis.candidateDegreeMax, event.candidateDegree);
 
-					productionAnalysis.hypothesisLiteralsMin = std::min(productionAnalysis.hypothesisLiteralsMin, event.hypothesisLiterals);
-					productionAnalysis.hypothesisLiteralsTotal += event.hypothesisLiterals;
-					productionAnalysis.hypothesisLiteralsMax = std::max(productionAnalysis.hypothesisLiteralsMax, event.hypothesisLiterals);
+					productionAnalysis.candidateLiteralsMin = std::min(productionAnalysis.candidateLiteralsMin, event.candidateLiterals);
+					productionAnalysis.candidateLiteralsTotal += event.candidateLiterals;
+					productionAnalysis.candidateLiteralsMax = std::max(productionAnalysis.candidateLiteralsMax, event.candidateLiterals);
 
-					productionAnalysis.hypothesesTested++;
+					productionAnalysis.candidatesTested++;
 				}
 				else if (event.purpose == purposeMinimize)
 					productionAnalysis.minimizationProofs++;
@@ -125,7 +125,7 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 			}
 		});
 
-	// Info about skipped hypotheses
+	// Info about skipped candidates
 	std::for_each(timedEventsConstraintsRemoved.cbegin(), timedEventsConstraintsRemoved.cend(),
 		[&](const auto &timedEvent)
 		{
@@ -135,13 +135,13 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromRawFile(const boost::fi
 				return;
 
 			if (event.reason == production::EventConstraintsRemoved::Reason::ContainsTerminalLiteral)
-				productionAnalysis.hypothesesSkippedContainsTerminalLiteral += event.removedConstraints;
+				productionAnalysis.candidatesSkippedContainsTerminalLiteral += event.removedConstraints;
 			else if (event.reason == production::EventConstraintsRemoved::Reason::DegreeTooHigh)
-				productionAnalysis.hypothesesSkippedDegreeTooHigh += event.removedConstraints;
+				productionAnalysis.candidatesSkippedDegreeTooHigh += event.removedConstraints;
 			else if (event.reason == production::EventConstraintsRemoved::Reason::ContainsTooManyLiterals)
-				productionAnalysis.hypothesesSkippedContainsTooManyLiterals += event.removedConstraints;
+				productionAnalysis.candidatesSkippedContainsTooManyLiterals += event.removedConstraints;
 			else if (event.reason == production::EventConstraintsRemoved::Reason::Subsumed)
-				productionAnalysis.hypothesesSkippedSubsumed += event.removedConstraints;
+				productionAnalysis.candidatesSkippedSubsumed += event.removedConstraints;
 		});
 
 	// Info about feedback extraction
@@ -207,19 +207,19 @@ ProductionAnalysis<Plain> ProductionAnalysis<Plain>::fromAnalysisFile(const boos
 	productionAnalysis.minimizationLiteralsRemoved = static_cast<size_t>(json["MinimizationLiteralsRemoved"].asUInt64());
 	productionAnalysis.minimizationTests = static_cast<size_t>(json["MinimizationTests"].asUInt64());
 
-	productionAnalysis.hypothesisDegreeMin = static_cast<size_t>(json["HypothesisDegreeMin"].asUInt64());
-	productionAnalysis.hypothesisDegreeTotal = static_cast<size_t>(json["HypothesisDegreeTotal"].asUInt64());
-	productionAnalysis.hypothesisDegreeMax = static_cast<size_t>(json["HypothesisDegreeMax"].asUInt64());
+	productionAnalysis.candidateDegreeMin = static_cast<size_t>(json["CandidateDegreeMin"].asUInt64());
+	productionAnalysis.candidateDegreeTotal = static_cast<size_t>(json["CandidateDegreeTotal"].asUInt64());
+	productionAnalysis.candidateDegreeMax = static_cast<size_t>(json["CandidateDegreeMax"].asUInt64());
 
-	productionAnalysis.hypothesisLiteralsMin = static_cast<size_t>(json["HypothesisLiteralsMin"].asUInt64());
-	productionAnalysis.hypothesisLiteralsTotal = static_cast<size_t>(json["HypothesisLiteralsTotal"].asUInt64());
-	productionAnalysis.hypothesisLiteralsMax = static_cast<size_t>(json["HypothesisLiteralsMax"].asUInt64());
+	productionAnalysis.candidateLiteralsMin = static_cast<size_t>(json["CandidateLiteralsMin"].asUInt64());
+	productionAnalysis.candidateLiteralsTotal = static_cast<size_t>(json["CandidateLiteralsTotal"].asUInt64());
+	productionAnalysis.candidateLiteralsMax = static_cast<size_t>(json["CandidateLiteralsMax"].asUInt64());
 
-	productionAnalysis.hypothesesTested = static_cast<size_t>(json["HypothesesTested"].asUInt64());
-	productionAnalysis.hypothesesSkippedContainsTerminalLiteral = static_cast<size_t>(json["HypothesesSkippedContainsTerminalLiteral"].asUInt64());
-	productionAnalysis.hypothesesSkippedDegreeTooHigh = static_cast<size_t>(json["HypothesesSkippedDegreeTooHigh"].asUInt64());
-	productionAnalysis.hypothesesSkippedContainsTooManyLiterals = static_cast<size_t>(json["HypothesesSkippedContainsTooManyLiterals"].asUInt64());
-	productionAnalysis.hypothesesSkippedSubsumed = static_cast<size_t>(json["HypothesesSkippedSubsumed"].asUInt64());
+	productionAnalysis.candidatesTested = static_cast<size_t>(json["CandidatesTested"].asUInt64());
+	productionAnalysis.candidatesSkippedContainsTerminalLiteral = static_cast<size_t>(json["CandidatesSkippedContainsTerminalLiteral"].asUInt64());
+	productionAnalysis.candidatesSkippedDegreeTooHigh = static_cast<size_t>(json["CandidatesSkippedDegreeTooHigh"].asUInt64());
+	productionAnalysis.candidatesSkippedContainsTooManyLiterals = static_cast<size_t>(json["CandidatesSkippedContainsTooManyLiterals"].asUInt64());
+	productionAnalysis.candidatesSkippedSubsumed = static_cast<size_t>(json["CandidatesSkippedSubsumed"].asUInt64());
 
 	productionAnalysis.feedbackExtractionTimeTotal = static_cast<size_t>(json["FeedbackExtractionTimeTotal"].asUInt64());
 	productionAnalysis.feedbackExtractionConstraintsTotal = static_cast<size_t>(json["FeedbackExtractionConstraintsTotal"].asUInt64());
@@ -254,19 +254,19 @@ ProductionAnalysis<Plain>::ProductionAnalysis()
 	minimizationLiteralsRemoved = 0;
 	minimizationTests = 0;
 
-	hypothesisDegreeMin = std::numeric_limits<size_t>::max();
-	hypothesisDegreeTotal = 0;
-	hypothesisDegreeMax = 0;
+	candidateDegreeMin = std::numeric_limits<size_t>::max();
+	candidateDegreeTotal = 0;
+	candidateDegreeMax = 0;
 
-	hypothesisLiteralsMin = std::numeric_limits<size_t>::max();
-	hypothesisLiteralsTotal = 0;
-	hypothesisLiteralsMax = 0;
+	candidateLiteralsMin = std::numeric_limits<size_t>::max();
+	candidateLiteralsTotal = 0;
+	candidateLiteralsMax = 0;
 
-	hypothesesTested = 0;
-	hypothesesSkippedContainsTerminalLiteral = 0;
-	hypothesesSkippedDegreeTooHigh = 0;
-	hypothesesSkippedContainsTooManyLiterals = 0;
-	hypothesesSkippedSubsumed = 0;
+	candidatesTested = 0;
+	candidatesSkippedContainsTerminalLiteral = 0;
+	candidatesSkippedDegreeTooHigh = 0;
+	candidatesSkippedContainsTooManyLiterals = 0;
+	candidatesSkippedSubsumed = 0;
 
 	feedbackExtractionTimeTotal = 0.0;
 	feedbackExtractionConstraintsTotal = 0;
@@ -302,19 +302,19 @@ void ProductionAnalysis<Plain>::write(const boost::filesystem::path &path) const
 	json["MinimizationLiteralsTotal"] = static_cast<Json::UInt64>(minimizationLiteralsTotal);
 	json["MinimizationLiteralsRemoved"] = static_cast<Json::UInt64>(minimizationLiteralsRemoved);
 
-	json["HypothesisDegreeMin"] = static_cast<Json::UInt64>(hypothesisDegreeMin);
-	json["HypothesisDegreeTotal"] = static_cast<Json::UInt64>(hypothesisDegreeTotal);
-	json["HypothesisDegreeMax"] = static_cast<Json::UInt64>(hypothesisDegreeMax);
+	json["CandidateDegreeMin"] = static_cast<Json::UInt64>(candidateDegreeMin);
+	json["CandidateDegreeTotal"] = static_cast<Json::UInt64>(candidateDegreeTotal);
+	json["CandidateDegreeMax"] = static_cast<Json::UInt64>(candidateDegreeMax);
 
-	json["HypothesisLiteralsMin"] = static_cast<Json::UInt64>(hypothesisLiteralsMin);
-	json["HypothesisLiteralsTotal"] = static_cast<Json::UInt64>(hypothesisLiteralsTotal);
-	json["HypothesisLiteralsMax"] = static_cast<Json::UInt64>(hypothesisLiteralsMax);
+	json["CandidateLiteralsMin"] = static_cast<Json::UInt64>(candidateLiteralsMin);
+	json["CandidateLiteralsTotal"] = static_cast<Json::UInt64>(candidateLiteralsTotal);
+	json["CandidateLiteralsMax"] = static_cast<Json::UInt64>(candidateLiteralsMax);
 
-	json["HypothesesTested"] = static_cast<Json::UInt64>(hypothesesTested);
-	json["HypothesesSkippedContainsTerminalLiteral"] = static_cast<Json::UInt64>(hypothesesSkippedContainsTerminalLiteral);
-	json["HypothesesSkippedDegreeToHigh"] = static_cast<Json::UInt64>(hypothesesSkippedDegreeTooHigh);
-	json["HypothesesSkippedContainsTooManyLiterals"] = static_cast<Json::UInt64>(hypothesesSkippedContainsTooManyLiterals);
-	json["HypothesesSkippedSubsumed"] = static_cast<Json::UInt64>(hypothesesSkippedSubsumed);
+	json["CandidatesTested"] = static_cast<Json::UInt64>(candidatesTested);
+	json["CandidatesSkippedContainsTerminalLiteral"] = static_cast<Json::UInt64>(candidatesSkippedContainsTerminalLiteral);
+	json["CandidatesSkippedDegreeToHigh"] = static_cast<Json::UInt64>(candidatesSkippedDegreeTooHigh);
+	json["CandidatesSkippedContainsTooManyLiterals"] = static_cast<Json::UInt64>(candidatesSkippedContainsTooManyLiterals);
+	json["CandidatesSkippedSubsumed"] = static_cast<Json::UInt64>(candidatesSkippedSubsumed);
 
 	json["FeedbackExtractionTimeTotal"] = feedbackExtractionTimeTotal;
 	json["FeedbackExtractionConstraintsTotal"] = static_cast<Json::UInt64>(feedbackExtractionConstraintsTotal);

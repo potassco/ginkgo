@@ -60,7 +60,7 @@ const std::string FeedbackLoop::FluentClosureEncoding =
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const std::string FeedbackLoop::StateWiseProofEncoding =
-	// Degree of the hypothesis
+	// Degree of the candidate
 	"time(0..degree).\n"
 	// Perform actions
 	"1 {apply(A, T) : action(A)} 1 :- time(T), T > 0.\n"
@@ -72,12 +72,12 @@ const std::string FeedbackLoop::StateWiseProofEncoding =
 	"del(F, T) :- apply(A, T), deletes(A, F), action(A), time(T).\n"
 	"holds(F, T) :- holds(F, T - 1), not del(F, T), time(T), time(T - 1).\n"
 	// Eliminate all states complying with the constraint
-	":- not hypothesisConstraint(0).\n";
+	":- not candidateConstraint(0).\n";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const std::string FeedbackLoop::InductiveProofBaseEncoding =
-	// Degree of the hypothesis
+	// Degree of the candidate
 	"time(0..degree).\n"
 	// Establish the initial state
 	"holds(F, 0) :- init(F).\n"
@@ -91,12 +91,12 @@ const std::string FeedbackLoop::InductiveProofBaseEncoding =
 	"del(F, T) :- apply(A, T), deletes(A, F), action(A), time(T).\n"
 	"holds(F, T) :- holds(F, T - 1), not del(F, T), time(T), time(T - 1).\n"
 	// Eliminate all states complying with the constraint at t = 0
-	":- not hypothesisConstraint(0).\n";
+	":- not candidateConstraint(0).\n";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const std::string FeedbackLoop::InductiveProofStepEncoding =
-	// Degree of the hypothesis (+ 1)
+	// Degree of the candidate (+ 1)
 	"time(0..degree).\n"
 	// Perform actions
 	"1 {apply(A, T) : action(A)} 1 :- time(T), T > 0.\n"
@@ -108,9 +108,9 @@ const std::string FeedbackLoop::InductiveProofStepEncoding =
 	"del(F, T) :- apply(A, T), deletes(A, F), action(A), time(T).\n"
 	"holds(F, T) :- holds(F, T - 1), not del(F, T), time(T), time(T - 1).\n"
 	// Eliminate all states not complying with the constraint at t = 0
-	":- hypothesisConstraint(0).\n"
+	":- candidateConstraint(0).\n"
 	// Eliminate all states complying with the constraint at t = 1
-	":- not hypothesisConstraint(1).\n";
+	":- not candidateConstraint(1).\n";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -167,7 +167,7 @@ void FeedbackLoop::run()
 		GeneralizedConstraint candidate(extractedConstraint);
 
 		if (m_environment->logLevel() == LogLevel::Debug)
-			std::cout << "[Info ] Testing hypothesis (degree: " << candidate.degree()
+			std::cout << "[Info ] Testing candidate (degree: " << candidate.degree()
 				<< ", #literals: " << candidate.literals().size() << ")" << std::endl;
 
 		auto proofResult = ProofResult::Unknown;
@@ -175,10 +175,10 @@ void FeedbackLoop::run()
 		switch (m_configuration->proofMethod)
 		{
 			case ProofMethod::StateWise:
-				proofResult = testCandidateStateWise(candidate, EventHypothesisTested::Purpose::Prove);
+				proofResult = testCandidateStateWise(candidate, EventCandidateTested::Purpose::Prove);
 				break;
 			case ProofMethod::Inductive:
-				proofResult = testCandidateInductively(candidate, EventHypothesisTested::Purpose::Prove);
+				proofResult = testCandidateInductively(candidate, EventCandidateTested::Purpose::Prove);
 				break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
@@ -194,7 +194,7 @@ void FeedbackLoop::run()
 		if (proofResult == ProofResult::Unproven)
 		{
 			if (m_environment->logLevel() == LogLevel::Debug)
-				std::cout << "[Info ] \033[1;31mHypothesis unproven\033[0m" << std::endl;
+				std::cout << "[Info ] \033[1;31mCandidate unproven\033[0m" << std::endl;
 
 			continue;
 		}
@@ -202,7 +202,7 @@ void FeedbackLoop::run()
 		if (proofResult == ProofResult::GroundingTimeout || proofResult == ProofResult::SolvingTimeout)
 		{
 			if (m_environment->logLevel() == LogLevel::Debug)
-				std::cout << "[Info ] \033[1;33mTimeout proving hypothesis\033[0m" << std::endl;
+				std::cout << "[Info ] \033[1;33mTimeout proving candidate\033[0m" << std::endl;
 
 			continue;
 		}
@@ -216,7 +216,7 @@ void FeedbackLoop::run()
 
 		m_provenConstraints.push_back(candidate);
 
-		std::cout << "[Info ] \033[1;32mHypothesis proven\033[0m" << " (" << m_provenConstraints.size();
+		std::cout << "[Info ] \033[1;32mCandidate proven\033[0m" << " (" << m_provenConstraints.size();
 
 		if (m_configuration->constraintsToProve > 0)
 			std::cout << "/" << m_configuration->constraintsToProve;
@@ -323,10 +323,10 @@ GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstrai
 		switch (m_configuration->proofMethod)
 		{
 			case ProofMethod::StateWise:
-				proofResult = testCandidateStateWise(candidate, EventHypothesisTested::Purpose::Minimize);
+				proofResult = testCandidateStateWise(candidate, EventCandidateTested::Purpose::Minimize);
 				break;
 			case ProofMethod::Inductive:
-				proofResult = testCandidateInductively(candidate, EventHypothesisTested::Purpose::Minimize);
+				proofResult = testCandidateInductively(candidate, EventCandidateTested::Purpose::Minimize);
 				break;
 			default:
 				std::cerr << "[Error] Unknown proof method" << std::endl;
@@ -378,7 +378,7 @@ GeneralizedConstraint FeedbackLoop::minimizeConstraint(const GeneralizedConstrai
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &candidate, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &candidate, EventCandidateTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -393,7 +393,7 @@ ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &ca
 
 	proofEncoding
 		<< "#const degree=" << candidate.degree() << "." << std::endl
-		<< "hypothesisConstraint(T) ";
+		<< "candidateConstraint(T) ";
 
 	proofEncoding
 		<< candidate << std::endl
@@ -415,7 +415,7 @@ ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &ca
 		};
 
 	auto solveAsync = clingoControl.solve_async(handleModel);
-	const auto finished = solveAsync.wait(m_configuration->hypothesisTestingTimeout.count());
+	const auto finished = solveAsync.wait(m_configuration->candidateTestingTimeout.count());
 
 	if (!finished)
 		return ProofResult::SolvingTimeout;
@@ -428,7 +428,7 @@ ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &ca
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &candidate, EventHypothesisTested::Purpose purpose)
+ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &candidate, EventCandidateTested::Purpose purpose)
 {
 	m_program.clear();
 	m_program.seekg(0, std::ios::beg);
@@ -441,7 +441,7 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 		proofEncoding
 			<< m_program.rdbuf()
 			<< "#const degree=" << candidate.degree() << "." << std::endl
-			<< "hypothesisConstraint(T) ";
+			<< "candidateConstraint(T) ";
 
 		proofEncoding
 			<< candidate << std::endl
@@ -463,7 +463,7 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 			};
 
 		auto solveAsync = clingoControl.solve_async(handleModel);
-		const auto finished = solveAsync.wait(m_configuration->hypothesisTestingTimeout.count());
+		const auto finished = solveAsync.wait(m_configuration->candidateTestingTimeout.count());
 
 		if (!finished)
 			return ProofResult::SolvingTimeout;
@@ -499,7 +499,7 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 
 		proofEncoding
 			<< "#const degree=" << (candidate.degree() + 1) << "." << std::endl
-			<< "hypothesisConstraint(T) ";
+			<< "candidateConstraint(T) ";
 
 		proofEncoding
 			<< candidate << std::endl
@@ -524,7 +524,7 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 			};
 
 		auto solveAsync = clingoControl.solve_async(handleModel);
-		const auto finished = solveAsync.wait(m_configuration->hypothesisTestingTimeout.count());
+		const auto finished = solveAsync.wait(m_configuration->candidateTestingTimeout.count());
 
 		if (!finished)
 			return ProofResult::SolvingTimeout;

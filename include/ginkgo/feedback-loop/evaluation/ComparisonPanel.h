@@ -74,15 +74,15 @@ class ComparisonPanel : public Gtk::Box
 		gtkWidgets::PieChartWidget m_successfulMinimizationProofsPieChart;
 		gtkWidgets::InfoWidget m_minimizationProofTimeInfo;
 
-		gtkWidgets::InfoWidget m_hypothesisDegreeInfo;
-		gtkWidgets::InfoWidget m_hypothesisLiteralsInfo;
+		gtkWidgets::InfoWidget m_candidateDegreeInfo;
+		gtkWidgets::InfoWidget m_candidateLiteralsInfo;
 
 		gtkWidgets::InfoWidget m_feedbackExtractionTimeInfo;
 		gtkWidgets::InfoWidget m_feedbackExtractionConstraintsInfo;
 
 		gtkWidgets::PieChartWidget m_literalsEliminatedByMinimizationPieChart;
 
-		gtkWidgets::PieChartWidget m_hypothesesSkippedPieChart;
+		gtkWidgets::PieChartWidget m_candidatesSkippedPieChart;
 
 		Gtk::Box m_configurationBox;
 		Gtk::Box m_barChartBox;

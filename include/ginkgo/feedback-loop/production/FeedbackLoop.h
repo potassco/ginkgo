@@ -34,7 +34,7 @@ class FeedbackLoop
 		static const std::string StateGeneratorEncoding;
 		// Generates initial states with the fluent closure via forward chaining
 		static const std::string FluentClosureEncoding;
-		// Check whether the hypothesis holds
+		// Check whether the candidate holds
 		static const std::string StateWiseProofEncoding;
 		static const std::string InductiveProofBaseEncoding;
 		static const std::string InductiveProofStepEncoding;
@@ -48,8 +48,8 @@ class FeedbackLoop
 		void mergePrograms();
 		void prepareExtraction();
 		GeneralizedConstraint minimizeConstraint(const GeneralizedConstraint &provenConstraint, size_t linearIncrement);
-		ProofResult testCandidateStateWise(const GeneralizedConstraint &candidate, EventHypothesisTested::Purpose purpose);
-		ProofResult testCandidateInductively(const GeneralizedConstraint &candidate, EventHypothesisTested::Purpose purpose);
+		ProofResult testCandidateStateWise(const GeneralizedConstraint &candidate, EventCandidateTested::Purpose purpose);
+		ProofResult testCandidateInductively(const GeneralizedConstraint &candidate, EventCandidateTested::Purpose purpose);
 
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;

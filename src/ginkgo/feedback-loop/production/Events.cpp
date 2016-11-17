@@ -53,15 +53,15 @@ Events Events::fromJSON(const Json::Value &json)
 			statistics.m_eventsMinimized.emplace_back(std::make_tuple(time, event));
 		});
 
-	auto &eventsHypothesisTested = json["HypothesisTested"];
+	auto &eventsCandidateTested = json["CandidateTested"];
 
-	std::for_each(eventsHypothesisTested.begin(), eventsHypothesisTested.end(),
+	std::for_each(eventsCandidateTested.begin(), eventsCandidateTested.end(),
 		[&](const auto &jsonEvent)
 		{
-			const auto event = EventHypothesisTested::fromJSON(jsonEvent);
+			const auto event = EventCandidateTested::fromJSON(jsonEvent);
 			const auto time = jsonEvent["Time"].asDouble();
 
-			statistics.m_eventsHypothesisTested.emplace_back(std::make_tuple(time, event));
+			statistics.m_eventsCandidateTested.emplace_back(std::make_tuple(time, event));
 		});
 
 	auto &eventsConstraintLearned = json["ConstraintLearned"];
@@ -123,15 +123,15 @@ Json::Value Events::toJSON() const
 			json["Minimized"].append(jsonEvent);
 		});
 
-	json["HypothesisTested"] = Json::arrayValue;
+	json["CandidateTested"] = Json::arrayValue;
 
-	std::for_each(m_eventsHypothesisTested.cbegin(), m_eventsHypothesisTested.cend(),
+	std::for_each(m_eventsCandidateTested.cbegin(), m_eventsCandidateTested.cend(),
 		[&](const auto &event)
 		{
 			auto jsonEvent = std::get<1>(event).toJSON();
 			jsonEvent["Time"] = std::get<0>(event);
 
-			json["HypothesisTested"].append(jsonEvent);
+			json["CandidateTested"].append(jsonEvent);
 		});
 
 	json["ConstaintLearned"] = Json::arrayValue;
@@ -181,9 +181,9 @@ void Events::notifyMinimized(const EventMinimized &event)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Events::notifyHypothesisTested(const EventHypothesisTested &event)
+void Events::notifyCandidateTested(const EventCandidateTested &event)
 {
-	m_eventsHypothesisTested.emplace_back(std::make_tuple(time(), event));
+	m_eventsCandidateTested.emplace_back(std::make_tuple(time(), event));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,9 +223,9 @@ const std::vector<Events::Timed<EventMinimized>> &Events::eventsMinimized() cons
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const std::vector<Events::Timed<EventHypothesisTested>> &Events::eventsHypothesisTested() const
+const std::vector<Events::Timed<EventCandidateTested>> &Events::eventsCandidateTested() const
 {
-	return m_eventsHypothesisTested;
+	return m_eventsCandidateTested;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

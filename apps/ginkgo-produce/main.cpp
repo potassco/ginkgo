@@ -22,10 +22,10 @@ int main(int argc, char **argv)
 		("fluent-closure-usage", po::value<ginkgo::feedbackLoop::production::FluentClosureUsage>()->default_value(ginkgo::feedbackLoop::production::FluentClosureUsage::NoFluentClosure), "Usage of fluent closure (NoFluentClosure, UseFluentClosure)")
 		("constraints-to-extract", po::value<size_t>()->default_value(1000), "Extract <n> constraints")
 		("constraints-to-prove", po::value<size_t>()->default_value(0), "Finish after <n> proven constraints")
-		("max-degree", po::value<size_t>()->default_value(5), "Maximum degree of hypotheses to test")
-		("max-number-of-literals", po::value<size_t>()->default_value(10), "Maximum number of literals of hypotheses to test")
+		("max-degree", po::value<size_t>()->default_value(5), "Maximum degree of candidates to test")
+		("max-number-of-literals", po::value<size_t>()->default_value(10), "Maximum number of literals of candidates to test")
 		("extraction-timeout", po::value<double>()->default_value(600.0), "Knowledge extraction timeout (seconds)")
-		("hypothesis-testing-timeout", po::value<double>()->default_value(10.0), "Hypothesis testing timeout (seconds)")
+		("candidate-testing-timeout", po::value<double>()->default_value(10.0), "Candidate testing timeout (seconds)")
 		("log-level", po::value<ginkgo::feedbackLoop::production::LogLevel>()->default_value(ginkgo::feedbackLoop::production::LogLevel::Normal), "Output (Debug = detailed output)");
 
 	po::positional_options_description positionalOptionsDescription;
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	checkVariable("max-degree", "Maximum degree of literals unspecified");
 	checkVariable("max-number-of-literals", "Maximum number of literals unspecified");
 	checkVariable("extraction-timeout", "Knowledge extraction timeout unspecified");
-	checkVariable("hypothesis-testing-timeout", "Hypothesis testing timeout unspecified");
+	checkVariable("candidate-testing-timeout", "Candidate testing timeout unspecified");
 
 	const auto inputFileNames = variablesMap["input"].as<std::vector<std::string>>();
 
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 	configuration->maxDegree = variablesMap["max-degree"].as<size_t>();
 	configuration->maxNumberOfLiterals = variablesMap["max-number-of-literals"].as<size_t>();
 	configuration->extractionTimeout = std::chrono::duration<double>(variablesMap["extraction-timeout"].as<double>());
-	configuration->hypothesisTestingTimeout = std::chrono::duration<double>(variablesMap["hypothesis-testing-timeout"].as<double>());
+	configuration->candidateTestingTimeout = std::chrono::duration<double>(variablesMap["candidate-testing-timeout"].as<double>());
 
 	configuration->instance = inputFileNames[0];
 	configuration->domain = inputFileNames[1];

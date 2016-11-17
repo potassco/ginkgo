@@ -32,9 +32,9 @@ struct ProductionAnalysisBase
 	typename S<size_t>::Numerical proofs;
 	// Number of successful proofs
 	typename S<size_t>::Numerical proofsSuccessful;
-	// Total time spent grounding while testing hypotheses
+	// Total time spent grounding while testing candidates
 	typename S<double>::Numerical proofTimeGroundingTotal;
-	// Total time spent solving while testing hypotheses
+	// Total time spent solving while testing candidates
 	typename S<double>::Numerical proofTimeSolvingTotal;
 
 	// Total number of performed minimization proofs
@@ -50,33 +50,33 @@ struct ProductionAnalysisBase
 	typename S<size_t>::Numerical minimizationLiteralsTotal;
 	// Total number of literals removed by minimization
 	typename S<size_t>::Numerical minimizationLiteralsRemoved;
-	// Total number of proofs required to minimize hypotheses
+	// Total number of proofs required to minimize candidates
 	typename S<size_t>::Numerical minimizationTests;
 
-	// Minimum degree of a tested hypothesis
-	typename S<size_t>::Numerical hypothesisDegreeMin;
-	// Sum of all degrees of tested hypotheses
-	typename S<size_t>::Numerical hypothesisDegreeTotal;
-	// Maximum degree of a tested hypothesis
-	typename S<size_t>::Numerical hypothesisDegreeMax;
+	// Minimum degree of a tested candidate
+	typename S<size_t>::Numerical candidateDegreeMin;
+	// Sum of all degrees of tested candidates
+	typename S<size_t>::Numerical candidateDegreeTotal;
+	// Maximum degree of a tested candidate
+	typename S<size_t>::Numerical candidateDegreeMax;
 
-	// Minimum number of literals of a tested hypothesis
-	typename S<size_t>::Numerical hypothesisLiteralsMin;
-	// Total number of literals of tested hypotheses
-	typename S<size_t>::Numerical hypothesisLiteralsTotal;
-	// Maximum number of literals of a tested hypothesis
-	typename S<size_t>::Numerical hypothesisLiteralsMax;
+	// Minimum number of literals of a tested candidate
+	typename S<size_t>::Numerical candidateLiteralsMin;
+	// Total number of literals of tested candidates
+	typename S<size_t>::Numerical candidateLiteralsTotal;
+	// Maximum number of literals of a tested candidate
+	typename S<size_t>::Numerical candidateLiteralsMax;
 
-	// Total number of tested hypotheses (not counting minimization)
-	typename S<size_t>::Numerical hypothesesTested;
-	// Total number of hypotheses skipped because of terminal literal
-	typename S<size_t>::Numerical hypothesesSkippedContainsTerminalLiteral;
-	// Total number of hypotheses skipped because degree was too high
-	typename S<size_t>::Numerical hypothesesSkippedDegreeTooHigh;
-	// Total number of hypotheses skipped because of too many literals
-	typename S<size_t>::Numerical hypothesesSkippedContainsTooManyLiterals;
-	// Total number of hypotheses skipped because of subsumption
-	typename S<size_t>::Numerical hypothesesSkippedSubsumed;
+	// Total number of tested candidates (not counting minimization)
+	typename S<size_t>::Numerical candidatesTested;
+	// Total number of candidates skipped because of terminal literal
+	typename S<size_t>::Numerical candidatesSkippedContainsTerminalLiteral;
+	// Total number of candidates skipped because degree was too high
+	typename S<size_t>::Numerical candidatesSkippedDegreeTooHigh;
+	// Total number of candidates skipped because of too many literals
+	typename S<size_t>::Numerical candidatesSkippedContainsTooManyLiterals;
+	// Total number of candidates skipped because of subsumption
+	typename S<size_t>::Numerical candidatesSkippedSubsumed;
 
 	// Total time spent extracting knowledge
 	typename S<double>::Numerical feedbackExtractionTimeTotal;
@@ -151,19 +151,19 @@ ProductionAnalysis<Aggregated> ProductionAnalysis<Aggregated>::aggregate(
 	aggregatedAnalysis.minimizationLiteralsTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).minimizationLiteralsTotal;}, selector);
 	aggregatedAnalysis.minimizationLiteralsRemoved.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).minimizationLiteralsRemoved;}, selector);
 
-	aggregatedAnalysis.hypothesisDegreeMin.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesisDegreeMin;}, selector);
-	aggregatedAnalysis.hypothesisDegreeTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesisDegreeTotal;}, selector);
-	aggregatedAnalysis.hypothesisDegreeMax.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesisDegreeMax;}, selector);
+	aggregatedAnalysis.candidateDegreeMin.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidateDegreeMin;}, selector);
+	aggregatedAnalysis.candidateDegreeTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidateDegreeTotal;}, selector);
+	aggregatedAnalysis.candidateDegreeMax.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidateDegreeMax;}, selector);
 
-	aggregatedAnalysis.hypothesisLiteralsMin.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesisLiteralsMin;}, selector);
-	aggregatedAnalysis.hypothesisLiteralsTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesisLiteralsTotal;}, selector);
-	aggregatedAnalysis.hypothesisLiteralsMax.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesisLiteralsMax;}, selector);
+	aggregatedAnalysis.candidateLiteralsMin.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidateLiteralsMin;}, selector);
+	aggregatedAnalysis.candidateLiteralsTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidateLiteralsTotal;}, selector);
+	aggregatedAnalysis.candidateLiteralsMax.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidateLiteralsMax;}, selector);
 
-	aggregatedAnalysis.hypothesesTested.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesesTested;}, selector);
-	aggregatedAnalysis.hypothesesSkippedContainsTerminalLiteral.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesesSkippedContainsTerminalLiteral;}, selector);
-	aggregatedAnalysis.hypothesesSkippedDegreeTooHigh.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesesSkippedDegreeTooHigh;}, selector);
-	aggregatedAnalysis.hypothesesSkippedContainsTooManyLiterals.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesesSkippedContainsTooManyLiterals;}, selector);
-	aggregatedAnalysis.hypothesesSkippedSubsumed.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).hypothesesSkippedSubsumed;}, selector);
+	aggregatedAnalysis.candidatesTested.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidatesTested;}, selector);
+	aggregatedAnalysis.candidatesSkippedContainsTerminalLiteral.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidatesSkippedContainsTerminalLiteral;}, selector);
+	aggregatedAnalysis.candidatesSkippedDegreeTooHigh.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidatesSkippedDegreeTooHigh;}, selector);
+	aggregatedAnalysis.candidatesSkippedContainsTooManyLiterals.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidatesSkippedContainsTooManyLiterals;}, selector);
+	aggregatedAnalysis.candidatesSkippedSubsumed.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).candidatesSkippedSubsumed;}, selector);
 
 	aggregatedAnalysis.feedbackExtractionTimeTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).feedbackExtractionTimeTotal;}, selector);
 	aggregatedAnalysis.feedbackExtractionConstraintsTotal.aggregate(plainAnalyses, [&](const auto &e) {return accessor(e).feedbackExtractionConstraintsTotal;}, selector);

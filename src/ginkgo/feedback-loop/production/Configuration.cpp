@@ -29,7 +29,7 @@ Configuration<Plain>::Configuration()
 	maxDegree = std::numeric_limits<decltype(maxDegree)>::max();
 	maxNumberOfLiterals = std::numeric_limits<decltype(maxNumberOfLiterals)>::max();
 	extractionTimeout = std::chrono::duration<double>(10.0);
-	hypothesisTestingTimeout = std::chrono::duration<double>(10.0);
+	candidateTestingTimeout = std::chrono::duration<double>(10.0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ Configuration<Plain> Configuration<Plain>::fromJSON(const Json::Value &json)
 	configuration.maxDegree = json["MaxDegree"].asUInt64();
 	configuration.maxNumberOfLiterals = json["MaxNumberOfLiterals"].asUInt64();
 	configuration.extractionTimeout = std::chrono::duration<double>(json["ExtractionTimeout"].asDouble());
-	configuration.hypothesisTestingTimeout = std::chrono::duration<double>(json["HypothesisTestingTimeout"].asDouble());
+	configuration.candidateTestingTimeout = std::chrono::duration<double>(json["CandidateTestingTimeout"].asDouble());
 
 	return configuration;
 }
@@ -82,7 +82,7 @@ Json::Value Configuration<Plain>::toJSON() const
 	json["MaxDegree"] = static_cast<Json::UInt64>(maxDegree);
 	json["MaxNumberOfLiterals"] = static_cast<Json::UInt64>(maxNumberOfLiterals);
 	json["ExtractionTimeout"] = extractionTimeout.count();
-	json["HypothesisTestingTimeout"] = hypothesisTestingTimeout.count();
+	json["CandidateTestingTimeout"] = candidateTestingTimeout.count();
 
 	return json;
 }

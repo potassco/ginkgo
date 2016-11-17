@@ -45,13 +45,13 @@ struct ConfigurationBase
 	typename S<size_t>::Set constraintsToExtract;
 	// Selected number of constraints to prove before termination
 	typename S<size_t>::Set constraintsToProve;
-	// Maximum degree of hypotheses to test
+	// Maximum degree of candidates to test
 	typename S<size_t>::Set maxDegree;
-	// Maximum number of literals of hypotheses to test
+	// Maximum number of literals of candidates to test
 	typename S<size_t>::Set maxNumberOfLiterals;
-	// Timeout applied to hypothesis validation
+	// Timeout applied to candidate validation
 	// TODO: rename
-	typename S<std::chrono::duration<double>>::Set hypothesisTestingTimeout;
+	typename S<std::chrono::duration<double>>::Set candidateTestingTimeout;
 	// Timeout applied to knowledge extraction
 	// TODO: remove
 	typename S<std::chrono::duration<double>>::Set extractionTimeout;
@@ -104,7 +104,7 @@ Configuration<Aggregated> Configuration<Aggregated>::aggregate(
 	aggregatedConfiguration.constraintsToProve.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).constraintsToProve;}, selector);
 	aggregatedConfiguration.maxDegree.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).maxDegree;}, selector);
 	aggregatedConfiguration.maxNumberOfLiterals.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).maxNumberOfLiterals;}, selector);
-	aggregatedConfiguration.hypothesisTestingTimeout.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).hypothesisTestingTimeout;}, selector);
+	aggregatedConfiguration.candidateTestingTimeout.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).candidateTestingTimeout;}, selector);
 	aggregatedConfiguration.extractionTimeout.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).extractionTimeout;}, selector);
 
 	return aggregatedConfiguration;

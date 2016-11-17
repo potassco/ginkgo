@@ -45,8 +45,8 @@ ComparisonPanel::ComparisonPanel(const gtkWidgets::Style &style)
 
 	m_infoRow.add(m_proofTimeInfo);
 	m_infoRow.add(m_minimizationProofTimeInfo);
-	m_infoRow.add(m_hypothesisDegreeInfo);
-	m_infoRow.add(m_hypothesisLiteralsInfo);
+	m_infoRow.add(m_candidateDegreeInfo);
+	m_infoRow.add(m_candidateLiteralsInfo);
 
 	m_infoRow.add(m_consumptionTimeoutsPieChart);
 
@@ -58,7 +58,7 @@ ComparisonPanel::ComparisonPanel(const gtkWidgets::Style &style)
 
 	m_infoRow.add(m_feedbackExtractionTimeInfo);
 	m_infoRow.add(m_feedbackExtractionConstraintsInfo);
-	m_infoRow.add(m_hypothesesSkippedPieChart);
+	m_infoRow.add(m_candidatesSkippedPieChart);
 
 	m_runtimeTotalMeanInfo.setTitle("Ø Feedback Loop Runtime");
 	m_runtimeTotalMeanInfo.set_valign(Gtk::ALIGN_START);
@@ -90,11 +90,11 @@ ComparisonPanel::ComparisonPanel(const gtkWidgets::Style &style)
 	m_minimizationProofTimeInfo.setTitle("Ø Minimization Proof Solving Time");
 	m_minimizationProofTimeInfo.set_valign(Gtk::ALIGN_START);
 
-	m_hypothesisDegreeInfo.setTitle("Ø Hypothesis Degree");
-	m_hypothesisDegreeInfo.set_valign(Gtk::ALIGN_START);
+	m_candidateDegreeInfo.setTitle("Ø Candidate Degree");
+	m_candidateDegreeInfo.set_valign(Gtk::ALIGN_START);
 
-	m_hypothesisLiteralsInfo.setTitle("Ø Hypothesis Literals");
-	m_hypothesisLiteralsInfo.set_valign(Gtk::ALIGN_START);
+	m_candidateLiteralsInfo.setTitle("Ø Candidate Literals");
+	m_candidateLiteralsInfo.set_valign(Gtk::ALIGN_START);
 
 	m_literalsEliminatedByMinimizationPieChart.setTitle("Literals Eliminated\nby Minimization");
 	m_literalsEliminatedByMinimizationPieChart.set_valign(Gtk::ALIGN_START);
@@ -105,8 +105,8 @@ ComparisonPanel::ComparisonPanel(const gtkWidgets::Style &style)
 	m_feedbackExtractionConstraintsInfo.setTitle("Ø Extracted Constraints");
 	m_feedbackExtractionConstraintsInfo.set_valign(Gtk::ALIGN_START);
 
-	m_hypothesesSkippedPieChart.setTitle("Hypotheses tested/\nskipped TLS/untested");
-	m_hypothesesSkippedPieChart.set_valign(Gtk::ALIGN_START);
+	m_candidatesSkippedPieChart.setTitle("Candidates tested/\nskipped TLS/untested");
+	m_candidatesSkippedPieChart.set_valign(Gtk::ALIGN_START);
 
 	m_proofMethodBox.onSelectedRowsChanged().connect(sigc::mem_fun(*this, &ComparisonPanel::refresh));
 	m_testingPolicyBox.onSelectedRowsChanged().connect(sigc::mem_fun(*this, &ComparisonPanel::refresh));
@@ -282,15 +282,15 @@ void ComparisonPanel::refresh()
 	m_successfulMinimizationProofsPieChart.setData({{1, false, Gdk::RGBA("#505050")}});
 	m_minimizationProofTimeInfo.setData({"", "", Gdk::RGBA("#505050")});
 
-	m_hypothesisDegreeInfo.setData({"", "", Gdk::RGBA("#505050")});
-	m_hypothesisLiteralsInfo.setData({"", "", Gdk::RGBA("#505050")});
+	m_candidateDegreeInfo.setData({"", "", Gdk::RGBA("#505050")});
+	m_candidateLiteralsInfo.setData({"", "", Gdk::RGBA("#505050")});
 
 	m_literalsEliminatedByMinimizationPieChart.setData({{1, false, Gdk::RGBA("#505050")}});
 
 	m_feedbackExtractionTimeInfo.setData({"", "", Gdk::RGBA("#505050")});
 	m_feedbackExtractionConstraintsInfo.setData({"", "", Gdk::RGBA("#505050")});
 
-	m_hypothesesSkippedPieChart.setData({{1, false, Gdk::RGBA("#505050")}});
+	m_candidatesSkippedPieChart.setData({{1, false, Gdk::RGBA("#505050")}});
 
 	const auto selectedProofMethodRows = m_proofMethodBox.selectedRows();
 	const auto selectedTestingPolicyRows = m_testingPolicyBox.selectedRows();
@@ -461,18 +461,18 @@ void ComparisonPanel::refresh()
 	if (minimizationLiteralsRemovedRatio > 0)
 		m_literalsEliminatedByMinimizationPieChart.setData({{minimizationLiteralsRemovedRatio, true, Gdk::RGBA("#3080e9")}, {1.0 - minimizationLiteralsRemovedRatio, false, Gdk::RGBA("#505050")}});
 
-	const auto hypothesisDegreeTotal = productionAnalysis.hypothesisDegreeTotal.arithmetic.sum;
-	const auto hypothesisDegreeMin = productionAnalysis.hypothesisDegreeMin.arithmetic.min;
-	const auto hypothesisDegreeMax = productionAnalysis.hypothesisDegreeMax.arithmetic.max;
-	const auto hypothesisDegreeMean = static_cast<double>(hypothesisDegreeTotal) / proofs;
+	const auto candidateDegreeTotal = productionAnalysis.candidateDegreeTotal.arithmetic.sum;
+	const auto candidateDegreeMin = productionAnalysis.candidateDegreeMin.arithmetic.min;
+	const auto candidateDegreeMax = productionAnalysis.candidateDegreeMax.arithmetic.max;
+	const auto candidateDegreeMean = static_cast<double>(candidateDegreeTotal) / proofs;
 
-	const auto hypothesisLiteralsTotal = productionAnalysis.hypothesisLiteralsTotal.arithmetic.sum;
-	const auto hypothesisLiteralsMin = productionAnalysis.hypothesisLiteralsMin.arithmetic.min;
-	const auto hypothesisLiteralsMax = productionAnalysis.hypothesisLiteralsMax.arithmetic.max;
-	const auto hypothesisLiteralsMean = static_cast<double>(hypothesisLiteralsTotal) / proofs;
+	const auto candidateLiteralsTotal = productionAnalysis.candidateLiteralsTotal.arithmetic.sum;
+	const auto candidateLiteralsMin = productionAnalysis.candidateLiteralsMin.arithmetic.min;
+	const auto candidateLiteralsMax = productionAnalysis.candidateLiteralsMax.arithmetic.max;
+	const auto candidateLiteralsMean = static_cast<double>(candidateLiteralsTotal) / proofs;
 
-	m_hypothesisDegreeInfo.setData({toString(hypothesisDegreeMean, 1), "[" + toString(hypothesisDegreeMin) + ", " + toString(hypothesisDegreeMax) + "]", Gdk::RGBA("#505050")});
-	m_hypothesisLiteralsInfo.setData({toString(hypothesisLiteralsMean, 1), "[" + toString(hypothesisLiteralsMin) + ", " + toString(hypothesisLiteralsMax) + "]", Gdk::RGBA("#505050")});
+	m_candidateDegreeInfo.setData({toString(candidateDegreeMean, 1), "[" + toString(candidateDegreeMin) + ", " + toString(candidateDegreeMax) + "]", Gdk::RGBA("#505050")});
+	m_candidateLiteralsInfo.setData({toString(candidateLiteralsMean, 1), "[" + toString(candidateLiteralsMin) + ", " + toString(candidateLiteralsMax) + "]", Gdk::RGBA("#505050")});
 
 	/*const auto numberOfStepsPerMeasurement = evaluationResult.solvingTimes.size();
 	const auto singleAnalyses = evaluationResult.singleAnalyses;
@@ -487,7 +487,7 @@ void ComparisonPanel::refresh()
 	const auto successfulProofs = evaluationResult.proofsSuccessful;
 	const auto minimizationTests = evaluationResult.minimizationTestsMean;
 
-	m_proofsInfo.setData({toString(static_cast<double>(proofs) / singleAnalyses), "validate: " + toString(evaluationResult.hypothesesTestedMean) + "\nminimize: " + toString(minimizationTests), Gdk::RGBA("#505050")});
+	m_proofsInfo.setData({toString(static_cast<double>(proofs) / singleAnalyses), "validate: " + toString(evaluationResult.candidatesTestedMean) + "\nminimize: " + toString(minimizationTests), Gdk::RGBA("#505050")});
 
 	if (proofs > 0 && successfulProofs > 0)
 		m_successfulProofsPieChart.setData({{static_cast<double>(successfulProofs), true, Gdk::RGBA("#3080e9")}, {static_cast<double>(proofs - successfulProofs), false, Gdk::RGBA("#505050")}});
@@ -497,16 +497,16 @@ void ComparisonPanel::refresh()
 
 	m_proofTimeInfo.setData({toString(proofTimeSolvingMean, 3) + " s", "ground: " + toString(proofTimeGroundingMean, 3) + " s", Gdk::RGBA("#505050")});
 
-	const auto hypothesisDegreeMin = evaluationResult.hypothesisDegreeMin;
-	const auto hypothesisDegreeMean = evaluationResult.hypothesisDegreeMean;
-	const auto hypothesisDegreeMax = evaluationResult.hypothesisDegreeMax;
+	const auto candidateDegreeMin = evaluationResult.candidateDegreeMin;
+	const auto candidateDegreeMean = evaluationResult.candidateDegreeMean;
+	const auto candidateDegreeMax = evaluationResult.candidateDegreeMax;
 
-	const auto hypothesisLiteralsMin = evaluationResult.hypothesisLiteralsMin;
-	const auto hypothesisLiteralsMean = evaluationResult.hypothesisLiteralsMean;
-	const auto hypothesisLiteralsMax = evaluationResult.hypothesisLiteralsMax;
+	const auto candidateLiteralsMin = evaluationResult.candidateLiteralsMin;
+	const auto candidateLiteralsMean = evaluationResult.candidateLiteralsMean;
+	const auto candidateLiteralsMax = evaluationResult.candidateLiteralsMax;
 
-	m_hypothesisDegreeInfo.setData({toString(hypothesisDegreeMean, 1), "[" + toString(hypothesisDegreeMin) + ", " + toString(hypothesisDegreeMax) + "]", Gdk::RGBA("#505050")});
-	m_hypothesisLiteralsInfo.setData({toString(hypothesisLiteralsMean, 1), "[" + toString(hypothesisLiteralsMin) + ", " + toString(hypothesisLiteralsMax) + "]", Gdk::RGBA("#505050")});
+	m_candidateDegreeInfo.setData({toString(candidateDegreeMean, 1), "[" + toString(candidateDegreeMin) + ", " + toString(candidateDegreeMax) + "]", Gdk::RGBA("#505050")});
+	m_candidateLiteralsInfo.setData({toString(candidateLiteralsMean, 1), "[" + toString(candidateLiteralsMin) + ", " + toString(candidateLiteralsMax) + "]", Gdk::RGBA("#505050")});
 
 	const auto literalsEliminatedByMinimization = evaluationResult.literalsRemovedByMinimization;
 
@@ -521,19 +521,19 @@ void ComparisonPanel::refresh()
 	m_feedbackExtractionTimeInfo.setData({toString(feedbackExtractionTimeMean, 1) + " s", "resumes: " + toString(feedbackExtractionResumesMean, 2) + "\nrestarts: " + toString(feedbackExtractionRestartsMean, 2), Gdk::RGBA("#505050")});
 	m_feedbackExtractionConstraintsInfo.setData({toString(feedbackExtractionConstraintsMean), "", Gdk::RGBA("#505050")});
 
-	const auto hypothesesTestedMean = evaluationResult.hypothesesTestedMean;
-	const auto hypothesesSkippedContainsTerminalLiteralMean = evaluationResult.hypothesesSkippedContainsTerminalLiteralMean;
-	const auto hypothesesSkippedDegreeTooHighMean = evaluationResult.hypothesesSkippedDegreeTooHighMean;
-	const auto hypothesesSkippedContainsTooManyLiteralsMean = evaluationResult.hypothesesSkippedContainsTooManyLiteralsMean;
-	const auto hypothesesSkippedSubsumedMean = evaluationResult.hypothesesSkippedSubsumedMean;
+	const auto candidatesTestedMean = evaluationResult.candidatesTestedMean;
+	const auto candidatesSkippedContainsTerminalLiteralMean = evaluationResult.candidatesSkippedContainsTerminalLiteralMean;
+	const auto candidatesSkippedDegreeTooHighMean = evaluationResult.candidatesSkippedDegreeTooHighMean;
+	const auto candidatesSkippedContainsTooManyLiteralsMean = evaluationResult.candidatesSkippedContainsTooManyLiteralsMean;
+	const auto candidatesSkippedSubsumedMean = evaluationResult.candidatesSkippedSubsumedMean;
 
-	m_hypothesesSkippedPieChart.setData({
-		{hypothesesTestedMean, true, Gdk::RGBA("#3080e9")},
-		{hypothesesSkippedContainsTerminalLiteralMean, false, Gdk::RGBA("#5c3566")},
-		{hypothesesSkippedDegreeTooHighMean, false, Gdk::RGBA("#75507b")},
-		{hypothesesSkippedContainsTooManyLiteralsMean, false, Gdk::RGBA("#92668d")},
-		{hypothesesSkippedSubsumedMean, false, Gdk::RGBA("#ad7fa8")},
-		{feedbackExtractionConstraintsMean - hypothesesTestedMean - hypothesesSkippedContainsTerminalLiteralMean - hypothesesSkippedDegreeTooHighMean - hypothesesSkippedContainsTooManyLiteralsMean - hypothesesSkippedSubsumedMean, false, Gdk::RGBA("#505050")}});*/
+	m_candidatesSkippedPieChart.setData({
+		{candidatesTestedMean, true, Gdk::RGBA("#3080e9")},
+		{candidatesSkippedContainsTerminalLiteralMean, false, Gdk::RGBA("#5c3566")},
+		{candidatesSkippedDegreeTooHighMean, false, Gdk::RGBA("#75507b")},
+		{candidatesSkippedContainsTooManyLiteralsMean, false, Gdk::RGBA("#92668d")},
+		{candidatesSkippedSubsumedMean, false, Gdk::RGBA("#ad7fa8")},
+		{feedbackExtractionConstraintsMean - candidatesTestedMean - candidatesSkippedContainsTerminalLiteralMean - candidatesSkippedDegreeTooHighMean - candidatesSkippedContainsTooManyLiteralsMean - candidatesSkippedSubsumedMean, false, Gdk::RGBA("#505050")}});*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -16,7 +16,7 @@
 #include <ginkgo/feedback-loop/production/EventFeedbackExtracted.h>
 #include <ginkgo/feedback-loop/production/EventConstraintsRemoved.h>
 #include <ginkgo/feedback-loop/production/EventMinimized.h>
-#include <ginkgo/feedback-loop/production/EventHypothesisTested.h>
+#include <ginkgo/feedback-loop/production/EventCandidateTested.h>
 #include <ginkgo/feedback-loop/production/EventConstraintLearned.h>
 #include <ginkgo/feedback-loop/production/EventFinished.h>
 
@@ -50,14 +50,14 @@ class Events
 		void notifyFeedbackExtracted(EventFeedbackExtracted event);
 		void notifyConstraintsRemoved(const EventConstraintsRemoved &event);
 		void notifyMinimized(const EventMinimized &event);
-		void notifyHypothesisTested(const EventHypothesisTested &event);
+		void notifyCandidateTested(const EventCandidateTested &event);
 		void notifyConstraintLearned(const EventConstraintLearned &event);
 		void notifyFinished(const EventFinished &event);
 
 		const std::vector<Timed<EventFeedbackExtracted>> &eventsFeedbackExtracted() const;
 		const std::vector<Timed<EventConstraintsRemoved>> &eventsConstraintsRemoved() const;
 		const std::vector<Timed<EventMinimized>> &eventsMinimized() const;
-		const std::vector<Timed<EventHypothesisTested>> &eventsHypothesisTested() const;
+		const std::vector<Timed<EventCandidateTested>> &eventsCandidateTested() const;
 		const std::vector<Timed<EventConstraintLearned>> &eventsConstraintLearned() const;
 		const Timed<EventFinished> &eventFinished() const;
 
@@ -67,7 +67,7 @@ class Events
 		std::vector<Timed<EventFeedbackExtracted>> m_eventsFeedbackExtracted;
 		std::vector<Timed<EventConstraintsRemoved>> m_eventsConstraintsRemoved;
 		std::vector<Timed<EventMinimized>> m_eventsMinimized;
-		std::vector<Timed<EventHypothesisTested>> m_eventsHypothesisTested;
+		std::vector<Timed<EventCandidateTested>> m_eventsCandidateTested;
 		std::vector<Timed<EventConstraintLearned>> m_eventsConstraintLearned;
 		Timed<EventFinished> m_eventFinished;
 
