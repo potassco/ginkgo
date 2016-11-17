@@ -20,6 +20,8 @@ static const std::set<std::string> supportedTimeIdentifiers =
 
 Range<size_t> computeTimeRange(const Literals &literals)
 {
+	// TODO: handle nontemporal literals appropriately
+
 	// Currently, normalization only works for plasp-formatted encodings
 	std::for_each(literals.cbegin(), literals.cend(),
 		[](const auto &literal)
