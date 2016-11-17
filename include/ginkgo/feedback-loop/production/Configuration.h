@@ -50,7 +50,6 @@ struct ConfigurationBase
 	// Maximum number of literals of candidates to test
 	typename S<size_t>::Set maxNumberOfLiterals;
 	// Timeout applied to candidate validation
-	// TODO: rename
 	typename S<std::chrono::duration<double>>::Set candidateTestingTimeout;
 	// Timeout applied to knowledge extraction
 	// TODO: remove
