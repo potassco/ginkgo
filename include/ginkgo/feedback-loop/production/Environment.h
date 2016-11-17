@@ -7,11 +7,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <ginkgo/feedback-loop/production/FluentClosureUsage.h>
 #include <ginkgo/feedback-loop/production/LogLevel.h>
-#include <ginkgo/feedback-loop/production/MinimizationStrategy.h>
-#include <ginkgo/feedback-loop/production/ProofMethod.h>
-#include <ginkgo/feedback-loop/production/TestingPolicy.h>
 
 namespace ginkgo
 {

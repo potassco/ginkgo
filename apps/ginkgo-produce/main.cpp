@@ -18,7 +18,6 @@ int main(int argc, char **argv)
 		("output,o", po::value<std::string>(), "Output prefix of the result files")
 		("horizon", po::value<size_t>(), "Horizon (maximum time steps)")
 		("proof-method", po::value<ginkgo::feedbackLoop::production::ProofMethod>()->default_value(ginkgo::feedbackLoop::production::ProofMethod::StateWise), "Proof method to use (StateWise, Induction)")
-		("testing-policy", po::value<ginkgo::feedbackLoop::production::TestingPolicy>()->default_value(ginkgo::feedbackLoop::production::TestingPolicy::TestAll), "Feedback constraint Testing policy (FindFirst, TestAll)")
 		("minimization-strategy", po::value<ginkgo::feedbackLoop::production::MinimizationStrategy>()->default_value(ginkgo::feedbackLoop::production::MinimizationStrategy::NoMinimization), "Clause minimization strategy (NoMinimization, SimpleMinimization, LinearMinimization)")
 		("fluent-closure-usage", po::value<ginkgo::feedbackLoop::production::FluentClosureUsage>()->default_value(ginkgo::feedbackLoop::production::FluentClosureUsage::NoFluentClosure), "Usage of fluent closure (NoFluentClosure, UseFluentClosure)")
 		("constraints-to-extract", po::value<size_t>()->default_value(1000), "Extract <n> constraints")
@@ -70,7 +69,6 @@ int main(int argc, char **argv)
 	checkVariable("output", "No output prefix specified");
 	checkVariable("horizon", "Horizon (maximum time steps) unspecified");
 	checkVariable("proof-method", "Proof method unspecified");
-	checkVariable("testing-policy", "Testing policy unspecified");
 	checkVariable("minimization-strategy", "Minimization strategy unspecified");
 	checkVariable("fluent-closure-usage", "Fluent closure usage unspecified");
 	checkVariable("constraints-to-extract", "Number of constraints to extract unspecified");
@@ -96,7 +94,6 @@ int main(int argc, char **argv)
 	auto configuration = std::make_unique<ginkgo::feedbackLoop::production::Configuration<ginkgo::Plain>>();
 	configuration->horizon = variablesMap["horizon"].as<size_t>();
 	configuration->proofMethod = variablesMap["proof-method"].as<ginkgo::feedbackLoop::production::ProofMethod>();
-	configuration->testingPolicy = variablesMap["testing-policy"].as<ginkgo::feedbackLoop::production::TestingPolicy>();
 	configuration->minimizationStrategy = variablesMap["minimization-strategy"].as<ginkgo::feedbackLoop::production::MinimizationStrategy>();
 	configuration->fluentClosureUsage = variablesMap["fluent-closure-usage"].as<ginkgo::feedbackLoop::production::FluentClosureUsage>();
 	configuration->constraintsToExtract = variablesMap["constraints-to-extract"].as<size_t>();

@@ -4,6 +4,5 @@
 #include <ginkgo/feedback-loop/production/FeedbackLoop.h>
 #include <ginkgo/feedback-loop/production/Environment.h>
 #include <ginkgo/feedback-loop/production/ProofMethod.h>
-#include <ginkgo/feedback-loop/production/TestingPolicy.h>
 
 #endif

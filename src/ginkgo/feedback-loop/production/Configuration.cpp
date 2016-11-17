@@ -22,7 +22,6 @@ Configuration<Plain>::Configuration()
 {
 	horizon = 0;
 	proofMethod = ProofMethod::StateWise;
-	testingPolicy = TestingPolicy::FindFirst;
 	minimizationStrategy = MinimizationStrategy::NoMinimization;
 	fluentClosureUsage = FluentClosureUsage::NoFluentClosure;
 	constraintsToExtract = 128;
@@ -60,7 +59,6 @@ Configuration<Plain> Configuration<Plain>::fromJSON(const Json::Value &json)
 	configuration.horizon = json["Horizon"].asUInt64();
 
 	configuration.proofMethod = fromString<ProofMethod>(json["ProofMethod"].asString());
-	configuration.testingPolicy = fromString<TestingPolicy>(json["TestingPolicy"].asString());
 	configuration.minimizationStrategy = fromString<MinimizationStrategy>(json["MinimizationStrategy"].asString());
 	configuration.fluentClosureUsage = fromString<FluentClosureUsage>(json["FluentClosureUsage"].asString());
 	configuration.constraintsToExtract = json["ConstraintsToExtract"].asUInt64();
@@ -87,7 +85,6 @@ Json::Value Configuration<Plain>::toJSON() const
 
 	json["Horizon"] = static_cast<Json::UInt64>(horizon);
 	json["ProofMethod"] = toString(proofMethod);
-	json["TestingPolicy"] = toString(testingPolicy);
 	json["MinimizationStrategy"] = toString(minimizationStrategy);
 	json["FluentClosureUsage"] = toString(fluentClosureUsage);
 	json["ConstraintsToExtract"] = static_cast<Json::UInt64>(constraintsToExtract);

@@ -8,7 +8,6 @@
 #include <json/json.h>
 
 #include <ginkgo/feedback-loop/production/ProofMethod.h>
-#include <ginkgo/feedback-loop/production/TestingPolicy.h>
 #include <ginkgo/feedback-loop/production/MinimizationStrategy.h>
 #include <ginkgo/feedback-loop/production/FluentClosureUsage.h>
 #include <ginkgo/feedback-loop/production/LogLevel.h>
@@ -38,8 +37,6 @@ struct ConfigurationBase
 	typename S<size_t>::Numerical horizon;
 	// Selected proof method
 	typename S<production::ProofMethod>::Set proofMethod;
-	// Selected testing policy
-	typename S<production::TestingPolicy>::Set testingPolicy;
 	// Selected minimization strategy
 	typename S<production::MinimizationStrategy>::Set minimizationStrategy;
 	// Selected fluent closure usage
@@ -99,7 +96,6 @@ Configuration<Aggregated> Configuration<Aggregated>::aggregate(
 
 	aggregatedConfiguration.horizon.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).horizon;}, selector);
 	aggregatedConfiguration.proofMethod.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).proofMethod;}, selector);
-	aggregatedConfiguration.testingPolicy.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).testingPolicy;}, selector);
 	aggregatedConfiguration.minimizationStrategy.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).minimizationStrategy;}, selector);
 	aggregatedConfiguration.fluentClosureUsage.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).fluentClosureUsage;}, selector);
 	aggregatedConfiguration.constraintsToExtract.aggregate(plainConfigurations, [&](const auto &e) {return accessor(e).constraintsToExtract;}, selector);
