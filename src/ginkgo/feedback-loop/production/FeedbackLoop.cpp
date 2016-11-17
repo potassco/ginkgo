@@ -221,8 +221,6 @@ void FeedbackLoop::run()
 
 		std::cout << ")" << std::endl;
 
-		// TODO: reimplement testing policies
-
 		auto &directConstraintsStream = m_environment->directConstraintsStream();
 		auto &generalizedConstraintsStream = m_environment->generalizedConstraintsStream();
 
