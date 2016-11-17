@@ -207,6 +207,8 @@ void FeedbackLoop::run()
 			continue;
 		}
 
+		BOOST_ASSERT(proofResult == ProofResult::Proven);
+
 		if (m_configuration->minimizationStrategy == MinimizationStrategy::SimpleMinimization)
 			candidate = minimizeConstraint(candidate, 0);
 		else if (m_configuration->minimizationStrategy == MinimizationStrategy::LinearMinimization)
@@ -398,8 +400,6 @@ ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &ca
 		<< StateWiseProofEncoding << std::endl;
 
 	// TODO: add warning/error message handler
-	// TODO: handle grounding/solving timeouts
-	// TODO: make timeout configurable
 	// TODO: record statistics, including grounding time
 	Clingo::Control clingoControl{{"--stats=2"}};
 	clingoControl.add("base", {}, proofEncoding.str().c_str());
@@ -407,8 +407,18 @@ ProofResult FeedbackLoop::testCandidateStateWise(const GeneralizedConstraint &ca
 
 	auto satisfiable = Satisfiability::Unsatisfiable;
 
-	for (auto model : clingoControl.solve_iteratively())
-		satisfiable = Satisfiability::Satisfiable;
+	const auto handleModel =
+		[&satisfiable](const auto &model)
+		{
+			satisfiable = Satisfiability::Satisfiable;
+			return true;
+		};
+
+	auto solveAsync = clingoControl.solve_async(handleModel);
+	const auto finished = solveAsync.wait(m_configuration->hypothesisTestingTimeout.count());
+
+	if (!finished)
+		return ProofResult::SolvingTimeout;
 
 	if (satisfiable == Satisfiability::Unsatisfiable)
 		return ProofResult::Proven;
@@ -438,8 +448,6 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 			<< InductiveProofBaseEncoding << std::endl;
 
 		// TODO: add warning/error message handler
-		// TODO: handle grounding/solving timeouts
-		// TODO: make timeout configurable
 		// TODO: record statistics, including grounding time
 		Clingo::Control clingoControl{{"--stats=2"}};
 		clingoControl.add("base", {}, proofEncoding.str().c_str());
@@ -447,8 +455,18 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 
 		auto satisfiable = Satisfiability::Unsatisfiable;
 
-		for (auto model : clingoControl.solve_iteratively())
-			satisfiable = Satisfiability::Satisfiable;
+		const auto handleModel =
+			[&satisfiable](const auto &model)
+			{
+				satisfiable = Satisfiability::Satisfiable;
+				return true;
+			};
+
+		auto solveAsync = clingoControl.solve_async(handleModel);
+		const auto finished = solveAsync.wait(m_configuration->hypothesisTestingTimeout.count());
+
+		if (!finished)
+			return ProofResult::SolvingTimeout;
 
 		ProofResult proofResult = ProofResult::Unknown;
 
@@ -491,8 +509,6 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 		proofEncoding.seekg(0, std::ios::beg);
 
 		// TODO: add warning/error message handler
-		// TODO: handle grounding/solving timeouts
-		// TODO: make timeout configurable
 		// TODO: record statistics, including grounding time
 		Clingo::Control clingoControl{{"--stats=2"}};
 		clingoControl.add("base", {}, proofEncoding.str().c_str());
@@ -500,8 +516,18 @@ ProofResult FeedbackLoop::testCandidateInductively(const GeneralizedConstraint &
 
 		auto satisfiable = Satisfiability::Unsatisfiable;
 
-		for (auto model : clingoControl.solve_iteratively())
-			satisfiable = Satisfiability::Satisfiable;
+		const auto handleModel =
+			[&satisfiable](const auto &model)
+			{
+				satisfiable = Satisfiability::Satisfiable;
+				return true;
+			};
+
+		auto solveAsync = clingoControl.solve_async(handleModel);
+		const auto finished = solveAsync.wait(m_configuration->hypothesisTestingTimeout.count());
+
+		if (!finished)
+			return ProofResult::SolvingTimeout;
 
 		ProofResult proofResult = ProofResult::Unknown;
 
