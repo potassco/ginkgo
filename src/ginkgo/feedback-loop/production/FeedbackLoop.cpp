@@ -146,12 +146,6 @@ void FeedbackLoop::run()
 
 	// TODO: reimplement statistics
 
-	// Remove constraints with a too high degree
-	// TODO: reimplement
-
-	// Remove all “terminal” literal
-	// TODO: reimplement
-
 	// Remove all constraints subsumed by previously proven constraints
 	// TODO: reimplement
 

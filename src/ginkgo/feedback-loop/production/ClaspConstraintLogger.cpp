@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <ginkgo/solving/Constraint.h>
+
 namespace ginkgo
 {
 namespace feedbackLoop
@@ -157,6 +159,12 @@ void ClaspConstraintLogger::log(const Clasp::Solver &solver, const Clasp::LitVec
 	if (constraint.literals().size() > m_configuration.maxNumberOfLiterals)
 	{
 		std::cout << "\033[1;33mskipped conflict (too many literals)\033[0m" << std::endl;
+		return;
+	}
+
+	if (contains(constraint.literals(), "terminal"))
+	{
+		std::cout << "\033[1;33mskipped conflict (contains “terminal” literal)\033[0m" << std::endl;
 		return;
 	}
 
