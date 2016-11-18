@@ -5,6 +5,7 @@
 
 #include <ginkgo/utils/TextFile.h>
 #include <ginkgo/feedback-loop/production/FeedbackLoop.h>
+#include <ginkgo/feedback-loop/production/PartialPrograms.h>
 
 namespace ginkgo
 {
@@ -75,7 +76,7 @@ void BenchmarkRunner::run()
 			std::stringstream metaEncoding;
 			metaEncoding
 				<< "#const horizon=" << m_environment->horizon() << "." << std::endl
-				<< production::FeedbackLoop::MetaEncoding << std::endl
+				<< production::MetaEncoding << std::endl
 				<< m_program.rdbuf() << std::endl;
 
 			const auto availableConstraints = std::min(numberOfConstraints, m_constraints.size());
