@@ -35,7 +35,6 @@ class FeedbackLoop
 	private:
 		void mergePrograms();
 		void prepareExtraction();
-		GeneralizedConstraint minimizeConstraint(const GeneralizedConstraint &provenConstraint, size_t linearIncrement);
 
 		std::unique_ptr<Environment> m_environment;
 		std::unique_ptr<Configuration<Plain>> m_configuration;
