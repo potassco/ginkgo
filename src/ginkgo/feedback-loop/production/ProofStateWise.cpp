@@ -18,30 +18,8 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-constexpr const auto StateWiseProofEncoding =
+constexpr const auto StateWiseProofProgram =
 R"(
-% Degree of the candidate
-time(0..degree).
-
-% Perform actions
-1 {occurs(Action, T) : action(Action)} 1 :- time(T), T > 0.
-
-% Check preconditions
-:- occurs(Action, T), precondition(Action, Variable, Value), not holds(Variable, Value, T - 1), time(T), time(T - 1).
-
-% Apply effects
-caused(Variable, Value, T) :- occurs(Action, T), postcondition(Action, _, Variable, Value).
-modified(Variable, T) :- caused(Variable, Value, T).
-
-holds(Variable, Value, T) :- caused(Variable, Value, T), time(T).
-holds(Variable, Value, T) :- holds(Variable, Value, T - 1), not modified(Variable, T), time(T), time(T - 1).
-
-% Check that variables have unique values
-:- variable(Variable), not 1 {holds(Variable, Value, T) : contains(Variable, Value)} 1, time(T).
-
-% Check mutexes
-:- mutexGroup(MutexGroup), not {holds(Variable, Value, T) : contains(MutexGroup, Variable, Value)} 1, time(T).
-
 % Eliminate all states complying with the constraint
 :- not candidateConstraint(0).
 )";
@@ -58,17 +36,16 @@ ProofResult testCandidateStateWise(const GeneralizedConstraint &candidate, std::
 	proofEncoding << program.rdbuf();
 
 	if (configuration.fluentClosureUsage == FluentClosureUsage::UseFluentClosure)
-		proofEncoding << FluentClosureEncoding;
+		proofEncoding << FluentClosureProgram;
 	else
-		proofEncoding << StateGeneratorEncoding;
+		proofEncoding << StateGeneratorProgram;
 
 	proofEncoding
 		<< "#const degree=" << candidate.degree() << "." << std::endl
-		<< "candidateConstraint(T) ";
-
-	proofEncoding
-		<< candidate << std::endl
-		<< StateWiseProofEncoding << std::endl;
+		<< "candidateConstraint(T) " << candidate << std::endl
+		<< DegreeProgram
+		<< ActionProgram
+		<< StateWiseProofProgram << std::endl;
 
 	// TODO: add warning/error message handler
 	// TODO: record statistics, including grounding time

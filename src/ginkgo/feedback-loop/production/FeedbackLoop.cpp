@@ -190,7 +190,10 @@ void FeedbackLoop::prepareExtraction()
 	std::stringstream metaEncoding;
 	metaEncoding
 		<< "#const horizon=" << m_configuration->horizon << "." << std::endl
-		<< MetaEncoding << std::endl
+		<< HorizonProgram
+		<< InitialStateProgram
+		<< ActionProgram
+		<< GoalProgram
 		<< m_program.rdbuf() << std::endl;
 
 	metaEncoding.clear();

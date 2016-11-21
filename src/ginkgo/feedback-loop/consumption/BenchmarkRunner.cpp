@@ -76,7 +76,10 @@ void BenchmarkRunner::run()
 			std::stringstream metaEncoding;
 			metaEncoding
 				<< "#const horizon=" << m_environment->horizon() << "." << std::endl
-				<< production::MetaEncoding << std::endl
+				<< production::HorizonProgram
+				<< production::InitialStateProgram
+				<< production::ActionProgram
+				<< production::GoalProgram
 				<< m_program.rdbuf() << std::endl;
 
 			const auto availableConstraints = std::min(numberOfConstraints, m_constraints.size());
