@@ -14,10 +14,10 @@ int main(int argc, char **argv)
 	po::options_description description("Allowed options");
 	description.add_options()
 		("help,h", "display this help message")
-		("input,i", po::value<std::vector<std::string>>(), "Instance and domain files (both required)")
-		("output,o", po::value<std::string>(), "Output prefix of the result files")
-		("horizon", po::value<size_t>(), "Horizon (maximum time steps)")
-		("proof-method", po::value<ginkgo::feedbackLoop::production::ProofMethod>()->default_value(ginkgo::feedbackLoop::production::ProofMethod::StateWise), "Proof method to use (StateWise, Induction)")
+		("input,i", po::value<std::vector<std::string>>(), "Input program (in plasp 3 output format)")
+		("output,o", po::value<std::string>(), "Prefix of the output files")
+		("horizon", po::value<size_t>(), "Horizon (maximum plan length)")
+		("proof-method", po::value<ginkgo::feedbackLoop::production::ProofMethod>()->default_value(ginkgo::feedbackLoop::production::ProofMethod::StateWise), "Proof method to use (StateWise, Inductive)")
 		("minimization-strategy", po::value<ginkgo::feedbackLoop::production::MinimizationStrategy>()->default_value(ginkgo::feedbackLoop::production::MinimizationStrategy::NoMinimization), "Clause minimization strategy (NoMinimization, SimpleMinimization, LinearMinimization)")
 		("fluent-closure-usage", po::value<ginkgo::feedbackLoop::production::FluentClosureUsage>()->default_value(ginkgo::feedbackLoop::production::FluentClosureUsage::NoFluentClosure), "Usage of fluent closure (NoFluentClosure, UseFluentClosure)")
 		("constraints-to-extract", po::value<size_t>()->default_value(1000), "Extract <n> constraints")
@@ -64,8 +64,8 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	};
 
-	checkVariable("input", "No instance encoding specified");
-	checkVariable("output", "No output prefix specified");
+	checkVariable("input", "No input program specified");
+	checkVariable("output", "No output file prefix specified");
 	checkVariable("horizon", "Horizon (maximum time steps) unspecified");
 
 	const auto inputFileNames = variablesMap["input"].as<std::vector<std::string>>();
