@@ -18,7 +18,6 @@ namespace production
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: switch to plasp format
 constexpr const auto InductiveProofBaseEncoding =
 R"(
 % Degree of the candidate
