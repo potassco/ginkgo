@@ -41,6 +41,7 @@ Range<size_t> computeTimeRange(const Literals &literals)
 		const auto &timeArgument = symbol.arguments().back();
 		const size_t time = timeArgument.number();
 
+		// TODO: add unit test
 		// Actions require at least one preceding time step in order to check preconditions
 		if (std::strcmp(symbol.name(), "occurs") == 0
 		    || std::strcmp(symbol.name(), "caused") == 0
