@@ -42,8 +42,12 @@ Range<size_t> computeTimeRange(const Literals &literals)
 		const size_t time = timeArgument.number();
 
 		// Actions require at least one preceding time step in order to check preconditions
-		if (std::strcmp(symbol.name(), "occurs") == 0)
+		if (std::strcmp(symbol.name(), "occurs") == 0
+		    || std::strcmp(symbol.name(), "caused") == 0
+		    || std::strcmp(symbol.name(), "modified") == 0)
+		{
 			timeRange.min = std::min(timeRange.min, time - 1);
+		}
 		else
 			timeRange.min = std::min(timeRange.min, time);
 
