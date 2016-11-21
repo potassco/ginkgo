@@ -14,7 +14,7 @@ namespace ginkgo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static const std::set<std::string> supportedTimeIdentifiers =
-	{"apply", "del", "holds", "terminal"};
+	{"caused", "holds", "modified", "occurs"};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +42,7 @@ Range<size_t> computeTimeRange(const Literals &literals)
 		const size_t time = timeArgument.number();
 
 		// Actions require at least one preceding time step in order to check preconditions
-		if (std::strcmp(symbol.name(), "apply") == 0 || std::strcmp(symbol.name(), "del") == 0)
+		if (std::strcmp(symbol.name(), "occurs") == 0)
 			timeRange.min = std::min(timeRange.min, time - 1);
 		else
 			timeRange.min = std::min(timeRange.min, time);

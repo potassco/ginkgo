@@ -42,7 +42,7 @@ TEST_CASE("[constraints] The time arguments of temporal literals are parsed corr
 TEST_CASE("[constraints] Literal identifiers are collected correctly", "[constraints]")
 {
 	ginkgo::deprecated::SymbolTable symbolTable;
-	ginkgo::deprecated::Constraint a(0, ":- a, b, c, terminal, holds(f, 7), not apply(t, 1).", symbolTable);
+	ginkgo::deprecated::Constraint a(0, ":- a, b, c, terminal, holds(f, 7), not occurs(t, 1).", symbolTable);
 
 	REQUIRE(a.containsIdentifier("a"));
 	REQUIRE(a.containsIdentifier("terminal"));
@@ -50,7 +50,7 @@ TEST_CASE("[constraints] Literal identifiers are collected correctly", "[constra
 	REQUIRE_FALSE(a.containsIdentifier("e"));
 	REQUIRE_FALSE(a.containsIdentifier("f"));
 	REQUIRE_FALSE(a.containsIdentifier("7"));
-	REQUIRE(a.containsIdentifier("apply"));
+	REQUIRE(a.containsIdentifier("occurs"));
 }
 */
 
@@ -75,14 +75,14 @@ TEST_CASE("[constraints] Constraints are correctly generalized and subsumed", "[
 
 	CHECK(ob.str() == ":- holds(a,T), holds(b,T), holds(c,T), time(T).");
 
-	const auto d = ginkgo::parseGroundConstraint({"apply(a, 6)", "holds(b, 6)", "holds(c, 6)"});
+	const auto d = ginkgo::parseGroundConstraint({"occurs(a, 6)", "holds(b, 6)", "holds(c, 6)"});
 	const auto gd = ginkgo::GeneralizedConstraint(d);
 
 	// Actions may not be applied in time step 0 → ensure shift by one
 	std::stringstream od;
 	od << gd;
 
-	CHECK(od.str() == ":- apply(a,T+1), holds(b,T+1), holds(c,T+1), time(T), time(T+1).");
+	CHECK(od.str() == ":- holds(b,T+1), holds(c,T+1), occurs(a,T+1), time(T), time(T+1).");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ TEST_CASE("[constraints] Ground constraints are correctly subsumed by generalize
 	const auto ga = ginkgo::GeneralizedConstraint(a);
 	const auto b = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 2)"});
 	const auto gb = ginkgo::GeneralizedConstraint(b);
-	const auto c = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)", "apply(spam, 37)"});
+	const auto c = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 0)", "holds(c, 0)", "occurs(spam, 37)"});
 	const auto d = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 1)", "holds(spam, 37)"});
 	const auto e = ginkgo::parseGroundConstraint({"holds(a, 1)", "holds(b, 1)", "holds(c, 1)", "holds(spam, 37)"});
 	const auto f = ginkgo::parseGroundConstraint({"holds(a, 0)", "holds(b, 1)", "holds(c, 2)", "holds(spam, 37)"});
@@ -227,11 +227,11 @@ TEST_CASE("[constraints] Ground constraints are correctly subsumed by generalize
 
 TEST_CASE("[constraints] Generalized constraint subsumption works with actions", "[constraints]")
 {
-	const auto a = ginkgo::parseGroundConstraint({"apply(a, 1)", "holds(b, 2)", "holds(c, 4)"});
+	const auto a = ginkgo::parseGroundConstraint({"occurs(a, 1)", "holds(b, 2)", "holds(c, 4)"});
 	const auto ga = ginkgo::GeneralizedConstraint(a);
-	const auto b = ginkgo::parseGroundConstraint({"apply(a, 5)", "holds(b, 6)", "holds(c, 8)", "holds(spam, 37)"});
-	const auto c = ginkgo::parseGroundConstraint({"apply(a, 34)", "holds(b, 35)", "holds(c, 37)", "holds(spam, 37)"});
-	const auto d = ginkgo::parseGroundConstraint({"apply(a, 8)", "holds(b, 6)", "holds(c, 8)", "holds(spam, 37)"});
+	const auto b = ginkgo::parseGroundConstraint({"occurs(a, 5)", "holds(b, 6)", "holds(c, 8)", "holds(spam, 37)"});
+	const auto c = ginkgo::parseGroundConstraint({"occurs(a, 34)", "holds(b, 35)", "holds(c, 37)", "holds(spam, 37)"});
+	const auto d = ginkgo::parseGroundConstraint({"occurs(a, 8)", "holds(b, 6)", "holds(c, 8)", "holds(spam, 37)"});
 
 	CHECK(ginkgo::subsumes(ga, b));
 	CHECK(ginkgo::subsumes(ga, c));

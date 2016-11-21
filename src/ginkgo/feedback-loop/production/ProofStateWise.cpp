@@ -24,16 +24,23 @@ R"(
 time(0..degree).
 
 % Perform actions
-1 {apply(A, T) : action(A)} 1 :- time(T), T > 0.
+1 {occurs(Action, T) : action(Action)} 1 :- time(T), T > 0.
 
 % Check preconditions
-:- apply(A, T), demands(A, F, true), not holds(F, T - 1), time(T), time(T - 1).
-:- apply(A, T), demands(A, F, false), holds(F, T - 1), time(T), time(T - 1).
+:- occurs(Action, T), precondition(Action, Variable, Value), not holds(Variable, Value, T - 1), time(T), time(T - 1).
 
 % Apply effects
-holds(F, T) :- apply(A, T), adds(A, F), action(A), time(T).
-del(F, T) :- apply(A, T), deletes(A, F), action(A), time(T).
-holds(F, T) :- holds(F, T - 1), not del(F, T), time(T), time(T - 1).
+caused(Variable, Value, T) :- occurs(Action, T), postcondition(Action, _, Variable, Value).
+modified(Variable, T) :- caused(Variable, Value, T).
+
+holds(Variable, Value, T) :- caused(Variable, Value, T), time(T).
+holds(Variable, Value, T) :- holds(Variable, Value, T - 1), not modified(Variable, T), time(T), time(T - 1).
+
+% Check that variables have unique values
+:- variable(Variable), not 1 {holds(Variable, Value, T) : contains(Variable, Value)} 1, time(T).
+
+% Check mutexes
+:- mutexGroup(MutexGroup), not {holds(Variable, Value, T) : contains(MutexGroup, Variable, Value)} 1, time(T).
 
 % Eliminate all states complying with the constraint
 :- not candidateConstraint(0).
