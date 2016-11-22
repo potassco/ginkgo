@@ -1,4 +1,4 @@
-# ginkgo [![GitHub Release](https://img.shields.io/github/release/potassco/ginkgo.svg?maxAge=3600)](https://github.com/potassco/ginkgo/releases) [![Build Status](https://img.shields.io/travis/potassco/ginkgo/develop.svg?maxAge=3600&label=build (master))](https://travis-ci.org/potassco/ginkgo?branch=master) [![Build Status](https://img.shields.io/travis/potassco/ginkgo/develop.svg?maxAge=3600&label=build (develop))](https://travis-ci.org/potassco/ginkgo?branch=develop)
+# ginkgo [![GitHub Release](https://img.shields.io/github/release/potassco/ginkgo.svg?maxAge=3600)](https://github.com/potassco/ginkgo/releases) [![Build Status](https://img.shields.io/travis/potassco/ginkgo/master.svg?maxAge=3600&label=build (master))](https://travis-ci.org/potassco/ginkgo?branch=master) [![Build Status](https://img.shields.io/travis/potassco/ginkgo/develop.svg?maxAge=3600&label=build (develop))](https://travis-ci.org/potassco/ginkgo?branch=develop)
 
 > Generalize learned constraints with ASP
 
